@@ -1,39 +1,39 @@
 {
-    "RAR": "RAR",
-    "ZIP": "ZIP",
-    "GZIP": "GZIP",
-    "BZIP": "BZIP",
-    "ARJ": "ARJ",
-    "SZDD": "SZDD",
-    "CAB": "CAB",
-    "CHM": "CHM",
-    "OLE": {
-        "__desc__": "Object linking and embedding",
-        "__alias__": [
-            "OLE2"
-        ]
-    },
-    "TAR": "POSIX TAR",
-    "CPIO": "CPIO",
-    "BINHEX": "BINHEX",
-    "SIS": "SIS",
-    "NSIS": "Nullsoft Installation Language",
-    "AutoIt": "AutoIT scripts",
-    "ISHIELD": "ISHIELD",
     "7zip": {
-        "__desc__": "7zip",
         "__alias__": [
             "7Z"
-        ]
+        ],
+        "__desc__": "7zip"
     },
-    "ISO9660": "ISO9660",
-    "DMG": "DMG",
-    "XAR": "XAR",
-    "HFSPLUS": "HFSPLUS",
-    "XZ": "XZ",
-    "PASSWD": "Unix PASSWD",
-    "MBR": "Boot MBR",
-    "GPT": "Boot GPT",
     "APM": "APM",
-    "EGG": "EGG archive"
+    "ARJ": "ARJ",
+    "AutoIt": "AutoIT scripts",
+    "BINHEX": "BINHEX",
+    "BZIP": "BZIP",
+    "CAB": "CAB",
+    "CHM": "CHM",
+    "CPIO": "CPIO",
+    "DMG": "DMG",
+    "EGG": "EGG archive",
+    "GPT": "Boot GPT",
+    "GZIP": "GZIP",
+    "HFSPLUS": "HFSPLUS",
+    "ISHIELD": "ISHIELD",
+    "ISO9660": "ISO9660",
+    "MBR": "Boot MBR",
+    "NSIS": "Nullsoft Installation Language",
+    "OLE": {
+        "__alias__": [
+            "OLE2"
+        ],
+        "__desc__": "Object linking and embedding"
+    },
+    "PASSWD": "Unix PASSWD",
+    "RAR": "RAR",
+    "SIS": "SIS",
+    "SZDD": "SZDD",
+    "TAR": "POSIX TAR",
+    "XAR": "XAR",
+    "XZ": "XZ",
+    "ZIP": "ZIP"
 }

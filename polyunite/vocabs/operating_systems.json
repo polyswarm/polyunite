@@ -1,85 +1,85 @@
 {
-  "AndroidOS": {
-    "__alias__": [
-      "Andr",
-      "Android"
-    ],
-    "__desc__": "Android Phone OS"
-  },
-  "Boot": {
-    "__alias__": [
-      "Boot-DOS"
-    ],
-    "__desc__": "Uses or resides in the Master Boot Record (MBR) or DOS Boot Sector of an operating system"
-  },
-  "DOS": "MS-DOS",
-  "EPOC": "Psion devices",
-  "FreeBSD": "FreeBSD platform",
-  "Generic": {
-    "__alias__": [
-      "IGeneric",
-      "GenericPMF",
-      "GenericRI",
-      "GenericFC",
-      "Generic",
-      "Legacy",
-      "multios",
-      "Multi"
-    ]
-  },
-  "Linux": {
-    "__alias__": [
-      "ELF",
-      "ELF.Linux"
-    ],
-    "__desc__": "Linux platform"
-  },
-  "MacOS": {
-    "__alias__": [
-        "OSX",
-      "Mac OSX",
-      "Mac"
-    ],
-      "__desc__": "MACOSX 10.0 or later"
-  },
-  "OS2": "OS2 platform",
-  "Palm": "Palm operating system",
-  "Script": "Interpreted",
-  "Solaris": "System V-based Unix platforms",
-  "SunOS": "Unix platforms 4.1.3 or lower",
-  "SymbOS": "Symbian operating system",
-  "UKP": {},
-  "UNIX": {
-    "__desc__": "general Unix platforms"
-  },
-  "Windows": {
-    "Win16": "Win16 (3.1) platform",
-    "Win2K": "Windows 2000 platform",
-    "Win32": {
-      "__alias__": [
-        "W32"
-      ],
-      "__desc__": "Windows 32-bit platform"
+    "AndroidOS": {
+        "__alias__": [
+            "Andr",
+            "Android"
+        ],
+        "__desc__": "Android Phone OS"
     },
-    "Win64": {
-      "__alias__": [
-        "W64"
-      ],
-      "__desc__": "Windows 64-bit platform"
+    "Boot": {
+        "__alias__": [
+            "Boot-DOS"
+        ],
+        "__desc__": "Uses or resides in the Master Boot Record (MBR) or DOS Boot Sector of an operating system"
     },
-    "Win95": "Windows 95, 98 and ME platforms",
-    "Win98": "Windows 98 platform only",
-    "WinCE": "Windows CE platform",
-    "WinNT": "WinNT",
-    "__alias__": [
-      "Win32/64"
-    ],
-    "__desc__": "Microsoft windows"
-  },
-  "iPhoneOS": {
-    "__alias__": [
-      "IOS"
-    ],
-    "__desc__": "IPhone"
-  }
+    "DOS": "MS-DOS",
+    "EPOC": "Psion devices",
+    "FreeBSD": "FreeBSD platform",
+    "Generic": {
+        "__alias__": [
+            "IGeneric",
+            "GenericPMF",
+            "GenericRI",
+            "GenericFC",
+            "Generic",
+            "Legacy",
+            "multios",
+            "Multi"
+        ]
+    },
+    "Linux": {
+        "__alias__": [
+            "ELF",
+            "ELF.Linux"
+        ],
+        "__desc__": "Linux platform"
+    },
+    "MacOS": {
+        "__alias__": [
+            "OSX",
+            "Mac OSX",
+            "Mac"
+        ],
+        "__desc__": "MACOSX 10.0 or later"
+    },
+    "OS2": "OS2 platform",
+    "Palm": "Palm operating system",
+    "Script": "Interpreted",
+    "Solaris": "System V-based Unix platforms",
+    "SunOS": "Unix platforms 4.1.3 or lower",
+    "SymbOS": "Symbian operating system",
+    "UKP": {},
+    "UNIX": {
+        "__desc__": "general Unix platforms"
+    },
+    "Windows": {
+        "Win16": "Win16 (3.1) platform",
+        "Win2K": "Windows 2000 platform",
+        "Win32": {
+            "__alias__": [
+                "W32"
+            ],
+            "__desc__": "Windows 32-bit platform"
+        },
+        "Win64": {
+            "__alias__": [
+                "W64"
+            ],
+            "__desc__": "Windows 64-bit platform"
+        },
+        "Win95": "Windows 95, 98 and ME platforms",
+        "Win98": "Windows 98 platform only",
+        "WinCE": "Windows CE platform",
+        "WinNT": "WinNT",
+        "__alias__": [
+            "Win32/64"
+        ],
+        "__desc__": "Microsoft windows"
+    },
+    "iPhoneOS": {
+        "__alias__": [
+            "IOS"
+        ],
+        "__desc__": "IPhone"
+    }
 }
