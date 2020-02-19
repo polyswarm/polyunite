@@ -13,6 +13,7 @@ Features
 --------
 
 To view a sample of how each ``polyunite`` breaks down each classification string, run::
+
   python tests/colorize.py
 
 

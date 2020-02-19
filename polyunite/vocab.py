@@ -21,10 +21,10 @@ class VocabRegex:
         self.name = name
         self.fields = fields
 
-    def build(self, name=None, exclude=[]):
+    def build(self, **kwargs):
         return '(?P<{name}>{fields})'.format(
-            name=name or self.name,
-            fields='|'.join([k for k, _ in self.visitor(self.fields, exclude=exclude)])
+            name=kwargs.get('name', self.name),
+            fields='|'.join([k for k, _ in self.visitor(self.fields, exclude=kwargs.get('exclude', []))])
         )
 
     @classmethod
