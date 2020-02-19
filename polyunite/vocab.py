@@ -1,19 +1,21 @@
-import string
 import json
+from typing import Dict, Mapping, Union
+
 import pkg_resources
-from typing import Any, Dict, List, Mapping, Optional, Type, Union
+
+from polyunite.utils import trx
+
 
 def load_vocab(name):
     return json.load(pkg_resources.resource_stream(__name__, f'vocabs/{name}.json'))
 
 
-DELNONALPHA = str.maketrans(
-    string.ascii_uppercase, string.ascii_lowercase, string.punctuation + string.whitespace
-)
-
 class VocabRegex:
     name: str
     fields: Dict[str, Union[Dict, str]]
+
+    def __str__(self):
+        return self.build()
 
     def __init__(self, name, fields):
         self.name = name
@@ -31,16 +33,13 @@ class VocabRegex:
             name=name, fields='|'.join([v.build(exclude=kwargs.get('exclude', [])) for v in vocabs])
         )
 
-    def __str__(self):
-        return self.build()
-
     def find(self, groups):
         value = groups.get(self.name)
-        needle = value.translate(DELNONALPHA)
+        needle = trx(value)
         if not value or not needle:
             return needle
         for k, path in self.visitor(self.fields):
-            if k.translate(DELNONALPHA) == needle:
+            if trx(k) == needle:
                 return path[0]
         return None  # f'(NOTFOUND)[{needle}]'
 
@@ -58,8 +57,6 @@ class VocabRegex:
 
 
 heuristics = ['heur[a-z]*', 'gen(eric)?' 'agent']
-
-
 
 # Provides extra detail about the malware, including how it is used as part of a multicomponent
 # threat. In the example above,

@@ -1,9 +1,9 @@
 # enum identifiers are sourced from https://maecproject.github.io/documentation/maec5-docs/#introduction
-import csv
+from collections import UserDict
 import re
-import string
-from typing import Any, ClassVar, Dict, List, Optional, Type, Union
+from typing import Any, Dict, Optional
 
+from polyunite.utils import trx
 from polyunite.vocab import (
     ARCHIVES,
     EXPLOITS,
@@ -15,14 +15,19 @@ from polyunite.vocab import (
     VocabRegex,
 )
 
-SCHEMES = {}
-DELNONALPHA = str.maketrans(
-    string.ascii_uppercase, string.ascii_lowercase, string.punctuation + string.whitespace
-)
+
+class EngineSchemes(UserDict):
+    def __setitem__(self, k, v):
+        return super().__setitem__(trx(k), v)
+
+    def __getitem__(self, k):
+        return super().__getitem__(trx(k))
+
+    def __contains__(self, k):
+        return super().__contains__(trx(k))
 
 
-def trx(ss: str):
-    return ss.translate(DELNONALPHA)
+Schemes = EngineSchemes()
 
 
 class NamingScheme:
@@ -33,14 +38,13 @@ class NamingScheme:
     @classmethod
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        name = trx(cls.__name__)
-        SCHEMES[name] = cls
+        Schemes[cls.__name__] = cls
 
     def __init__(self, classification: str):
         normalized = classification
         self.match = self.rgx.match(normalized)
-        self.values = {}
         if self.match:
+            self.values = {}
             for k, v in self.match.groupdict().items():
                 if not k.isupper():
                     raise ValueError("Must supply upper-cased group names")
@@ -77,7 +81,7 @@ class NamingScheme:
         )
 
     def colorize(self):
-        """Return a colorized classification string (works in Unix/VT200+ only)"""
+        """Colorize a classification string"""
         if not self.match:
             return None
         black = '\033[30m'
@@ -104,13 +108,14 @@ class NamingScheme:
             'EXTRA': white,
             'LANGS': red,
             'EXPLOIT': white,
-            'BEHAVIOR': white,
+            'BEHAVIOR': white
         }
         ss = self.match.string
         for name, mt in self.match.groupdict().items():
             if name not in gr_color or not mt:
                 continue
             start = self.match.start(name)
+            # be lazyi in finding the new location mod ANSI color codes.
             idx = ss.find(mt, start)
             end = idx + len(mt)
             ss = ss[:idx] + gr_color[name] + mt + reset + ss[end:]
@@ -218,17 +223,3 @@ class Rising(NamingScheme):
 
 class Virusdie(NamingScheme):
     rgx = re.compile(rf"((?P<LABEL>\w+)\.)?((?P<BEHAVIOR>\w+)\.)?(?P<EXTRA>\w*)")
-
-
-def seen(f):
-    with open(f, newline='') as csvfile:
-        yield from csv.reader(csvfile)
-
-
-for name, family in seen('engine_families.csv'):
-    engine = trx(name)
-    if engine in SCHEMES:
-        # print("ENGINE: %s = %s" % (engine, NamingScheme._engines[NamingScheme.to_engine(engine)].rgx))
-        res = SCHEMES[engine](family)
-        print(res.colorize())
-        # print(res)

@@ -5,8 +5,6 @@ polyunite
 
 
 
-
-
 polyunite parses a variety of antimalware vendor's classification strings
 
 
@@ -14,13 +12,8 @@ polyunite parses a variety of antimalware vendor's classification strings
 Features
 --------
 
-* TODO
+To view a sample of how each ``polyunite`` breaks down each classification string, run::
+  python tests/colorize.py
 
-Credits
--------
 
-This package was created with Cookiecutter_ and the `elgertam/cookiecutter-pipenv`_ project template, based on `audreyr/cookiecutter-pypackage`_.
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`elgertam/cookiecutter-pipenv`: https://github.com/elgertam/cookiecutter-pipenv
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+You can view the color correspondence in `polyunite/polyunite.py`
