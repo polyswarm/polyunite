@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Mapping, Union
+from typing import Dict, Iterator, List, Mapping, Optional, Tuple, Union
 
 import pkg_resources
 
@@ -7,6 +7,7 @@ from polyunite.utils import trx
 
 
 def load_vocab(name):
+    # these identifiers are sourced from https://maecproject.github.io/documentation/maec5-docs/#introduction
     return json.load(pkg_resources.resource_stream(__name__, f'vocabs/{name}.json'))
 
 
@@ -21,19 +22,20 @@ class VocabRegex:
         self.name = name
         self.fields = fields
 
-    def build(self, **kwargs):
+    def build(self, **kwargs) -> str:
         return '(?P<{name}>{fields})'.format(
             name=kwargs.get('name', self.name),
             fields='|'.join([k for k, _ in self.visitor(self.fields, exclude=kwargs.get('exclude', []))])
         )
 
     @classmethod
-    def combine(cls, name, *vocabs, **kwargs):
+    def combine(cls, name, *vocabs, **kwargs) -> str:
         return '(?P<{name}>({fields}))'.format(
             name=name, fields='|'.join([v.build(exclude=kwargs.get('exclude', [])) for v in vocabs])
         )
 
-    def find(self, groups):
+    def find(self, groups) -> Optional[str]:
+        "Attempt to extract & normalize a group with the same name as this ``VocabRegex``"
         value = groups.get(self.name)
         needle = trx(value)
         if not value or not needle:
@@ -43,7 +45,7 @@ class VocabRegex:
                 return path[0]
         return None  # f'(NOTFOUND)[{needle}]'
 
-    def visitor(self, kv, exclude=[], path=[]):
+    def visitor(self, kv, exclude=[], path=[]) -> Iterator[Tuple[str, List[str]]]:
         for k in kv:
             if k == '__alias__':
                 for alias in kv[k]:

@@ -1,4 +1,3 @@
-# enum identifiers are sourced from https://maecproject.github.io/documentation/maec5-docs/#introduction
 from collections import UserDict
 import re
 from typing import Any, Dict, Optional
@@ -17,6 +16,7 @@ from polyunite.vocab import (
 
 
 class EngineSchemes(UserDict):
+    """A fancy dictionary for holding each engine, with easy lookup"""
     def __setitem__(self, k, v):
         return super().__setitem__(trx(k), v)
 
@@ -55,23 +55,23 @@ class NamingScheme:
         return str(self.__class__.__name__)
 
     @property
-    def heuristic(self):
+    def heuristic(self) -> str:
         return None
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.values.get('NAME')
 
     @property
-    def operating_system(self):
+    def operating_system(self) -> str:
         return OSES.find(self.values)
 
     @property
-    def script(self):
+    def script(self) -> str:
         return LANGS.find(self.values)
 
     @property
-    def label(self):
+    def label(self) -> str:
         return LABELS.find(self.values)
 
     def __repr__(self):
@@ -80,7 +80,7 @@ class NamingScheme:
             engine=self.engine, fields=", ".join([f'{f}={v}' for f, v in fields.items() if v])
         )
 
-    def colorize(self):
+    def colorize(self) -> str:
         """Colorize a classification string"""
         if not self.match:
             return None

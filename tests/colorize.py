@@ -1,8 +1,8 @@
 import csv
 import os
+import sys
 
 import polyunite
-import sys
 
 
 def seen(f):
