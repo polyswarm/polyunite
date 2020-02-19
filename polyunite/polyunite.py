@@ -43,36 +43,7 @@ class NamingScheme:
     def __init__(self, classification: str):
         normalized = classification
         self.match = self.rgx.match(normalized)
-        if self.match:
-            self.values = {}
-            for k, v in self.match.groupdict().items():
-                if not k.isupper():
-                    raise ValueError("Must supply upper-cased group names")
-                self.values[k] = v if v else ''
-
-    @property
-    def engine(self) -> str:
-        return str(self.__class__.__name__)
-
-    @property
-    def heuristic(self) -> str:
-        return None
-
-    @property
-    def name(self) -> str:
-        return self.values.get('NAME')
-
-    @property
-    def operating_system(self) -> str:
-        return OSES.find(self.values)
-
-    @property
-    def script(self) -> str:
-        return LANGS.find(self.values)
-
-    @property
-    def label(self) -> str:
-        return LABELS.find(self.values)
+        self.build_values(self.match)
 
     def __repr__(self):
         fields = {f: getattr(self, f, None) for f in ('name', 'operating_system', 'script', 'label')}
@@ -96,21 +67,21 @@ class NamingScheme:
         reset = '\033[0m'
         gr_color = {
             'NAME': red,
-            'PLATFORM': underline,
+            'PLATFORM': magenta + underline,
             'LABEL': yellow,
             'VENDORID': blue,
             'PREFIX': cyan,
             'CONFIDENCE': underline,
-            'OPERATINGSYSTEM': underline + magenta,
             'FAMILY': red,
             'VARIANT': green,
             'OBFUSCATION': black,
             'EXTRA': white,
             'LANGS': red,
             'EXPLOIT': white,
+            'DDOS': white,
             'BEHAVIOR': white
         }
-        ss = self.match.string
+        ss = self.classification_name
         for name, mt in self.match.groupdict().items():
             if name not in gr_color or not mt:
                 continue
@@ -118,8 +89,48 @@ class NamingScheme:
             # be lazyi in finding the new location mod ANSI color codes.
             idx = ss.find(mt, start)
             end = idx + len(mt)
-            ss = ss[:idx] + gr_color[name] + mt + reset + ss[end:]
+            further = ss[end+1:].find(reset)
+            ss = ss[:idx] + gr_color[name] + mt + (reset if further == -1 else '') + ss[end:]
         return ss
+
+    # override these methods to change how an engine sources particular features.
+    # extracted from the source match.
+    @property
+    def classification_name(self) -> str:
+        return self.match.string
+
+    @property
+    def av_vendor(self) -> str:
+        return str(self.__class__.__name__)
+
+    @property
+    def heuristic(self) -> str:
+        return None
+
+    @property
+    def name(self) -> str:
+        return self.values.get('NAME')
+
+    @property
+    def operating_system(self) -> str:
+        return OSES.find(self.values)
+
+    @property
+    def script(self) -> str:
+        return LANGS.find(self.values)
+
+    @property
+    def label(self) -> str:
+        return LABELS.find(self.values)
+
+    def build_values(self, match):
+        if match:
+            self.values = {}
+            for k, v in match.groupdict().items():
+                if not k.isupper():
+                    raise ValueError("Must supply upper-cased group names")
+                self.values[k] = v if v else ''
+
 
 
 class Alibaba(NamingScheme):
@@ -213,12 +224,19 @@ class QuickHeal(NamingScheme):
 class Rising(NamingScheme):
     rgx = re.compile(
         rf"^((?P<LABEL>\w+))?"
-        rf"(?=.).((?P<FAMILY>[\/\w]*?)\.)?"
-        rf"(?P<NAME>[^!\s\/\.]+)?"
-        rf"(\.(?P<VARIANT>\w+))?"
-        rf"(/{PLATFORM_REGEXES})?"
-        rf"(\!(?P<EXTRA>.*))?$"
+        r"(\.(?P<EXPLOIT>Exploit))?"
+        r"(\.(?P<DDOS>DDoSer))?"
+        rf"(((((^|\/|\.)({PLATFORM_REGEXES})))|((\.|\/)(?P<FAMILY>[\-\w]+))))*"
+        rf"((\#|\@|\!|\.)(?P<VARIANT>.*))$"
     )
+    def build_values(self, match):
+        if match:
+            self.values = {}
+            for k, v in match.groupdict().items():
+                if not k.isupper():
+                    raise ValueError("Must supply upper-cased group names")
+                self.values[k] = v if v else ''
+
 
 
 class Virusdie(NamingScheme):

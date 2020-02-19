@@ -20,7 +20,7 @@ elif len(sys.argv) == 2:
     if sys.argv[1] == '-r':
         # print regular expressions for each engine
         for name, engine in polyunite.Schemes.items():
-            print("%s: \n\n%s\n" % (name, engine.rgx))
+            print("%s: \n%s\n" % (name, engine.rgx.pattern))
         sys.exit(0)
 
 raise NotImplementedError
