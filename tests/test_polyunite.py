@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """Tests for `polyunite` package."""
 
 import pytest
-
 
 from polyunite import polyunite
 
