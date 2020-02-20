@@ -15,13 +15,8 @@
     "DOS": "MS-DOS",
     "EPOC": "Psion devices",
     "FreeBSD": "FreeBSD platform",
-    "Generic": {
+    "Multi": {
         "__alias__": [
-            "IGeneric",
-            "GenericPMF",
-            "GenericRI",
-            "GenericFC",
-            "Generic",
             "Legacy",
             "multios",
             "Multi"
@@ -38,6 +33,7 @@
         "__alias__": [
             "OSX",
             "Mac OSX",
+            "MacOSX",
             "Mac"
         ],
         "__desc__": "MACOSX 10.0 or later"

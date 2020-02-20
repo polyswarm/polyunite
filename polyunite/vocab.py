@@ -28,10 +28,9 @@ class VocabRegex:
             fields='|'.join([k for k, _ in self.visitor(self.fields, exclude=kwargs.get('exclude', []))])
         )
 
-    @classmethod
-    def combine(cls, name, *vocabs, **kwargs) -> str:
+    def combine(self, name, *vocabs, **kwargs) -> str:
         return '(?P<{name}>({fields}))'.format(
-            name=name, fields='|'.join([v.build(exclude=kwargs.get('exclude', [])) for v in vocabs])
+            name=name, fields='|'.join([v.build(exclude=kwargs.get('exclude', [])) for v in [self] + list(vocabs)])
         )
 
     def find(self, groups=None, value=None) -> Optional[str]:
@@ -71,4 +70,4 @@ ARCHIVES = VocabRegex('ARCHIVES', load_vocab('archives'))
 MACROS = VocabRegex('MACROS', load_vocab('macros'))
 OSES = VocabRegex('OPERATINGSYSTEM', load_vocab('operating_systems'))
 HEURISTICS = VocabRegex('HEURISTICS', load_vocab('heuristics'))
-PLATFORM_REGEXES = VocabRegex.combine('PLATFORM', ARCHIVES, MACROS, OSES, LANGS)
+PLATFORM_REGEXES = OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)

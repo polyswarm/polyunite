@@ -28,8 +28,6 @@ GROUP_COLORS = {
     'FAMILY': red,
     'VARIANT': green,
     'OBFUSCATION': black,
-    'EXTRA': white,
     'EXPLOIT': white,
     'DDOS': white,
-    'BEHAVIOR': white
 }
