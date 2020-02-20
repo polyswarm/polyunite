@@ -1,0 +1,71 @@
+{
+    "generic": {
+        "__alias__": [
+            "generic",
+            "generik",
+            "gen",
+            "genmalicious",
+            "generickd",
+            "tsgeneric",
+            "genericr",
+            "heuristic",
+            "heur",
+            "siggen",
+            "genetic",
+            "genome",
+            "cloud",
+            "kcloud",
+            "memscan",
+            "score",
+            "attribute",
+            "advml",
+            "bloodhound",
+            "sape",
+            "maltrec",
+            "symvt",
+            "igeneric",
+            "eheur",
+            "undefined",
+            "static"
+        ],
+        "__desc__": "Generic virus detection"
+    },
+    "family": {
+        "__alias__": [
+            "agent",
+            "eldorado",
+            "artemis",
+            "krap",
+            "kazy",
+            "katusha",
+            "pornoasset",
+            "foreign",
+            "symmi",
+            "jorik",
+            "graftor",
+            "strictor"
+        ],
+        "__desc__": "Contains characteristics usual of a particular class of viruses"
+    },
+    "suspicious": {
+        "__alias__": [
+            "suspected",
+            "suspect",
+            "suspicious",
+            "susp",
+            "suspic",
+            "suspectcrc",
+            "reputation",
+            "behaveslike",
+            "lookslike",
+            "variant",
+            "based",
+            "possible",
+            "threat",
+            "probably",
+            "confidence",
+            "highconfidence"
+        ],
+        "__desc__": "Suspicious behavior without signature match"
+    }
+}

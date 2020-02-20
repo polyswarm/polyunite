@@ -34,12 +34,15 @@ class VocabRegex:
             name=name, fields='|'.join([v.build(exclude=kwargs.get('exclude', [])) for v in vocabs])
         )
 
-    def find(self, groups) -> Optional[str]:
+    def find(self, groups=None, value=None) -> Optional[str]:
         "Attempt to extract & normalize a group with the same name as this ``VocabRegex``"
-        value = groups.get(self.name)
+        if value is None:
+            if groups is None:
+                return None
+            value = groups.get(self.name)
         needle = trx(value)
-        if not value or not needle:
-            return needle
+        if not needle:
+            return None
         for k, path in self.visitor(self.fields):
             if trx(k) == needle:
                 return path[0]
@@ -58,8 +61,6 @@ class VocabRegex:
                 yield from self.visitor(kv[k], exclude=exclude, path=path + [k])
 
 
-heuristics = ['heur[a-z]*', 'gen(eric)?' 'agent']
-
 # Provides extra detail about the malware, including how it is used as part of a multicomponent
 # threat. In the example above,
 SUFFIXES = VocabRegex('SUFFIX', load_vocab('suffixes'))
@@ -69,4 +70,5 @@ LANGS = VocabRegex('LANGS', load_vocab('langs'))
 ARCHIVES = VocabRegex('ARCHIVES', load_vocab('archives'))
 MACROS = VocabRegex('MACROS', load_vocab('macros'))
 OSES = VocabRegex('OPERATINGSYSTEM', load_vocab('operating_systems'))
+HEURISTICS = VocabRegex('HEURISTICS', load_vocab('heuristics'))
 PLATFORM_REGEXES = VocabRegex.combine('PLATFORM', ARCHIVES, MACROS, OSES, LANGS)

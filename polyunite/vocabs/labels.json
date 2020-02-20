@@ -29,10 +29,45 @@
         ],
         "__desc__": "A tool used to perform a distributed denial of service attack."
     },
-    "downloader": "Malware programmed to download and execute other files, usually more complex malware.",
+    "downloader": {
+        "__alias__": [
+            "downloader",
+            "downldr",
+            "dloader",
+            "dwnldr",
+            "dldr",
+            "dloadr",
+            "dloade",
+            "download",
+            "dload",
+            "downware",
+            "downagent",
+            "trojandownloader",
+            "trojandwnldr",
+            "trjndwnlder",
+            "exedown",
+            "downldexe",
+            "dropped",
+            "docdl",
+            "macrodown",
+            "downloadware",
+            "dloadware"
+        ],
+        "__desc__": "Malware programmed to download and execute other files, usually more complex malware."
+    },
     "dropper": {
         "__alias__": [
-            "trojan-dropper"
+            "trojan-dropper",
+            "docdrop",
+            "docdrp",
+            "dropper",
+            "drop",
+            "dropr",
+            "dldrop",
+            "mdropper",
+            "muldrop",
+            "exedrop",
+            "droppr"
         ],
         "__desc__": "A type of Trojan that deposits an enclosed payload onto a destination host computer by loading itself into memory, extracting the malicious payload, and then writing it to the file system."
     },
@@ -42,7 +77,18 @@
     "fork-bomb": "A simple form of malware, a type of rabbit which launches more copies of itself. Once a fork bomb is executed, it will attempt to run several identical processes, which will do the same, the number growing exponentially until the system resources are overwhelmed by the number of identical processes running, which may in some cases bring the system down and cause a denial of service.",
     "greyware": {
         "__alias__": [
+            "tool",
+            "risktool",
+            "securitytool",
+            "fraudtool",
+            "virtool",
+            "keygen",
+            "hack",
             "hacktool",
+            "hktl",
+            "spamtool",
+            "crack",
+            "cracktool",
             "pua",
             "joke",
             "program",
@@ -77,7 +123,11 @@
     "malware-as-a-service": "Malware that is sold or produced as a service.",
     "mass-mailer": {
         "__alias__": [
-            "spammer"
+            "email",
+            "spammer",
+            "smtp",
+            "spam",
+            "spambot"
         ],
         "__desc__": "A worm that uses email to propagate across the internet."
     },
@@ -85,6 +135,34 @@
     "mid-infector": "A type of file-infecting virus which places its code in the middle of files it infects. It may move a section of the original code to the end of the file, or simply push the code aside to make space for its own code.",
     "mobile-code": "Either code received from remote, possibly untrusted systems, but executed on a local system; or software transferred between systems (e.g across a network) and executed on a local system without explicit installation or execution by the recipient.",
     "multipartite-virus": "Malware that infects boot records, boot sectors, and files.",
+    "nonmalware": {
+        "__alias__": [
+            "not-a-virus",
+            "eicar",
+            "test",
+            "testfile",
+            "testvirus",
+            "tool",
+            "risktool",
+            "securitytool",
+            "keygen",
+            "hack",
+            "hacktool",
+            "hktl",
+            "spamtool",
+            "crack",
+            "cracktool",
+            "pua",
+            "joke",
+            "risktool",
+            "riskware",
+            "virtool",
+            "misleading",
+            "settings-modifier",
+            "hoax"
+        ],
+        "__desc__": "Not a virus"
+    },
     "parental-control": {
         "__alias__": [
             "monitoring-tool"
@@ -95,7 +173,9 @@
         "__alias__": [
             "pws",
             "trojanpws",
-            "stealer"
+            "stealer",
+            "pwstealer",
+            "infostealer"
         ],
         "__desc__": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system."
     },
@@ -125,12 +205,20 @@
         "__desc__": "A type of virus that encrypts its code differently with each infection (or with each generation of infections)."
     },
     "premium-dialer-smser": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers.",
-    "prepender": "A file-infecting virus that inserts code at the beginning of the files it infects.",
+    "prepender": {
+        "__alias__": ["hllp"],
+        "__desc__": "A file-infecting virus that inserts code at the beginning of the files it infects."
+    },
     "ransomware": {
         "__alias__": [
             "ansom",
             "ransom",
-            "trojan-ransom"
+            "trojan-ransom",
+            "ransomlock",
+            "ransomcrypt",
+            "ransomware",
+            "filecoder",
+            "filecryptor"
         ],
         "__desc__": "Malware that encrypts files on a victim's system, demanding payment of ransom in return for the access codes required to unlock files."
     },
@@ -143,7 +231,14 @@
     },
     "resource-exploiter": {
         "__alias__": [
-            "zipbomb"
+            "zipbomb",
+            "miner",
+            "coinmine",
+            "coinminer",
+            "bitcoinminer",
+            "bitcoin",
+            "btcmine",
+            "bitminer"
         ],
         "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner."
     },
@@ -159,7 +254,9 @@
     "security-assessment-tool": "A program that can be used to gather information for unauthorized access to computer systems.",
     "shellcode": {
         "__alias__": [
+            "shellkode",
             "exploit",
+            "expl",
             "exp"
         ],
         "__desc__": "Either a small piece of code that activates a command-line interface to a system that can be used to disable security measures, open a backdoor, or download further malicious code; or a small piece of code that opens a system up for exploitation, sometimes by not necessarily involving a command-line shell."
@@ -168,7 +265,8 @@
     "test": {
         "__alias__": [
             "eicar",
-            "testfile"
+            "testfile",
+            "testvirus"
         ],
         "__desc__": "A test file, not actually a virus"
     },
@@ -196,7 +294,8 @@
             "p2p-worm",
             "im-worm",
             "irc-worm",
-            "email-worm"
+            "email-worm",
+            "hllw"
         ],
         "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."
     }

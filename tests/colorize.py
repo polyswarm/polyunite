@@ -13,7 +13,22 @@ def seen(f):
 if len(sys.argv) == 1:
     for name, family in seen(f'{os.path.dirname(__file__)}/fixtures/engine_families.csv'):
         if name in polyunite.Schemes:
-            print('%-10s' % name, polyunite.Schemes[name](family).colorize())
+            sch = polyunite.Schemes[name](family)
+            try:
+                print(
+                    '{:<10} {:1} {:1} {:>9.9} {:>10.10} {:>12.12} {:85}'.format(
+                        name,
+                        'H' if sch.heuristic else ' ',
+                        'T' if sch.malice_unlikely else ' ',
+                        str(sch.operating_system or '    '),
+                        str(sch.label),
+                        str(sch.name),
+                        sch.colorize(),
+                    )
+                )
+            except TypeError as e:
+                print("Couldn't parse '%s' as a %s name" % (family, name))
+                print("Err: ", e)
     sys.exit(0)
 
 elif len(sys.argv) == 2:

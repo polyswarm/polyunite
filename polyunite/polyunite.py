@@ -2,29 +2,16 @@ from collections import UserDict
 import re
 from typing import Any, Dict, Optional
 
-from polyunite.utils import (
-    GROUP_COLORS,
-    black,
-    blue,
-    cyan,
-    green,
-    magenta,
-    red,
-    reset,
-    trx,
-    underline,
-    white,
-    yellow,
-)
+from polyunite.utils import GROUP_COLORS, reset, trx
 from polyunite.vocab import (
     ARCHIVES,
     EXPLOITS,
+    HEURISTICS,
     LABELS,
     LANGS,
     MACROS,
     OSES,
     PLATFORM_REGEXES,
-    VocabRegex,
 )
 
 
@@ -49,8 +36,8 @@ class BaseNameScheme:
     rgx: re.Pattern
 
     @classmethod
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
+    def __init_subclass__(cls):
+        super().__init_subclass__()
         Schemes[cls.__name__] = cls
 
     def __init__(self, classification: str):
@@ -59,8 +46,8 @@ class BaseNameScheme:
 
     def __repr__(self):
         fields = {f: getattr(self, f, None) for f in ('name', 'operating_system', 'script', 'label')}
-        return '<{engine}.scheme({fields})>'.format(
-            engine=self.engine, fields=", ".join([f'{f}={v}' for f, v in fields.items() if v])
+        return '<{av_vendor}.scheme({fields})>'.format(
+            av_vendor=self.av_vendor, fields=", ".join([f'{f}={v}' for f, v in fields.items() if v])
         )
 
     def colorize(self) -> str:
@@ -72,7 +59,8 @@ class BaseNameScheme:
             # be lazyi in finding the new location mod ANSI color codes.
             idx = ss.rfind(mt)
             end = idx + len(mt)
-            ss = ss[:idx] + GROUP_COLORS.get(name, '') + mt + (reset if ss[end:].find(reset) == -1 else '') + ss[end:]
+            ss = ss[:idx] + GROUP_COLORS.get(name, '') + mt + (reset if ss[end:].find(reset) == -1 else
+                                                               '') + ss[end:]
         return ss
 
     def match_raw(self, rgx) -> Optional[re.Match]:
@@ -83,34 +71,32 @@ class BaseNameScheme:
     # extracted from the source match.
     @property
     def classification_name(self) -> str:
-        return self.match.string
+        return self.match.string if self.match else None
 
     @property
     def av_vendor(self) -> str:
         return str(self.__class__.__name__)
 
     @property
-    def heuristic(self) -> Optional[int]:
-        if self.match_raw(r'[^a-z](Heur|Heuristic)[^a-z]'):
-            return 50
-        if self.match_raw(r'[^a-z]Agent[^a-z]'):
-            25
-        if self.match_raw(r'[^a-z][a-z]?Generic\w*[^a-z]'):
-            15
-        if self.label == 'greyware':
-            return 35
-        return 0
+    def heuristic(self) -> Optional[bool]:
+        if self.values.get('HEURISTIC'):
+            return True
+        else:
+            for field in filter(None, map(self.values.get, ('LABEL', 'FIELDS', 'NAME', 'FAMILY'))):
+                if HEURISTICS.find(value=field):
+                    return True
+        return False
 
     @property
-    def is_test(self) -> bool:
+    def malice_unlikely(self) -> bool:
         """*IMPERFECT* predicate for checking if a classification string suggests the file isn't malware"""
-        if self.match_raw(r'\WEICAR[^a-z]'):
+        if self.match_raw(r'(\b|[^a-z])(not-a-virus|notavirus|eicar|test|testfile|testvirus)([^a-z]|\b)'):
             return True
         return self.label == 'test'
 
     @property
     def name(self) -> str:
-        return self.values.get('NAME')
+        return self.values.get('NAME') or self.values.get('FAMILY')
 
     @property
     def operating_system(self) -> str:
@@ -155,9 +141,9 @@ class ClamAV(BaseNameScheme):
 
 class DrWeb(BaseNameScheme):
     rgx = re.compile(
-        rf"^((?P<CONFIDENCE>probably|modification)\s*(of)?\s*)?"
+        rf"^({HEURISTICS}\s*(of)?\s*)?"
         rf"({EXPLOITS}\.)?"
-        rf"{PLATFORM_REGEXES}?"
+        rf"{OSES.combine('PLATFORM', OSES, ARCHIVES, MACROS, LANGS)}?"
         rf"((\.|^)(?P<LABEL>[A-Za-z]*))?"
         rf"((\.|^)((?P<NAME>(?P<FAMILY>[A-Za-z][-\w\.]+?))((\.|$)(?P<VARIANT>[0-9]+))?))?"
         rf"(\.?(?P<SUFFIX>(origin|based)))?$"
@@ -167,7 +153,7 @@ class DrWeb(BaseNameScheme):
 class Ikarus(BaseNameScheme):
     rgx = re.compile(
         r"^((?P<OBFUSCATION>Packed)\.)?"
-        r"((?P<CONFIDENCE>not\-a\-virus|HEUR)(\.|\:))?"
+        rf"(?P<HEURISTIC>[-\w+]+?\:)?"
         r"((?P<LABEL>[\w-]*?))?"
         rf"((^|[^\w]){PLATFORM_REGEXES})?"
         r"(\.(?P<NAME>..+))?$"
@@ -236,15 +222,18 @@ class Rising(BaseNameScheme):
 
     @property
     def heuristic(self):
-        cf = trx(self.CONFIDENCE)
-        lb = trx(self.LABEL)
+        result = super().heuristic
+        if result:
+            return result
+        cf = trx(self.values.get('CONFIDENCE'))
+        lb = trx(self.values.get('LABEL'))
         if cf == trx('Heuristic'):
             # extract number from ET#96%
-            return self.VARIANT[4:6]
+            return True
         elif cf == trx('Agent'):
-            return 80
+            return True
         elif cf == "Heur" or lb == 'Heur' or lb == 'Generic':
-            return 65
+            return True
         return False
 
 
