@@ -181,9 +181,11 @@
     },
     "virus": {
         "__alias__": [
+            "irus",
             "spoofer",
             "constructor",
-            "malware"
+            "malware",
+            "alware"
         ],
         "__desc__": "Self-replicating malware that requires human interaction to spread; also, self-replicating malware that runs and spreads by modifying and inserting itself into other programs or files."
     },

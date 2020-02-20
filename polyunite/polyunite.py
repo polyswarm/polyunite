@@ -2,7 +2,20 @@ from collections import UserDict
 import re
 from typing import Any, Dict, Optional
 
-from polyunite.utils import trx
+from polyunite.utils import (
+    GROUP_COLORS,
+    black,
+    blue,
+    cyan,
+    green,
+    magenta,
+    red,
+    reset,
+    trx,
+    underline,
+    white,
+    yellow,
+)
 from polyunite.vocab import (
     ARCHIVES,
     EXPLOITS,
@@ -30,7 +43,7 @@ class EngineSchemes(UserDict):
 Schemes = EngineSchemes()
 
 
-class NamingScheme:
+class BaseNameScheme:
     match: Optional[re.Match]
     values: Dict[str, Any]
     rgx: re.Pattern
@@ -41,8 +54,7 @@ class NamingScheme:
         Schemes[cls.__name__] = cls
 
     def __init__(self, classification: str):
-        normalized = classification
-        self.match = self.rgx.match(normalized)
+        self.match = self.rgx.match(classification)
         self.build_values(self.match)
 
     def __repr__(self):
@@ -55,43 +67,17 @@ class NamingScheme:
         """Colorize a classification string"""
         if not self.match:
             return None
-        black = '\033[30m'
-        red = '\033[31m'
-        green = '\033[32m'
-        yellow = '\033[33m'
-        blue = '\033[34m'
-        magenta = '\033[35m'
-        cyan = '\033[36m'
-        white = '\033[37m'
-        underline = '\033[4m'
-        reset = '\033[0m'
-        gr_color = {
-            'NAME': red,
-            'PLATFORM': magenta + underline,
-            'LABEL': yellow,
-            'VENDORID': blue,
-            'PREFIX': cyan,
-            'CONFIDENCE': underline,
-            'FAMILY': red,
-            'VARIANT': green,
-            'OBFUSCATION': black,
-            'EXTRA': white,
-            'LANGS': red,
-            'EXPLOIT': white,
-            'DDOS': white,
-            'BEHAVIOR': white
-        }
         ss = self.classification_name
-        for name, mt in self.match.groupdict().items():
-            if name not in gr_color or not mt:
-                continue
-            start = self.match.start(name)
+        for name, mt in ((k, v) for k, v in self.match.groupdict().items() if v):
             # be lazyi in finding the new location mod ANSI color codes.
-            idx = ss.find(mt, start)
+            idx = ss.rfind(mt)
             end = idx + len(mt)
-            further = ss[end+1:].find(reset)
-            ss = ss[:idx] + gr_color[name] + mt + (reset if further == -1 else '') + ss[end:]
+            ss = ss[:idx] + GROUP_COLORS.get(name, '') + mt + (reset if ss[end:].find(reset) == -1 else '') + ss[end:]
         return ss
+
+    def match_raw(self, rgx) -> Optional[re.Match]:
+        """Return a match on the raw classification name string"""
+        return re.match(rgx, self.classification_name, re.IGNORECASE)
 
     # override these methods to change how an engine sources particular features.
     # extracted from the source match.
@@ -104,8 +90,23 @@ class NamingScheme:
         return str(self.__class__.__name__)
 
     @property
-    def heuristic(self) -> str:
-        return None
+    def heuristic(self) -> Optional[int]:
+        if self.match_raw(r'[^a-z](Heur|Heuristic)[^a-z]'):
+            return 50
+        if self.match_raw(r'[^a-z]Agent[^a-z]'):
+            25
+        if self.match_raw(r'[^a-z][a-z]?Generic\w*[^a-z]'):
+            15
+        if self.label == 'greyware':
+            return 35
+        return 0
+
+    @property
+    def is_test(self) -> bool:
+        """*IMPERFECT* predicate for checking if a classification string suggests the file isn't malware"""
+        if self.match_raw(r'\WEICAR[^a-z]'):
+            return True
+        return self.label == 'test'
 
     @property
     def name(self) -> str:
@@ -124,16 +125,15 @@ class NamingScheme:
         return LABELS.find(self.values)
 
     def build_values(self, match):
+        self.values = {}
         if match:
-            self.values = {}
             for k, v in match.groupdict().items():
                 if not k.isupper():
                     raise ValueError("Must supply upper-cased group names")
                 self.values[k] = v if v else ''
 
 
-
-class Alibaba(NamingScheme):
+class Alibaba(BaseNameScheme):
     rgx = re.compile(
         rf"^((?P<LABEL>\w+):)?"
         rf"({PLATFORM_REGEXES}\/)?"
@@ -143,7 +143,7 @@ class Alibaba(NamingScheme):
     )
 
 
-class ClamAV(NamingScheme):
+class ClamAV(BaseNameScheme):
     rgx = re.compile(
         rf"^((?P<PREFIX>BC|Clamav)\.)?"
         rf"({PLATFORM_REGEXES}\.)?"
@@ -153,18 +153,18 @@ class ClamAV(NamingScheme):
     )
 
 
-class DrWeb(NamingScheme):
+class DrWeb(BaseNameScheme):
     rgx = re.compile(
         rf"^((?P<CONFIDENCE>probably|modification)\s*(of)?\s*)?"
         rf"({EXPLOITS}\.)?"
         rf"{PLATFORM_REGEXES}?"
-        rf"((\.|\b)(?P<LABEL>[A-Za-z]*))?"
-        rf"((\.|\b)((?P<NAME>(?P<FAMILY>[A-Za-z][-\w\.]+?))((\.|$)(?P<VARIANT>[0-9]+))?))?"
+        rf"((\.|^)(?P<LABEL>[A-Za-z]*))?"
+        rf"((\.|^)((?P<NAME>(?P<FAMILY>[A-Za-z][-\w\.]+?))((\.|$)(?P<VARIANT>[0-9]+))?))?"
         rf"(\.?(?P<SUFFIX>(origin|based)))?$"
     )
 
 
-class Ikarus(NamingScheme):
+class Ikarus(BaseNameScheme):
     rgx = re.compile(
         r"^((?P<OBFUSCATION>Packed)\.)?"
         r"((?P<CONFIDENCE>not\-a\-virus|HEUR)(\.|\:))?"
@@ -174,7 +174,7 @@ class Ikarus(NamingScheme):
     )
 
 
-class Jiangmin(NamingScheme):
+class Jiangmin(BaseNameScheme):
     rgx = re.compile(
         rf"^((?P<LABEL>[-\w]+)"
         rf"(\.|\/))?({PLATFORM_REGEXES}\.?)"
@@ -183,11 +183,11 @@ class Jiangmin(NamingScheme):
     )
 
 
-class K7(NamingScheme):
+class K7(BaseNameScheme):
     rgx = re.compile(rf"(?P<LABEL>[\w-]+)" rf"( \( (?P<EXTRA>[a-f0-9]+) \))?")
 
 
-class Lionic(NamingScheme):
+class Lionic(BaseNameScheme):
     rgx = re.compile(
         rf"^((?P<LABEL>\w+)\.)?"
         rf"({PLATFORM_REGEXES}\.)?"
@@ -196,7 +196,7 @@ class Lionic(NamingScheme):
     )
 
 
-class NanoAV(NamingScheme):
+class NanoAV(BaseNameScheme):
     rgx = re.compile(
         rf"^((?P<CONFIDENCE>HEUR)\/)?"
         rf"((?P<PLATFORM1>\w+)\/)"
@@ -206,11 +206,11 @@ class NanoAV(NamingScheme):
     )
 
 
-class Qihoo360(NamingScheme):
+class Qihoo360(BaseNameScheme):
     rgx = re.compile(rf"^({PLATFORM_REGEXES}\/)?((?P<LABEL>[^.]+)\.)((?P<NAME>\w+)\.)?(.*)$")
 
 
-class QuickHeal(NamingScheme):
+class QuickHeal(BaseNameScheme):
     rgx = re.compile(
         rf"^{EXPLOITS}?"
         rf"({PLATFORM_REGEXES})?"
@@ -221,23 +221,32 @@ class QuickHeal(NamingScheme):
     )
 
 
-class Rising(NamingScheme):
+class Rising(BaseNameScheme):
     rgx = re.compile(
         rf"^((?P<LABEL>\w+))?"
         r"(\.(?P<EXPLOIT>Exploit))?"
         r"(\.(?P<DDOS>DDoSer))?"
+        # this hellscape is there to cover the 3 different formats rising can emit:
+        # Label.Name/OS ...
+        # Label.OS.Name ...
+        # Label.Name.OS ..
         rf"(((((^|\/|\.)({PLATFORM_REGEXES})))|((\.|\/)(?P<FAMILY>[\-\w]+))))*"
         rf"((\#|\@|\!|\.)(?P<VARIANT>.*))$"
     )
-    def build_values(self, match):
-        if match:
-            self.values = {}
-            for k, v in match.groupdict().items():
-                if not k.isupper():
-                    raise ValueError("Must supply upper-cased group names")
-                self.values[k] = v if v else ''
+
+    @property
+    def heuristic(self):
+        cf = trx(self.CONFIDENCE)
+        lb = trx(self.LABEL)
+        if cf == trx('Heuristic'):
+            # extract number from ET#96%
+            return self.VARIANT[4:6]
+        elif cf == trx('Agent'):
+            return 80
+        elif cf == "Heur" or lb == 'Heur' or lb == 'Generic':
+            return 65
+        return False
 
 
-
-class Virusdie(NamingScheme):
+class Virusdie(BaseNameScheme):
     rgx = re.compile(rf"((?P<LABEL>\w+)\.)?((?P<BEHAVIOR>\w+)\.)?(?P<EXTRA>\w*)")
