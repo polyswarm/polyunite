@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Dict, Iterator, List, Mapping, Optional, Tuple, Union
 
 import pkg_resources
@@ -30,22 +31,22 @@ class VocabRegex:
 
     def combine(self, name, *vocabs, **kwargs) -> str:
         return '(?P<{name}>({fields}))'.format(
-            name=name, fields='|'.join([v.build(exclude=kwargs.get('exclude', [])) for v in [self] + list(vocabs)])
+            name=name,
+            fields='|'.join([v.build(exclude=kwargs.get('exclude', [])) for v in [self] + list(vocabs)])
         )
 
-    def find(self, groups=None, value=None) -> Optional[str]:
+    def find(self, groups=None, value=None, every=False) -> Optional[str]:
         "Attempt to extract & normalize a group with the same name as this ``VocabRegex``"
-        if value is None:
-            if groups is None:
-                return None
-            value = groups.get(self.name)
-        needle = trx(value)
-        if not needle:
-            return None
-        for k, path in self.visitor(self.fields):
-            if trx(k) == needle:
-                return path[0]
-        return None  # f'(NOTFOUND)[{needle}]'
+        needle = value or groups.get(self.name)
+        results = set()
+        if needle:
+            for k, (category, *_) in self.visitor(self.fields):
+                if re.fullmatch(k, needle, re.IGNORECASE):
+                    if not every:
+                        return category
+                    if category not in results:
+                        results.add(category)
+        return list(results)
 
     def visitor(self, kv, exclude=[], path=[]) -> Iterator[Tuple[str, List[str]]]:
         for k in kv:

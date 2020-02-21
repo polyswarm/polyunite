@@ -17,6 +17,7 @@
     "FreeBSD": "FreeBSD platform",
     "Multi": {
         "__alias__": [
+            "Any",
             "Legacy",
             "multios",
             "Multi"
@@ -25,15 +26,18 @@
     "Linux": {
         "__alias__": [
             "ELF",
-            "ELF.Linux"
+            "ELF.?Linux",
+            "ElfArm\\d+?",
+            "ELFx?(64|86)"
         ],
         "__desc__": "Linux platform"
     },
-    "MacOS": {
+    "MacOSX": {
         "__alias__": [
             "OSX",
             "Mac OSX",
             "MacOSX",
+            "MacOS",
             "Mac"
         ],
         "__desc__": "MACOSX 10.0 or later"
@@ -68,7 +72,8 @@
         "WinCE": "Windows CE platform",
         "WinNT": "WinNT",
         "__alias__": [
-            "Win32/64"
+            "Win32.64",
+            "Win"
         ],
         "__desc__": "Microsoft windows"
     },

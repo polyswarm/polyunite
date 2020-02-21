@@ -8,14 +8,15 @@
     "bot": "Malware that resides on an infected system, communicating with and forming part of a botnet. The bot may be implanted by a worm or trojan, which opens a backdoor. The bot then monitors the backdoor for further instructions.",
     "browser-modifier": {
         "__alias__": [
-            "bho"
+            "bho",
+            "injector"
         ],
         "__desc__": "extension or plugin that modifies browser behavior"
     },
     "cavity-filler": "A type of file-infecting virus that seeks unused space within the files it infects, inserting its code into these gaps to avoid changing the size of the file and thus not alerting integrity-checking software to its presence.",
     "clicker": {
         "__alias__": [
-            "trojan-clicker"
+            "trojan-?clicker"
         ],
         "__desc__": "A trojan that makes a system visit a specific web page, often very frequently and usually with the aim of increasing the traffic recorded by the site and thus increasing revenue from advertising. Clickers may also be used to carry out DDoS attacks."
     },
@@ -23,7 +24,7 @@
     "data-diddler": "A type of malware that makes small, random changes to data, such as data in a spreadsheet, to render the data contained in a document inaccurate and in some cases worthless.",
     "ddos": {
         "__alias__": [
-            "trojan-ddos",
+            "(trojan.)?ddos",
             "flooder",
             "[a-z]+flooder"
         ],
@@ -42,7 +43,7 @@
             "dload",
             "downware",
             "downagent",
-            "trojandownloader",
+            "[a-z]*.?downloader",
             "trojandwnldr",
             "trjndwnlder",
             "exedown",
@@ -57,10 +58,9 @@
     },
     "dropper": {
         "__alias__": [
-            "trojan-dropper",
+            "[a-z]*.?dropper",
             "docdrop",
             "docdrp",
-            "dropper",
             "drop",
             "dropr",
             "dldrop",
@@ -78,9 +78,9 @@
     "greyware": {
         "__alias__": [
             "tool",
-            "risktool",
-            "securitytool",
-            "fraudtool",
+            "risk-?tool",
+            "security-?tool",
+            "fraud-?tool",
             "virtool",
             "keygen",
             "hack",
@@ -90,6 +90,8 @@
             "crack",
             "cracktool",
             "pua",
+            "puf",
+            "pup",
             "joke",
             "program",
             "application",
@@ -98,6 +100,7 @@
             "risktool",
             "riskware",
             "virtool",
+            "unwanted.?(program|file)",
             "misleading",
             "settings-modifier",
             "hoax",
@@ -126,6 +129,7 @@
             "email",
             "spammer",
             "smtp",
+            "email.*",
             "spam",
             "spambot"
         ],
@@ -139,8 +143,11 @@
         "__alias__": [
             "not-a-virus",
             "eicar",
+            "eicar_test_file",
+            ".*eicar.?test.*",
             "test",
             "testfile",
+            "test.file",
             "testvirus",
             "tool",
             "risktool",
@@ -149,16 +156,9 @@
             "hack",
             "hacktool",
             "hktl",
-            "spamtool",
             "crack",
             "cracktool",
-            "pua",
             "joke",
-            "risktool",
-            "riskware",
-            "virtool",
-            "misleading",
-            "settings-modifier",
             "hoax"
         ],
         "__desc__": "Not a virus"
@@ -171,8 +171,7 @@
     },
     "password-stealer": {
         "__alias__": [
-            "pws",
-            "trojanpws",
+            "([a-z]*(\\-|\\_)?)?(pws|psw)",
             "stealer",
             "pwstealer",
             "infostealer"
@@ -204,7 +203,10 @@
         ],
         "__desc__": "A type of virus that encrypts its code differently with each infection (or with each generation of infections)."
     },
-    "premium-dialer-smser": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers.",
+    "premium-dialer-smser": {
+      "__alias__": ["dialer"],
+      "__desc__": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers."
+    },
     "prepender": {
         "__alias__": ["hllp"],
         "__desc__": "A file-infecting virus that inserts code at the beginning of the files it infects."
@@ -213,7 +215,8 @@
         "__alias__": [
             "ansom",
             "ransom",
-            "trojan-ransom",
+            "ransom-?encoder",
+            "[a-z]+.?ransom",
             "ransomlock",
             "ransomcrypt",
             "ransomware",
@@ -266,6 +269,7 @@
         "__alias__": [
             "eicar",
             "testfile",
+            "test.file",
             "testvirus"
         ],
         "__desc__": "A test file, not actually a virus"
@@ -273,7 +277,8 @@
     "trackware": "Malware that traces a user's path on the Internet and sends information to third parties. Compare to spyware, which monitors system activity to capture confidential information such as passwords.",
     "trojan": {
         "__alias__": [
-            "trojan(\\s|_|-)?[a-z]+"
+            "trojan(\\s|_|-)?[a-z]+",
+            "proxy.?(program)"
         ],
         "__desc__": "Malware disguised as something inert or benign."
     },
@@ -290,11 +295,7 @@
     "web-bug": "Code embedded in a web page or email that checks whether a user has accessed the content (e.g., a tiny, transparent GIF image).",
     "worm": {
         "__alias__": [
-            "i-worm",
-            "p2p-worm",
-            "im-worm",
-            "irc-worm",
-            "email-worm",
+            "([a-z0-9]+\\-?)?worm",
             "hllw"
         ],
         "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."

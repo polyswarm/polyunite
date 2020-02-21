@@ -16,6 +16,7 @@ def seen():
 
 if len(sys.argv) == 1:
     missing = set()
+    errors = []
     for engine, family in seen():
         sch = polyunite.Schemes.parse(engine, family)
         if sch:
@@ -23,20 +24,22 @@ if len(sys.argv) == 1:
                 print(
                     '{:<10} {:1} {:1} {:<15.12} {:30.30} {:>16.16} {}'.format(
                         engine,
-                        'H' if sch.heuristic else ' ',
-                        'T' if sch.malice_unlikely else ' ',
-                        str(sch.operating_system or '    '),
-                        str(', '.join(sch.label)),
-                        str(sch.name),
+                        sch.heuristic and 'H' or ' ',
+                        sch.malice_unlikely and 'T' or ' ',
+                        sch.operating_system or '    ',
+                        ', '.join(sch.label),
+                        sch.name,
                         sch.colorize(),
                     )
                 )
-            except TypeError as e:
-                print("Couldn't parse '%s' as a %s name" % (family, engine))
-                print("Err: ", e)
+            except TypeError:
+                errors.append((engine, family))
         else:
             missing.add(engine)
-    print("No name scheme found for: ", missing)
+    print("{:-^100}".format("FAILURES"))
+    for engine, family in errors:
+        print("{:<15}: {:85}".format(engine, family))
+    print("\nNo name scheme found for: ", missing)
     sys.exit(0)
 
 elif len(sys.argv) == 2:

@@ -1,6 +1,7 @@
 from collections import UserDict
 import re
-from typing import Any, Dict, Optional
+import string
+from typing import Any, Dict, List, Optional
 
 from polyunite.utils import GROUP_COLORS, reset, trx
 from polyunite.vocab import (
@@ -25,6 +26,11 @@ class EngineSchemes(UserDict):
 
     def __contains__(self, k):
         return super().__contains__(trx(k))
+
+    def parse(self, name, classification: str):
+        if name in self:
+            return self[name](classification)
+        return None
 
 
 Schemes = EngineSchemes()
@@ -54,13 +60,17 @@ class BaseNameScheme:
         """Colorize a classification string"""
         if not self.match:
             return None
+
         ss = self.classification_name
-        for name, mt in ((k, v) for k, v in self.match.groupdict().items() if v):
+
+        for name, mt in self.match.groupdict().items():
+            if not mt or name not in GROUP_COLORS:
+                continue
             # be lazyi in finding the new location mod ANSI color codes.
             idx = ss.rfind(mt)
             end = idx + len(mt)
-            color = GROUP_COLORS.get(name, '')
-            ss = ss[:idx] + color + mt + ('' if reset in ss[end:] else reset) + ss[end:]
+            ss = ss[:idx] + GROUP_COLORS[name] + mt + ('' if reset in ss[end:] else reset) + ss[end:]
+
         return ss
 
     def match_raw(self, rgx) -> Optional[re.Match]:
@@ -79,21 +89,23 @@ class BaseNameScheme:
 
     @property
     def heuristic(self) -> Optional[bool]:
-        return any(
+        return self.values.get('VARIANT', '').lower().startswith('gen') or any(
             HEURISTICS.find(value=f)
-            for f in map(self.values.get, ('HEURISTICS', 'LABEL', 'FIELDS', 'NAME', 'FAMILY'))
+            for f in list(map(trx, map(self.values.get, ('HEURISTICS', 'NAME', 'FAMILY', 'LABEL'))))
             if f
         )
 
     @property
     def malice_unlikely(self) -> bool:
-        return bool(
-            self.match_raw(r'(\b|[^a-z])(not-a-virus|notavirus|eicar|test|testfile|testvirus)([^a-z]|\b)')
-        )
+        raw = self.classification_name
+        if isinstance(raw, str):
+            lower = trx(raw.lower()).replace('-', '')
+            return any(word in lower for word in {'eicar', 'notavirus', 'testfile', 'testvirus'})
+        return None
 
     @property
     def name(self) -> str:
-        return self.values.get('NAME') or self.values.get('FAMILY')
+        return self.values.get('NAME')
 
     @property
     def fullname(self) -> str:
@@ -110,8 +122,8 @@ class BaseNameScheme:
         return LANGS.find(self.values)
 
     @property
-    def label(self) -> str:
-        return LABELS.find(self.values)
+    def label(self) -> List[str]:
+        return LABELS.find(self.values, every=True)
 
     def build_values(self, match):
         values = {}
@@ -127,19 +139,18 @@ class Alibaba(BaseNameScheme):
     rgx = re.compile(
         rf"^((?P<LABEL>\w+):)?"
         rf"({PLATFORM_REGEXES}\/)?"
-        rf"((?P<FAMILY>[^.]+))"
-        rf"(\.(?P<VARIANT>.*))?$",
+        rf"(?P<NAME>((?P<FAMILY>[^.]+))"
+        rf"(\.(?P<VARIANT>.*))?)$",
         flags=re.IGNORECASE
     )
 
 
 class ClamAV(BaseNameScheme):
     rgx = re.compile(
-        rf"^((?P<PREFIX>BC|Clamav)\.)?"
-        rf"({PLATFORM_REGEXES}\.)?"
-        rf"((?P<LABEL>\w+)\.)?"
-        rf"(?P<FAMILY>.+?)?"
-        rf"(\-(?P<VARIANT>[-0-9]+))?$"
+        r"^((?P<PREFIX>BC|Clamav))?"
+        rf"((\.|^){PLATFORM_REGEXES})?"
+        r"((\.|^)(?P<LABEL>[-\w]+))"
+        r"((\.|^)(?P<NAME>((?P<FAMILY>\w+)((\:\w)|(\/\w+))*(\-(?P<VARIANT>[\-0-9]+)))))?$", re.IGNORECASE
     )
 
 
@@ -160,44 +171,52 @@ class Ikarus(BaseNameScheme):
         rf"(?P<HEURISTIC>[-\w+]+?\:)?"
         r"((?P<LABEL>[\w-]*?))?"
         rf"((^|[^\w]){PLATFORM_REGEXES})?"
-        r"(\.(?P<FAMILY>..+))?$"
+        r"(\.(?P<NAME>..+))?$"
     )
 
 
 class Jiangmin(BaseNameScheme):
     rgx = re.compile(
-        rf"^((?P<LABEL>[-\w]+)"
-        rf"(\.|\/))?({PLATFORM_REGEXES}\.?)"
-        rf"?((?P<FAMILY>[\.\-\w]+?)\.)?"
-        rf"(?P<VARIANT>\w*)?$"
+        r"^(?P<HEURISTIC>heur\:)?"
+        r"(?P<LABEL>([-\w]*?((\.|\/)(PSW|P2P|Banker|HLLP|HLLA|HLLV))?))?"
+        rf"((\.|\/|^){PLATFORM_REGEXES})?"
+        r"((\.|\/)(?P<NAME>((?P<FAMILY>[-\w]+)(\.|$))?((?P<VARIANT>((\d+\.)?\w*))?)))$"
     )
 
 
 class K7(BaseNameScheme):
-    rgx = re.compile(rf"(?P<LABEL>[\w-]+)" rf"( \( (?P<VARIANT>[a-f0-9]+) \))?")
+    rgx = re.compile(rf"(?P<LABEL>[\w-]+)\s*(\s*\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?")
+
+    @property
+    def name(self):
+        return ':'.join((self.values['LABEL'], self.values.get('VARIANT', '')))
 
 
 class Lionic(BaseNameScheme):
     rgx = re.compile(
-        rf"^((?P<LABEL>\w+)\.)?"
-        rf"({PLATFORM_REGEXES}\.)?"
-        rf"((?P<FAMILY>[-\w\.]+))"
-        rf"(\!\w.*)?"
+        r"^((?P<LABEL>\w+|Test\.File))?"
+        rf"((^|\.){PLATFORM_REGEXES})?"
+        r"((\.|^)(?P<NAME>((?P<FAMILY>[-\w]+)"
+        r"(\.(?P<VARIANT>\w*))?"
+        r"(\!(?P<SUFFIX>\w.*))?)))?$", re.IGNORECASE
     )
 
 
 class NanoAV(BaseNameScheme):
     rgx = re.compile(
-        rf"^((?P<CONFIDENCE>HEUR)\/)?"
-        rf"((?P<PLATFORM1>\w+)\/)"
-        rf"?((?P<LABEL>[\w\/]+))?\.?"
-        rf"({PLATFORM_REGEXES}\.)?"
-        rf"(?P<FAMILY>[\-\.\w]+(\.[A-Z]+)?)?$"
+        r"^((?P<LABEL>\w+))?"
+        rf"((\.)({PLATFORM_REGEXES}|\w+))?"
+        r"((\.|^)(?P<NAME>((?P<FAMILY>\w+)(\.(?P<VARIANT>[a-z]+)))))$"
     )
 
 
 class Qihoo360(BaseNameScheme):
-    rgx = re.compile(rf"^({PLATFORM_REGEXES}\/)?((?P<LABEL>[^.]+)\.)((?P<FAMILY>\w+)\.)?(.*)$")
+    rgx = re.compile(
+        rf"^(({PLATFORM_REGEXES}(\.|\/))"
+        r"|((?P<LABEL>[-\w]+)\.)"
+        r"|((?P<HEURISTICS>Generic|HEUR)(\/)(QVM\d*\.(\d\.)?([0-9A-F]+\.)?)?))*?"
+        r"((?<=\.)(?P<NAME>((?P<FAMILY>[-\w]+)\.)?((?P<VARIANT>\w+))))?$", re.IGNORECASE
+    )
 
 
 class QuickHeal(BaseNameScheme):
@@ -205,37 +224,23 @@ class QuickHeal(BaseNameScheme):
         r"^((?P<EXPLOIT>Exploit|Exp)\.)?"
         r"((\.|^)(?P<LABEL>[-\w]*?))?"
         rf"((\.|^)({PLATFORM_REGEXES}))?"
-        r"((\.|\/)(?P<FAMILY>(((?P<NAME>[-\w]+))(\.(?P<VARIANT>\w+))?(\.(?P<SUFFIX>\w+))?)))?$"
-        , re.IGNORECASE)
+        r"((\.|\/)(?P<NAME>(((?P<FAMILY>[-\w]+))(\.(?P<VARIANT>\w+))?(\.(?P<SUFFIX>\w+))?)))?$", re.IGNORECASE
+    )
 
 
 class Rising(BaseNameScheme):
     rgx = re.compile(
         rf"^((?P<LABEL>\w+))?"
-        # this hellscape is there to cover the 3 different formats rising can emit:
-        # Label.Name/OS ...
-        # Label.OS.Name ...
-        # Label.Name.OS ..
         rf"(((((^|\/|\.)({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS, HEURISTICS)})))"
         r"|((\.|\/)(?P<FAMILY>[\-\w]+))|((\.|^)(?P<EXPLOIT>Exploit))|((\.|^)(?P<DDOS>DDoSer))))*"
-        rf"((\#|\@|\!|\.)(?P<VARIANT>.*))$", re.IGNORECASE)
+        rf"((?P<VARIANTSEP>(\#|\@|\!|\.))(?P<VARIANT>.*))$", re.IGNORECASE
+    )
 
     @property
-    def heuristic(self):
-        result = super().heuristic
-        if result:
-            return result
-        cf = trx(self.values.get('CONFIDENCE'))
-        lb = trx(self.values.get('LABEL'))
-        if cf == trx('Heuristic'):
-            # extract number from ET#96%
-            return True
-        elif cf == trx('Agent'):
-            return True
-        elif cf == "Heur" or lb == 'Heur' or lb == 'Generic':
-            return True
-        return False
+    def name(self) -> str:
+        return self.values.get('FAMILY', '') + self.values.get('VARIANTSEP',
+                                                               '') + self.values.get('VARIANT', '')
 
 
 class Virusdie(BaseNameScheme):
-    rgx = re.compile(rf"((?P<LABEL>\w+)\.)?((?P<BEHAVIOR>\w+)\.)?(?P<VARIANT>\w*)")
+    rgx = re.compile(rf"^((?P<LABEL>\w+?)\.)?(?P<NAME>((?P<FAMILY>[\.\w]+))?(\.(?P<VARIANT>\w*)))$")

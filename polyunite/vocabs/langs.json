@@ -20,6 +20,7 @@
         "TIFF": "TIFF image",
         "_desc": "Image files"
     },
+    "TXT": "Text file",
     "INF": "Uses Windows INF files",
     "INI": "Uses mIRC INI files",
     "IRC": "mIRC/pIRC scripts",
