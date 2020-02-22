@@ -15,6 +15,9 @@
     "DOS": "MS-DOS",
     "EPOC": "Psion devices",
     "FreeBSD": "FreeBSD platform",
+    "EICAR": {
+        "__desc__": "The standard antivirus test file"
+    },
     "Multi": {
         "__alias__": [
             "Any",
@@ -25,10 +28,7 @@
     },
     "Linux": {
         "__alias__": [
-            "ELF",
-            "ELF.?Linux",
-            "ElfArm\\d+?",
-            "ELFx?(64|86)"
+            "(?i:ELF.?(Linux|ARM|x)?\\d*)"
         ],
         "__desc__": "Linux platform"
     },

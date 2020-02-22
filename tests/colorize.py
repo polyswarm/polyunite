@@ -21,15 +21,20 @@ if len(sys.argv) == 1:
         sch = polyunite.Schemes.parse(engine, family)
         if sch:
             try:
+                colorized = sch.colorize()
+                if not colorized:
+                    raise TypeError
                 print(
-                    '{:<10} {:1} {:1} {:<15.12} {:30.30} {:>16.16} {}'.format(
+                    '{:<10} {:1} {:1} {:<10.10} {:<8.8} {:<10.10} {:30.30} {:>16.16} {}'.format(
                         engine,
                         sch.heuristic and 'H' or ' ',
                         sch.malice_unlikely and 'T' or ' ',
                         sch.operating_system or '    ',
+                        sch.language or '    ',
+                        sch.macro or '    ',
                         ', '.join(sch.label),
                         sch.name,
-                        sch.colorize(),
+                        colorized,
                     )
                 )
             except TypeError:

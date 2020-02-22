@@ -19,15 +19,12 @@ underline = '\033[4m'
 reset = '\033[0m'
 
 GROUP_COLORS = {
-    'NAME': red,
-    'PLATFORM': magenta + underline,
+    'NAME': underline,
+    'PLATFORM': cyan,
     'LABEL': yellow,
-    'VENDORID': blue,
     'PREFIX': cyan,
-    'CONFIDENCE': underline,
-    'FAMILY': red,
-    'VARIANT': green,
+    'HEURISTIC': underline,
+    'FAMILY': green,
+    'VARIANT': white,
     'OBFUSCATION': black,
-    'EXPLOIT': white,
-    'DDOS': white,
 }

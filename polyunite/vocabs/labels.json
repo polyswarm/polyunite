@@ -9,7 +9,8 @@
     "browser-modifier": {
         "__alias__": [
             "bho",
-            "injector"
+            "WebToolbar",
+            "BrowserModifier"
         ],
         "__desc__": "extension or plugin that modifies browser behavior"
     },
@@ -24,6 +25,8 @@
     "data-diddler": "A type of malware that makes small, random changes to data, such as data in a spreadsheet, to render the data contained in a document inaccurate and in some cases worthless.",
     "ddos": {
         "__alias__": [
+            "DoS",
+            "hack\\Wddoser",
             "(trojan.)?ddos",
             "flooder",
             "[a-z]+flooder"
@@ -43,7 +46,7 @@
             "dload",
             "downware",
             "downagent",
-            "[a-z]*.?downloader",
+            "(?i:(trojan(\\.|_|\\-)downloader))",
             "trojandwnldr",
             "trjndwnlder",
             "exedown",
@@ -83,12 +86,10 @@
             "fraud-?tool",
             "virtool",
             "keygen",
-            "hack",
             "hacktool",
             "hktl",
-            "spamtool",
-            "crack",
-            "cracktool",
+            "spam(tool)?",
+            "crack(tool)?",
             "pua",
             "puf",
             "pup",
@@ -96,7 +97,9 @@
             "program",
             "application",
             "software-bundler",
+            "Bundler",
             "tool",
+            "pswtool",
             "risktool",
             "riskware",
             "virtool",
@@ -141,25 +144,18 @@
     "multipartite-virus": "Malware that infects boot records, boot sectors, and files.",
     "nonmalware": {
         "__alias__": [
-            "not-a-virus",
-            "eicar",
-            "eicar_test_file",
-            ".*eicar.?test.*",
+            "not-?a-?virus",
+            ".*(?i:(eicar(\\W?test\\W?file)?)).*",
             "test",
             "testfile",
             "test.file",
             "testvirus",
             "tool",
-            "risktool",
             "securitytool",
             "keygen",
-            "hack",
-            "hacktool",
-            "hktl",
             "crack",
             "cracktool",
-            "joke",
-            "hoax"
+            "joke"
         ],
         "__desc__": "Not a virus"
     },
@@ -173,8 +169,8 @@
         "__alias__": [
             "([a-z]*(\\-|\\_)?)?(pws|psw)",
             "stealer",
-            "pwstealer",
-            "infostealer"
+            "pwsteal(er)?",
+            "infosteal(er)?"
         ],
         "__desc__": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system."
     },
@@ -204,7 +200,7 @@
         "__desc__": "A type of virus that encrypts its code differently with each infection (or with each generation of infections)."
     },
     "premium-dialer-smser": {
-      "__alias__": ["dialer"],
+        "__alias__": ["dialer", "porn\\W?dialer"],
       "__desc__": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers."
     },
     "prepender": {
@@ -228,7 +224,8 @@
     "remote-access-trojan": {
         "__alias__": [
             "rat",
-            "remote-access"
+            "remote-access",
+            "(?i:remote\\W?admin)"
         ],
         "__desc__": "A remote access trojan program (or RAT), is a trojan horse capable of controlling a machine through commands issued by a remote attacker."
     },
@@ -236,12 +233,7 @@
         "__alias__": [
             "zipbomb",
             "miner",
-            "coinmine",
-            "coinminer",
-            "bitcoinminer",
-            "bitcoin",
-            "btcmine",
-            "bitminer"
+            "bitcoinminer"
         ],
         "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner."
     },
@@ -258,9 +250,9 @@
     "shellcode": {
         "__alias__": [
             "shellkode",
-            "exploit",
-            "expl",
-            "exp"
+            "hack",
+            "hack\\Wexploit",
+            "(?i:(exp(l(oit)?)?))"
         ],
         "__desc__": "Either a small piece of code that activates a command-line interface to a system that can be used to disable security measures, open a backdoor, or download further malicious code; or a small piece of code that opens a system up for exploitation, sometimes by not necessarily involving a command-line shell."
     },
@@ -277,7 +269,7 @@
     "trackware": "Malware that traces a user's path on the Internet and sends information to third parties. Compare to spyware, which monitors system activity to capture confidential information such as passwords.",
     "trojan": {
         "__alias__": [
-            "trojan(\\s|_|-)?[a-z]+",
+            "(?i:(trojan(\\.|\\s|_|\/|-)?(pws|dwnldr|dropper|downloader|miner|proxy|dialer|psw|spy|banker|ddos|ddoser|dialer)))",
             "proxy.?(program)"
         ],
         "__desc__": "Malware disguised as something inert or benign."
@@ -296,6 +288,7 @@
     "worm": {
         "__alias__": [
             "([a-z0-9]+\\-?)?worm",
+            "(?i:(worm(\\.|\\-|\\/)(P2p|p2p|mail|smtp)))",
             "hllw"
         ],
         "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."

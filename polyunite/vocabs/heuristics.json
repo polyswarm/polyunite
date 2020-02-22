@@ -12,7 +12,7 @@
             "genetic",
             "genmalicious",
             "genome",
-            ".?heur(istic)?",
+            "(?i:(heur(istic)?))",
             "kcloud",
             "maltrec",
             "memscan",
@@ -58,6 +58,7 @@
             "possible",
             "threat",
             "probably",
+            "modification",
             "confidence",
             "highconfidence"
         ],

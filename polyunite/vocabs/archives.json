@@ -19,6 +19,7 @@
     "GZIP": "GZIP",
     "HFSPLUS": "HFSPLUS",
     "ISHIELD": "ISHIELD",
+    "InnoSetup": "Innosetup",
     "ISO9660": "ISO9660",
     "MBR": "Boot MBR",
     "NSIS": "Nullsoft Installation Language",

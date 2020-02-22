@@ -5,17 +5,14 @@
     "HE": "macro scripting",
     "MIME": "MIME packets",
     "MSOffice": {
+        "__alias__": [
+            "(?i:MS(Excel|Word|Powerpoint|Outlook)((20)?\\d\\d)?)",
+            "(?i:Office((20)?\\d\\d)?)",
+            "Doc"
+        ],
         "A97M": "Access 97, 2000, XP, 2003, 2007, and 2010 macros",
         "AM": "Runs as a VBA macro in the Microsoft Access application (version 97 or later)",
         "CM": "Runs as a VBA macro in the Corel Draw! application (version 9.0 or later)",
-        "Doc": {
-            "__magic__": "office",
-            "__source__": "ClamAV"
-        },
-        "MS(Excel|Word|Powerpoint|Outlook)": {
-            "__magic__": "office",
-            "label": "macro-virus"
-        },
         "O97M": "Office 97, 2000, XP, 2003, 2007, and 2010 macros - those that affect Word, Excel, and Powerpoint",
         "OM": "Uses or runs in two or more applications in the Office 97 suite or later, including related products (Visio, Projects)",
         "PP97M": "PowerPoint 97, 2000, XP, 2003, 2007, and 2010 macros",
@@ -24,6 +21,7 @@
         "V5M": "Visio5 macros",
         "W1M": "Word1Macro",
         "W2M": "Word2Macro",
+        "W42": "Word2Macro",
         "W97M": "Word 97, 2000, XP, 2003, 2007, and 2010 macros",
         "WM": "Word 95 macros",
         "X97M": "Excel 97, 2000, XP, 2003, 2007, and 2010 macros",
@@ -42,6 +40,10 @@
     "SB": "StarBasic (Staroffice XML) files",
     "SWF": "Shockwave Flash files",
     "TSQL": "MS SQL server files",
+    "FONT": {
+        "__alias__": ["TTF"],
+        "__desc__": "Font files"
+    },
     "WMA": "Runs as a Windows media Audio file (usually disguised as mp3)",
     "WMV": "Runs as a Windows media Video file (usually disguised as avi)",
     "WinHEX": "Uses WinHex",

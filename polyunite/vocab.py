@@ -1,6 +1,15 @@
 import json
 import re
-from typing import Dict, Iterator, List, Mapping, Optional, Tuple, Union
+from typing import (
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+)
 
 import pkg_resources
 
@@ -23,17 +32,19 @@ class VocabRegex:
         self.name = name
         self.fields = fields
 
+    def named_group(
+        self, name: str = None, fields: Iterable[str] = [], include: Iterable = [], exclude: Iterable = []
+    ):
+        fs = set(map(str, (*fields, *include))).difference(map(str, exclude))
+        return '(?P<{name}>{fields})'.format(name=name or self.name, fields='|'.join(fs))
+
     def build(self, **kwargs) -> str:
-        return '(?P<{name}>{fields})'.format(
-            name=kwargs.get('name', self.name),
-            fields='|'.join([k for k, _ in self.visitor(self.fields, exclude=kwargs.get('exclude', []))])
+        return self.named_group(
+            name=kwargs.get('name', self.name), fields=[k for k, _ in self.visitor(self.fields)], **kwargs
         )
 
     def combine(self, name, *vocabs, **kwargs) -> str:
-        return '(?P<{name}>({fields}))'.format(
-            name=name,
-            fields='|'.join([v.build(exclude=kwargs.get('exclude', [])) for v in [self] + list(vocabs)])
-        )
+        return self.named_group(name=name, fields=[self, *vocabs], **kwargs)
 
     def find(self, groups=None, value=None, every=False) -> Optional[str]:
         "Attempt to extract & normalize a group with the same name as this ``VocabRegex``"
@@ -70,5 +81,5 @@ LANGS = VocabRegex('LANGS', load_vocab('langs'))
 ARCHIVES = VocabRegex('ARCHIVES', load_vocab('archives'))
 MACROS = VocabRegex('MACROS', load_vocab('macros'))
 OSES = VocabRegex('OPERATINGSYSTEM', load_vocab('operating_systems'))
-HEURISTICS = VocabRegex('HEURISTICS', load_vocab('heuristics'))
+HEURISTICS = VocabRegex('HEURISTIC', load_vocab('heuristics'))
 PLATFORM_REGEXES = OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)

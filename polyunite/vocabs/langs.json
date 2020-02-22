@@ -29,6 +29,10 @@
     "LOGO": "LOGO scripts",
     "MPB": "MapBasic scripts",
     "MSH": "Monad shell scripts",
+    "COM": {
+        "__alias__": ["ComObj"],
+        "__desc__": "Component Object Model"
+    },
     "MSIL": ".Net intermediate language scripts",
     "PHP": "Hypertext Preprocessor scripts",
     "PS": "Postscript",

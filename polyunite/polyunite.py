@@ -47,8 +47,7 @@ class BaseNameScheme:
         Schemes[cls.__name__] = cls
 
     def __init__(self, classification: str):
-        self.match = self.rgx.match(classification)
-        self.values = self.build_values(self.match)
+        self.values = self.build_values(classification)
 
     def __repr__(self):
         fields = {f: getattr(self, f, None) for f in ('name', 'operating_system', 'script', 'label')}
@@ -91,7 +90,7 @@ class BaseNameScheme:
     def heuristic(self) -> Optional[bool]:
         return self.values.get('VARIANT', '').lower().startswith('gen') or any(
             HEURISTICS.find(value=f)
-            for f in list(map(trx, map(self.values.get, ('HEURISTICS', 'NAME', 'FAMILY', 'LABEL'))))
+            for f in list(map(trx, map(self.values.get, ('HEURISTIC', 'FIELDS', 'FAMILY', 'LABEL'))))
             if f
         )
 
@@ -118,17 +117,22 @@ class BaseNameScheme:
         return OSES.find(self.values)
 
     @property
-    def script(self) -> str:
+    def language(self) -> str:
         return LANGS.find(self.values)
+
+    @property
+    def macro(self) -> str:
+        return MACROS.find(self.values)
 
     @property
     def label(self) -> List[str]:
         return LABELS.find(self.values, every=True)
 
-    def build_values(self, match):
+    def build_values(self, classification):
+        self.match = self.rgx.match(classification)
         values = {}
-        if match:
-            for k, v in match.groupdict().items():
+        if self.match:
+            for k, v in self.match.groupdict().items():
                 if not k.isupper():
                     raise ValueError("Must supply upper-cased group names")
                 values[k] = v if v else ''
@@ -156,12 +160,10 @@ class ClamAV(BaseNameScheme):
 
 class DrWeb(BaseNameScheme):
     rgx = re.compile(
-        rf"^({HEURISTICS}\s*(of)?\s*)?"
-        rf"({EXPLOITS}\.)?"
-        rf"{OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)}?"
-        rf"((\.|^)(?P<LABEL>[A-Za-z]*))?"
-        rf"((\.|^)((?P<FAMILY>(?P<NAME>[A-Za-z][-\w\.]+?))((\.|$)(?P<VARIANT>[0-9]+))?))?"
-        rf"(\.?(?P<SUFFIX>(origin|based)))?$"
+        rf"^((?i:{HEURISTICS})(\s+(of\s*)?)?)?"
+        rf"((\.|\b)({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)}))?"
+        rf"((\.|\b)(?P<LABEL>[A-Za-z]*))?"
+        r"((\.|\b)((?P<NAME>((?P<FAMILY>[A-Za-z][-\w\.]+?)((\.|$)(?P<VARIANT>[0-9]+))?(\.?(?P<SUFFIX>(origin|based)))?))))?$"
     )
 
 
@@ -177,24 +179,23 @@ class Ikarus(BaseNameScheme):
 
 class Jiangmin(BaseNameScheme):
     rgx = re.compile(
-        r"^(?P<HEURISTIC>heur\:)?"
-        r"(?P<LABEL>([-\w]*?((\.|\/)(PSW|P2P|Banker|HLLP|HLLA|HLLV))?))?"
-        rf"((\.|\/|^){PLATFORM_REGEXES})?"
-        r"((\.|\/)(?P<NAME>((?P<FAMILY>[-\w]+)(\.|$))?((?P<VARIANT>((\d+\.)?\w*))?)))$"
+        r"^(?P<HEURISTIC>(Variant|heur\:))?"
+        rf"((\.|\/|^)((?i:{LABELS})|({PLATFORM_REGEXES})))*"
+        r"((\.|\/|^)(?P<NAME>(((?P<FAMILY>[-\w]+)(\.|$))?((?P<VARIANT>((\d+\.)?\w*)))?)))$"
     )
 
 
 class K7(BaseNameScheme):
-    rgx = re.compile(rf"(?P<LABEL>[\w-]+)\s*(\s*\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?")
+    rgx = re.compile(rf"^(?i:{LABELS})\s*(\s*\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?")
 
     @property
     def name(self):
-        return ':'.join((self.values['LABEL'], self.values.get('VARIANT', '')))
-
+        variant = self.values.get("VARIANT")
+        return self.values['LABEL'] + (f':{variant}' if variant else '')
 
 class Lionic(BaseNameScheme):
     rgx = re.compile(
-        r"^((?P<LABEL>\w+|Test\.File))?"
+        rf"^({LABELS})?"
         rf"((^|\.){PLATFORM_REGEXES})?"
         r"((\.|^)(?P<NAME>((?P<FAMILY>[-\w]+)"
         r"(\.(?P<VARIANT>\w*))?"
@@ -204,35 +205,36 @@ class Lionic(BaseNameScheme):
 
 class NanoAV(BaseNameScheme):
     rgx = re.compile(
-        r"^((?P<LABEL>\w+))?"
+        r"^((?P<EXPLOIT>Exploit|Exp)\.)?"
+        rf"((?i:{LABELS}))?"
         rf"((\.)({PLATFORM_REGEXES}|\w+))?"
-        r"((\.|^)(?P<NAME>((?P<FAMILY>\w+)(\.(?P<VARIANT>[a-z]+)))))$"
-    )
+        r"((\.|^)(?P<NAME>((?P<FAMILY>[\w-]+)(\.(?P<VARIANT>[a-z]+)))))$", re.IGNORECASE)
 
 
 class Qihoo360(BaseNameScheme):
     rgx = re.compile(
-        rf"^(({PLATFORM_REGEXES}(\.|\/))"
+        rf"^(({PLATFORM_REGEXES}(\.|\/))+"
         r"|((?P<LABEL>[-\w]+)\.)"
-        r"|((?P<HEURISTICS>Generic|HEUR)(\/)(QVM\d*\.(\d\.)?([0-9A-F]+\.)?)?))*?"
+        r"|((?P<HEURISTIC>Generic|HEUR)(\/)(QVM\d*\.(\d\.)?([0-9A-F]+\.)?)?))*?"
         r"((?<=\.)(?P<NAME>((?P<FAMILY>[-\w]+)\.)?((?P<VARIANT>\w+))))?$", re.IGNORECASE
     )
 
 
 class QuickHeal(BaseNameScheme):
     rgx = re.compile(
-        r"^((?P<EXPLOIT>Exploit|Exp)\.)?"
-        r"((\.|^)(?P<LABEL>[-\w]*?))?"
+        rf"^({HEURISTICS}\.)?((?P<EXPLOIT>Exploit|Exp)\.)?"
+        # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
+        rf"((\.|^){LABELS}(\)$)?)?"
         rf"((\.|^)({PLATFORM_REGEXES}))?"
-        r"((\.|\/)(?P<NAME>(((?P<FAMILY>[-\w]+))(\.(?P<VARIANT>\w+))?(\.(?P<SUFFIX>\w+))?)))?$", re.IGNORECASE
+        r"((\.|\/|^)(?P<NAME>(((?P<FAMILY>[-\w]+))(\.(?P<VARIANT>\w+))?(\.(?P<SUFFIX>\w+))?)))?$", re.IGNORECASE
     )
 
 
 class Rising(BaseNameScheme):
     rgx = re.compile(
-        rf"^((?P<LABEL>\w+))?"
-        rf"(((((^|\/|\.)({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS, HEURISTICS)})))"
-        r"|((\.|\/)(?P<FAMILY>[\-\w]+))|((\.|^)(?P<EXPLOIT>Exploit))|((\.|^)(?P<DDOS>DDoSer))))*"
+        rf"^({LABELS})?"
+        rf"(((((^|\/|\.)({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)})))"
+        r"|((\.|\/)(?P<FAMILY>[\-\w]+))))*"
         rf"((?P<VARIANTSEP>(\#|\@|\!|\.))(?P<VARIANT>.*))$", re.IGNORECASE
     )
 
@@ -243,4 +245,6 @@ class Rising(BaseNameScheme):
 
 
 class Virusdie(BaseNameScheme):
-    rgx = re.compile(rf"^((?P<LABEL>\w+?)\.)?(?P<NAME>((?P<FAMILY>[\.\w]+))?(\.(?P<VARIANT>\w*)))$")
+    rgx = re.compile(
+        rf"^({HEURISTICS})?((^|\.){LABELS})?((^|\.){PLATFORM_REGEXES})?"
+        r"((^|\.)(?P<NAME>((?P<FAMILY>[\.\w]+)?(\.(?P<VARIANT>\w+))?)?))$", re.IGNORECASE)
