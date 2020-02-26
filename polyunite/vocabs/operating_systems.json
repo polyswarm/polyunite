@@ -15,11 +15,9 @@
     "DOS": "MS-DOS",
     "EPOC": "Psion devices",
     "FreeBSD": "FreeBSD platform",
-    "EICAR": {
-        "__desc__": "The standard antivirus test file"
-    },
     "Multi": {
         "__alias__": [
+            "Application",
             "Any",
             "Legacy",
             "multios",
@@ -35,8 +33,7 @@
     "MacOSX": {
         "__alias__": [
             "OSX",
-            "Mac OSX",
-            "MacOSX",
+            "Mac(\\_|\\s)?OS_?X?",
             "MacOS",
             "Mac"
         ],

@@ -1,0 +1,60 @@
+{
+    "packing": {
+        "__alias__": [
+            "packer",
+            "obfuscator",
+            "msilobfuscator",
+            "encoder",
+
+            "[Pp]ack(ed)?",
+            "malpack",
+            "encpk",
+            "malob",
+            "genpack",
+            "krypt",
+            "kryptk",
+            "kryptik",
+            "obfuscated",
+            "obfus",
+            "obfusc",
+            "obfuscate",
+            "malcrypt",
+            "vbcrypt",
+            "vbkrypt",
+            "vbpack",
+            "xpack",
+            "zpack",
+
+            "suspiciouspacker",
+
+            "asprotect",
+            "nspack",
+            "pecompact",
+            "upack",
+            "themida",
+            "vmprotect"
+        ],
+        "__desc__": "Packing of the malware instance code, not including encryption."
+    },
+    "code-encryption": {
+        "__alias__": [
+            "cryptor",
+            "crypter",
+            "cryp",
+            "crypt",
+            "crypted",
+            "cryptic"
+        ],
+        "__desc__": "Encryption of the malware instance code."
+    },
+    "dead-code-insertion": "Dead code inserted in the malware instance.",
+    "entry-point-obfuscation": "Obfuscation of the malware instance entry point.",
+    "import-address-table-obfuscation": "Obfuscation of the malware instance import address table.",
+    "interleaving-code": "Code interleaving in the malware instance (code is split into sections that are rearranged and connected by unconditional jumps).",
+    "symbolic-obfuscation": "Obfuscation of the malware instance symbols.",
+    "string-obfuscation": "Obfuscation of the malware instance strings.",
+    "subroutine-reordering": "Reordering of subroutines in the malware instance.",
+    "code-transposition": "Reordering of instructions in the malware instance.",
+    "instruction-substitution": "Substitution of malware instance instructions with semantic equivalents.",
+    "register-reassignment": "Replacement of unused registers with those containing malicious code."
+}

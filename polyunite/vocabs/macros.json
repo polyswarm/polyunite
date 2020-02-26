@@ -4,6 +4,7 @@
     "HC": "HyperCard Apple scripts",
     "HE": "macro scripting",
     "MIME": "MIME packets",
+    "CRX": "Chrome extension",
     "MSOffice": {
         "__alias__": [
             "(?i:MS(Excel|Word|Powerpoint|Outlook)((20)?\\d\\d)?)",
@@ -34,7 +35,10 @@
         "__desc__": "Microsoft Office files"
     },
     "Netware": "Novell Netware files",
-    "PDF": "Portable document format",
+    "PDF": {
+        "__alias__": ["pdfjs"],
+        "__desc__": "Portable document format"
+    },
     "QT": "Quicktime files",
     "RTF": "Rich-text format",
     "SB": "StarBasic (Staroffice XML) files",
@@ -47,5 +51,8 @@
     "WMA": "Runs as a Windows media Audio file (usually disguised as mp3)",
     "WMV": "Runs as a Windows media Video file (usually disguised as avi)",
     "WinHEX": "Uses WinHex",
-    "XML": "XML files"
+    "XML": {
+        "__alias__": ["xfa"],
+        "__desc__": "XML files"
+    }
 }

@@ -1,5 +1,6 @@
 import json
 import re
+import string
 from typing import (
     Dict,
     Iterable,
@@ -21,7 +22,7 @@ def load_vocab(name):
     return json.load(pkg_resources.resource_stream(__name__, f'vocabs/{name}.json'))
 
 
-class VocabRegex:
+class VocabRegex(string.Formatter):
     name: str
     fields: Dict[str, Union[Dict, str]]
 
@@ -75,11 +76,20 @@ class VocabRegex:
 # Provides extra detail about the malware, including how it is used as part of a multicomponent
 # threat. In the example above,
 SUFFIXES = VocabRegex('SUFFIX', load_vocab('suffixes'))
-EXPLOITS = VocabRegex('EXPLOIT', {'Exploit': {'__desc__': '', '__alias__': ['Exp']}})
 LABELS = VocabRegex('LABEL', load_vocab('labels'))
 LANGS = VocabRegex('LANGS', load_vocab('langs'))
 ARCHIVES = VocabRegex('ARCHIVES', load_vocab('archives'))
 MACROS = VocabRegex('MACROS', load_vocab('macros'))
 OSES = VocabRegex('OPERATINGSYSTEM', load_vocab('operating_systems'))
 HEURISTICS = VocabRegex('HEURISTIC', load_vocab('heuristics'))
-PLATFORM_REGEXES = OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)
+
+PLATFORM = OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)
+OBFUSCATIONS = VocabRegex('OBFUSCATION', load_vocab('obfuscation_methods'))
+
+BEHAVIORS = r"(?P<BEHAVIOR>AntiVM)"
+
+IDENT = r"(?P<NAME>((?P<FAMILY>(((CVE-[\d-]+)|[-\w]+?)(\.\w+(?=(\.\d+)))?))" + \
+        r"((?P<VARIANTSEP>\.)(?P<VARIANT>\w*))?" + \
+        r"((?P<SUFFIXSEP>!)(?P<SUFFIX>\w*))?))"
+
+EXPLOITS = r'(?P<EXPLOIT>(Exploit|Exp))'

@@ -1,3 +1,4 @@
+from collections import UserDict
 import string
 
 DELNONALPHA = str.maketrans(string.ascii_uppercase, string.ascii_lowercase, string.whitespace)
@@ -28,3 +29,20 @@ GROUP_COLORS = {
     'VARIANT': white,
     'OBFUSCATION': black,
 }
+
+
+class EngineSchemes(UserDict):
+    """A fancy dictionary for holding each engine, with easy lookup"""
+    def __setitem__(self, k, v):
+        return super().__setitem__(trx(k), v)
+
+    def __getitem__(self, k):
+        return super().__getitem__(trx(k))
+
+    def __contains__(self, k):
+        return super().__contains__(trx(k))
+
+    def parse(self, name, classification: str):
+        if name in self:
+            return self[name](classification)
+        return None

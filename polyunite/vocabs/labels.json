@@ -89,16 +89,22 @@
             "hacktool",
             "hktl",
             "spam(tool)?",
+            "Sorter\\.AVE",
+            "Harm",
+            "VirusOrg",
             "crack(tool)?",
+            "gamehack",
             "pua",
             "puf",
             "pup",
             "joke",
             "program",
+            "nettool",
             "application",
             "software-bundler",
             "Bundler",
             "tool",
+            "toolbar",
             "pswtool",
             "risktool",
             "riskware",
@@ -200,7 +206,7 @@
         "__desc__": "A type of virus that encrypts its code differently with each infection (or with each generation of infections)."
     },
     "premium-dialer-smser": {
-        "__alias__": ["dialer", "porn\\W?dialer"],
+        "__alias__": ["dialer", "porn\\W?dialer", "trojansms"],
       "__desc__": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers."
     },
     "prepender": {
@@ -212,7 +218,7 @@
             "ansom",
             "ransom",
             "ransom-?encoder",
-            "[a-z]+.?ransom",
+            "trojan\\Wransom",
             "ransomlock",
             "ransomcrypt",
             "ransomware",
@@ -256,20 +262,28 @@
         ],
         "__desc__": "Either a small piece of code that activates a command-line interface to a system that can be used to disable security measures, open a backdoor, or download further malicious code; or a small piece of code that opens a system up for exploitation, sometimes by not necessarily involving a command-line shell."
     },
-    "spyware": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner.",
+    "spyware": {
+        "__alias__": [
+            "Monitor"
+        ],
+        "__desc__": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner."
+    },
     "test": {
         "__alias__": [
-            "eicar",
+            ".*(?i:(eicar(\\W?test\\W?file)?)).*",
             "testfile",
             "test.file",
             "testvirus"
         ],
         "__desc__": "A test file, not actually a virus"
     },
-    "trackware": "Malware that traces a user's path on the Internet and sends information to third parties. Compare to spyware, which monitors system activity to capture confidential information such as passwords.",
+    "trackware": {
+        "__alias__": ["AdDisplay"],
+        "__desc__": "Malware that traces a user's path on the Internet and sends information to third parties. Compare to spyware, which monitors system activity to capture confidential information such as passwords."
+    },
     "trojan": {
         "__alias__": [
-            "(?i:(trojan(\\.|\\s|_|\/|-)?(pws|dwnldr|dropper|downloader|miner|proxy|dialer|psw|spy|banker|ddos|ddoser|dialer)))",
+            "(?i:(trojan(\\.|\\s|_|\/|-)?(ransom|pws|dwnldr|dropper|downloader|miner|proxy|dialer|psw|spy|banker|ddos|ddoser|dialer|sms)))",
             "proxy.?(program)"
         ],
         "__desc__": "Malware disguised as something inert or benign."
@@ -280,6 +294,7 @@
             "spoofer",
             "constructor",
             "malware",
+            "Mal",
             "alware"
         ],
         "__desc__": "Self-replicating malware that requires human interaction to spread; also, self-replicating malware that runs and spreads by modifying and inserting itself into other programs or files."

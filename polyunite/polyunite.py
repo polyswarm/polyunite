@@ -1,37 +1,20 @@
-from collections import UserDict
 import re
-import string
 from typing import Any, Dict, List, Optional
 
-from polyunite.utils import GROUP_COLORS, reset, trx
+from polyunite.utils import GROUP_COLORS, EngineSchemes, reset, trx
 from polyunite.vocab import (
     ARCHIVES,
     EXPLOITS,
     HEURISTICS,
+    OBFUSCATIONS,
+    BEHAVIORS,
+    IDENT,
     LABELS,
     LANGS,
     MACROS,
     OSES,
-    PLATFORM_REGEXES,
+    PLATFORM,
 )
-
-
-class EngineSchemes(UserDict):
-    """A fancy dictionary for holding each engine, with easy lookup"""
-    def __setitem__(self, k, v):
-        return super().__setitem__(trx(k), v)
-
-    def __getitem__(self, k):
-        return super().__getitem__(trx(k))
-
-    def __contains__(self, k):
-        return super().__contains__(trx(k))
-
-    def parse(self, name, classification: str):
-        if name in self:
-            return self[name](classification)
-        return None
-
 
 Schemes = EngineSchemes()
 
@@ -140,19 +123,13 @@ class BaseNameScheme:
 
 
 class Alibaba(BaseNameScheme):
-    rgx = re.compile(
-        rf"^((?P<LABEL>\w+):)?"
-        rf"({PLATFORM_REGEXES}\/)?"
-        rf"(?P<NAME>((?P<FAMILY>[^.]+))"
-        rf"(\.(?P<VARIANT>.*))?)$",
-        flags=re.IGNORECASE
-    )
+    rgx = re.compile(rf"^({LABELS}:)?({PLATFORM}\/)?({IDENT})$", re.IGNORECASE)
 
 
 class ClamAV(BaseNameScheme):
     rgx = re.compile(
         r"^((?P<PREFIX>BC|Clamav))?"
-        rf"((\.|^){PLATFORM_REGEXES})?"
+        rf"((\.|^){PLATFORM})?"
         r"((\.|^)(?P<LABEL>[-\w]+))"
         r"((\.|^)(?P<NAME>((?P<FAMILY>\w+)((\:\w)|(\/\w+))*(\-(?P<VARIANT>[\-0-9]+)))))?$", re.IGNORECASE
     )
@@ -161,27 +138,34 @@ class ClamAV(BaseNameScheme):
 class DrWeb(BaseNameScheme):
     rgx = re.compile(
         rf"^((?i:{HEURISTICS})(\s+(of\s*)?)?)?"
-        rf"((\.|\b)({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)}))?"
-        rf"((\.|\b)(?P<LABEL>[A-Za-z]*))?"
-        r"((\.|\b)((?P<NAME>((?P<FAMILY>[A-Za-z][-\w\.]+?)((\.|$)(?P<VARIANT>[0-9]+))?(\.?(?P<SUFFIX>(origin|based)))?))))?$"
+        rf"((\.|\A)(?i:({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)})))?"
+        rf"((\.|\A)(?i:{LABELS}))?"
+        r"((\.|\b)((?P<NAME>("
+        r"(?P<FAMILY>[A-Za-z][-\w\.]+?)"
+        r"((\.|$)(?P<VARIANT>[0-9]+))?"
+        r"(\.?(?P<SUFFIX>(origin|based)))?))))?$"
     )
 
 
 class Ikarus(BaseNameScheme):
     rgx = re.compile(
-        r"^((?P<OBFUSCATION>Packed)\.)?"
+        rf"^({OBFUSCATIONS}\.)?"
         rf"(?P<HEURISTIC>[-\w+]+?\:)?"
         r"((?P<LABEL>[\w-]*?))?"
-        rf"((^|[^\w]){PLATFORM_REGEXES})?"
-        r"(\.(?P<NAME>..+))?$"
+        rf"((\.){EXPLOITS})?"
+        rf"((^|[^\w]){PLATFORM})?"
+        rf"(\.{IDENT})?$", re.IGNORECASE
     )
 
 
 class Jiangmin(BaseNameScheme):
     rgx = re.compile(
-        r"^(?P<HEURISTIC>(Variant|heur\:))?"
-        rf"((\.|\/|^)((?i:{LABELS})|({PLATFORM_REGEXES})))*"
-        r"((\.|\/|^)(?P<NAME>(((?P<FAMILY>[-\w]+)(\.|$))?((?P<VARIANT>((\d+\.)?\w*)))?)))$"
+        r"^(?P<HEURISTIC>(Variant|heur:))?"
+        rf"((\b|\.|\A)({OBFUSCATIONS}))?"
+        rf"((\b|\.|\/|\A)((?i:{LABELS})|({PLATFORM})))*"
+        r"((\.|\/|\A|\b)(?P<NAME>("
+        r"((?P<FAMILY>(CVE-[\d-]*|\w+))(?P<SUFFIX>(\-(\w+)))?(\.|$))?"
+        r"((?P<VARIANT>((\d+\.)?\w*)))?)))?$", re.IGNORECASE
     )
 
 
@@ -193,47 +177,45 @@ class K7(BaseNameScheme):
         variant = self.values.get("VARIANT")
         return self.values['LABEL'] + (f':{variant}' if variant else '')
 
+
 class Lionic(BaseNameScheme):
-    rgx = re.compile(
-        rf"^({LABELS})?"
-        rf"((^|\.){PLATFORM_REGEXES})?"
-        r"((\.|^)(?P<NAME>((?P<FAMILY>[-\w]+)"
-        r"(\.(?P<VARIANT>\w*))?"
-        r"(\!(?P<SUFFIX>\w.*))?)))?$", re.IGNORECASE
-    )
+    rgx = re.compile(rf"^({LABELS})?" rf"((^|\.){PLATFORM})?" rf"((\.|^){IDENT})?$", re.IGNORECASE)
 
 
 class NanoAV(BaseNameScheme):
     rgx = re.compile(
-        r"^((?P<EXPLOIT>Exploit|Exp)\.)?"
-        rf"((?i:{LABELS}))?"
-        rf"((\.)({PLATFORM_REGEXES}|\w+))?"
-        r"((\.|^)(?P<NAME>((?P<FAMILY>[\w-]+)(\.(?P<VARIANT>[a-z]+)))))$", re.IGNORECASE)
+        rf"^({LABELS})?"
+        r"((\.)(?P<NANO_TYPE>(Macro|Text|(Url\.(\w+)))))?"
+        rf"((\.)({PLATFORM}))?"
+        rf"((\.|\A|\b){IDENT})$", re.IGNORECASE
+    )
 
 
 class Qihoo360(BaseNameScheme):
     rgx = re.compile(
-        rf"^(({PLATFORM_REGEXES}(\.|\/))+"
-        r"|((?P<LABEL>[-\w]+)\.)"
-        r"|((?P<HEURISTIC>Generic|HEUR)(\/)(QVM\d*\.(\d\.)?([0-9A-F]+\.)?)?))*?"
-        r"((?<=\.)(?P<NAME>((?P<FAMILY>[-\w]+)\.)?((?P<VARIANT>\w+))))?$", re.IGNORECASE
+        r"^((?P<HEURISTIC>(VirusOrg|Generic|HEUR))(/|((?<=VirusOrg)\.)))?"
+        r"(macro|tif)?"
+        rf"(((\.|\b)(url|iframe|{MACROS}|{LANGS}|{OSES}|{ARCHIVES}))|(\.|\b|/){LABELS}|"
+        r"((\.|\b)(QVM\d*(\.\d)?(\.[0-9A-F]+)?)))*"
+        rf"((\.|/){IDENT})?$", re.IGNORECASE
     )
 
 
 class QuickHeal(BaseNameScheme):
     rgx = re.compile(
-        rf"^({HEURISTICS}\.)?((?P<EXPLOIT>Exploit|Exp)\.)?"
+        rf"^({HEURISTICS}\.)?"
         # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
         rf"((\.|^){LABELS}(\)$)?)?"
-        rf"((\.|^)({PLATFORM_REGEXES}))?"
-        r"((\.|\/|^)(?P<NAME>(((?P<FAMILY>[-\w]+))(\.(?P<VARIANT>\w+))?(\.(?P<SUFFIX>\w+))?)))?$", re.IGNORECASE
+        rf"((\.|^)({PLATFORM}))?"
+        r"((\.|\/|^)(?P<NAME>(((?P<FAMILY>[-\w]+))(\.(?P<VARIANT>\w+))?(\.(?P<SUFFIX>\w+))?)))?$",
+        re.IGNORECASE
     )
 
 
 class Rising(BaseNameScheme):
     rgx = re.compile(
         rf"^({LABELS})?"
-        rf"(((((^|\/|\.)({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)})))"
+        rf"(((((^|\/|\.)({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS, include=['System', 'Macro'])})))"
         r"|((\.|\/)(?P<FAMILY>[\-\w]+))))*"
         rf"((?P<VARIANTSEP>(\#|\@|\!|\.))(?P<VARIANT>.*))$", re.IGNORECASE
     )
@@ -246,5 +228,6 @@ class Rising(BaseNameScheme):
 
 class Virusdie(BaseNameScheme):
     rgx = re.compile(
-        rf"^({HEURISTICS})?((^|\.){LABELS})?((^|\.){PLATFORM_REGEXES})?"
-        r"((^|\.)(?P<NAME>((?P<FAMILY>[\.\w]+)?(\.(?P<VARIANT>\w+))?)?))$", re.IGNORECASE)
+        rf"^({HEURISTICS})?((^|\.){LABELS})?((^|\.){PLATFORM})?"
+        rf"((^|\.){IDENT})$", re.IGNORECASE
+    )
