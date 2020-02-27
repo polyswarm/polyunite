@@ -13,7 +13,6 @@ def seen():
         with zf.open('engine_families.csv') as csvfile:
             yield from csv.reader(map(bytes.decode, csvfile.readlines()))
 
-
 if len(sys.argv) == 1:
     missing = set()
     errors = []
@@ -32,7 +31,7 @@ if len(sys.argv) == 1:
                         sch.operating_system or '    ',
                         sch.language or '    ',
                         sch.macro or '    ',
-                        ', '.join(sch.label),
+                        ', '.join(sch.labels),
                         sch.name,
                         colorized,
                     )

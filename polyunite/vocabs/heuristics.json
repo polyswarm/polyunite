@@ -47,15 +47,15 @@
     },
     "suspicious": {
         "__alias__": [
-            "suspect(crc|ed)?",
-            "susp(ic)?",
+            "suspect",
+            "suspected",
             "suspicious",
             "reputation",
             "behaveslike",
             "lookslike",
             "variant",
             "VirusOrg",
-            "Sorter\\.AVE",
+            "Sorter.AVE",
             "based",
             "possible",
             "threat",

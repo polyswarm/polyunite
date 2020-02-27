@@ -21,10 +21,12 @@ reset = '\033[0m'
 
 GROUP_COLORS = {
     'NAME': underline,
-    'PLATFORM': cyan,
-    'LABEL': yellow,
-    'PREFIX': cyan,
-    'HEURISTIC': underline,
+    'LABELS': yellow,
+    'ARCHIVES': black,
+    'HEURISTICS': underline,
+    'MACROS': green,
+    'LANGS': blue,
+    'OPERATING_SYSTEMS': cyan,
     'FAMILY': green,
     'VARIANT': white,
     'OBFUSCATION': black,

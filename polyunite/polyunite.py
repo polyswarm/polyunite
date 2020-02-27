@@ -83,7 +83,7 @@ class BaseNameScheme:
     def heuristic(self) -> Optional[bool]:
         return self.values.get('VARIANT', '').lower().startswith('gen') or any(
             HEURISTICS.find(value=f)
-            for f in list(map(trx, map(self.values.get, ('HEURISTIC', 'FIELDS', 'FAMILY', 'LABEL'))))
+            for f in list(map(trx, map(self.values.get, ('HEURISTICS', 'FIELDS', 'FAMILY', 'LABELS'))))
             if f
         )
 
@@ -100,7 +100,7 @@ class BaseNameScheme:
         family = self.values.get('FAMILY', None)
         prefix = [family] if family and len(family) > 2 else [
             v for k, v in self.match.groupdict().items()
-            if k in {'LANGS', 'MACROS', 'OPERATINGSYSTEM', 'ARCHIVES', 'LABEL'} if v
+            if k in {'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'ARCHIVES', 'LABELS'} if v
         ]
         result = '.'.join(filter(None, prefix + [self.values.get('VARIANT', self.values.get('SUFFIX'))]))
         return result
@@ -118,19 +118,19 @@ class BaseNameScheme:
         return MACROS.find(self.values)
 
     @property
-    def label(self) -> List[str]:
+    def labels(self) -> List[str]:
         return LABELS.find(self.values, every=True)
 
 
 class Alibaba(BaseNameScheme):
-    rgx = re.compile(rf"^(?:{LABELS}:)?(?:{PLATFORM}\/)?(?:{IDENT})$", re.IGNORECASE)
+    rgx = re.compile(rf"^(?:{LABELS}:)?(?:({PLATFORM})\/)?(?:{IDENT})$", re.IGNORECASE)
 
 
 class ClamAV(BaseNameScheme):
     rgx = re.compile(
         r"^(?:(?P<PREFIX>BC|Clamav))?"
-        rf"(?:(\.|^){PLATFORM})?"
-        r"(?:(\.|^)(?P<LABEL>[-\w]+))"
+        rf"(?:(\.|^)({PLATFORM}))?"
+        r"(?:(\.|^)(?P<LABELS>[-\w]+))"
         r"(?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$", re.IGNORECASE
     )
 
@@ -139,7 +139,7 @@ class DrWeb(BaseNameScheme):
     rgx = re.compile(
         rf"""^
         ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
-        ((\.|\A|\b)(?i:({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)})))?
+        ((\.|\A|\b)(?i:({PLATFORM})))?
         ((\.|\A|\b)(?i:{LABELS}))?
         ((\.|\b)( # MulDrop6.38732 can appear alone or in front of another `.`
             (?P<FAMILY>[A-Za-z][-\w\.]+?)
@@ -182,11 +182,11 @@ class K7(BaseNameScheme):
     @property
     def name(self):
         variant = self.values.get("VARIANT")
-        return self.values['LABEL'] + (f':{variant}' if variant else '')
+        return self.values['LABELS'] + (f':{variant}' if variant else '')
 
 
 class Lionic(BaseNameScheme):
-    rgx = re.compile(rf"^({LABELS})?" rf"((^|\.){PLATFORM})?" rf"((\.|^){IDENT})?$", re.IGNORECASE)
+    rgx = re.compile(rf"^({LABELS})?" rf"((^|\.)(?:{PLATFORM}))?" rf"((\.|^){IDENT})?$", re.IGNORECASE)
 
 
 class NanoAV(BaseNameScheme):
@@ -194,7 +194,7 @@ class NanoAV(BaseNameScheme):
         rf"""^
         ({LABELS})?
         ((\.)(?P<NANO_TYPE>(Macro|Text|Url)))?
-        ((\.)({PLATFORM}))*?
+        ((\.)(?:{PLATFORM}))*?
         ((\.|\A|\b){IDENT})
         $""", re.VERBOSE
     )
@@ -219,7 +219,7 @@ class QuickHeal(BaseNameScheme):
         ({HEURISTICS}\.)?
         # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
         ((\.|^){LABELS}(\)$)?)?
-        ((\.|^)({PLATFORM}))?
+        ((\.|^)(?:{PLATFORM}))?
         ((\.|\/|^)
             ((?P<FAMILY>[-\w]+))
             (\.(?P<VARIANT>\w+))?
@@ -233,7 +233,7 @@ class Rising(BaseNameScheme):
         rf"""^
         ({LABELS})?
         ((
-             (((?:^|\/|\.)({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)}))) |
+             (((?:^|\/|\.)(?:{PLATFORM}))) |
              ((\.|\/) (?P<FAMILY>[A-Z][\-\w]+)))
         )*
         ((?P<VARIANTSEP>(\#|\@|\!|\.))(?P<VARIANT>.*))
@@ -243,6 +243,6 @@ class Rising(BaseNameScheme):
 
 class Virusdie(BaseNameScheme):
     rgx = re.compile(
-        rf"^(?:{HEURISTICS})?(?:(?:^|\.){LABELS})?(?:(?:^|\.){PLATFORM})?"
-        rf"(?:(?:^|\.){IDENT})$", re.IGNORECASE
+        rf"^({HEURISTICS})?((^|\.){LABELS})?((^|\.){PLATFORM})?"
+        rf"((^|\.){IDENT})$"
     )

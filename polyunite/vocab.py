@@ -14,14 +14,9 @@ from typing import (
 
 import pkg_resources
 
-from polyunite.utils import trx
 
-
-def load_vocab(name):
-    # these identifiers are sourced from https://maecproject.github.io/documentation/maec5-docs/#introduction
-    return json.load(pkg_resources.resource_stream(__name__, f'vocabs/{name}.json'))
-
-
+# THIS class is a temporary hack to get polyscore going.
+# Do not invest (much) work into improving beyond bugfixes
 class VocabRegex(string.Formatter):
     name: str
     fields: Dict[str, Union[Dict, str]]
@@ -41,7 +36,9 @@ class VocabRegex(string.Formatter):
 
     def build(self, **kwargs) -> str:
         return self.named_group(
-            name=kwargs.get('name', self.name), fields=[k for k, _ in self.visitor(self.fields)], **kwargs
+            name=kwargs.get('name', self.name),
+            fields=[k for k, _ in self.visitor(self.fields)],
+            **kwargs
         )
 
     def combine(self, name, *vocabs, **kwargs) -> str:
@@ -72,19 +69,25 @@ class VocabRegex(string.Formatter):
             if isinstance(kv[k], Mapping):
                 yield from self.visitor(kv[k], exclude=exclude, path=path + [k])
 
+    @classmethod
+    def load_vocab(cls, name):
+        return cls(
+            name.upper(),
+            json.load(pkg_resources.resource_stream(__name__, f'vocabs/{name}.json'))
+        )
+
 
 # Provides extra detail about the malware, including how it is used as part of a multicomponent
 # threat. In the example above,
-SUFFIXES = VocabRegex('SUFFIX', load_vocab('suffixes'))
-LABELS = VocabRegex('LABEL', load_vocab('labels'))
-LANGS = VocabRegex('LANGS', load_vocab('langs'))
-ARCHIVES = VocabRegex('ARCHIVES', load_vocab('archives'))
-MACROS = VocabRegex('MACROS', load_vocab('macros'))
-OSES = VocabRegex('OPERATINGSYSTEM', load_vocab('operating_systems'))
-HEURISTICS = VocabRegex('HEURISTIC', load_vocab('heuristics'))
+LABELS = VocabRegex.load_vocab('labels')
+LANGS = VocabRegex.load_vocab('langs')
+ARCHIVES = VocabRegex.load_vocab('archives')
+MACROS = VocabRegex.load_vocab('macros')
+OSES = VocabRegex.load_vocab('operating_systems')
+HEURISTICS = VocabRegex.load_vocab('heuristics')
+OBFUSCATIONS = VocabRegex.load_vocab('obfuscations')
 
-PLATFORM = OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)
-OBFUSCATIONS = VocabRegex('OBFUSCATION', load_vocab('obfuscation_methods'))
+PLATFORM = rf"{OSES}|{ARCHIVES}|{MACROS}|{LANGS}"
 
 BEHAVIORS = r"(?P<BEHAVIOR>AntiVM)"
 
