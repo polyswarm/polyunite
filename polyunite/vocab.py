@@ -37,7 +37,7 @@ class VocabRegex(string.Formatter):
         self, name: str = None, fields: Iterable[str] = [], include: Iterable = [], exclude: Iterable = []
     ):
         fs = set(map(str, (*fields, *include))).difference(map(str, exclude))
-        return '(?P<{name}>{fields})'.format(name=name or self.name, fields='|'.join(fs))
+        return '(?i:(?P<{name}>{fields}))'.format(name=name or self.name, fields='|'.join(fs))
 
     def build(self, **kwargs) -> str:
         return self.named_group(

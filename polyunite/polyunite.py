@@ -4,14 +4,14 @@ from typing import Any, Dict, List, Optional
 from polyunite.utils import GROUP_COLORS, EngineSchemes, reset, trx
 from polyunite.vocab import (
     ARCHIVES,
+    BEHAVIORS,
     EXPLOITS,
     HEURISTICS,
-    OBFUSCATIONS,
-    BEHAVIORS,
     IDENT,
     LABELS,
     LANGS,
     MACROS,
+    OBFUSCATIONS,
     OSES,
     PLATFORM,
 )
@@ -31,6 +31,16 @@ class BaseNameScheme:
 
     def __init__(self, classification: str):
         self.values = self.build_values(classification)
+
+    def build_values(self, classification):
+        self.match = self.rgx.match(classification)
+        values = {}
+        if self.match:
+            for k, v in self.match.groupdict().items():
+                if not k.isupper():
+                    raise ValueError("Must supply upper-cased group names")
+                values[k] = v if v else ''
+        return values
 
     def __repr__(self):
         fields = {f: getattr(self, f, None) for f in ('name', 'operating_system', 'script', 'label')}
@@ -87,13 +97,13 @@ class BaseNameScheme:
 
     @property
     def name(self) -> str:
-        return self.values.get('NAME')
-
-    @property
-    def fullname(self) -> str:
-        return self.values.get('FAMILY') or (
-            '.'.join((self.values.get('NAME', ''), self.values.get('VARIANT', '')))
-        ) or None
+        family = self.values.get('FAMILY', None)
+        prefix = [family] if family and len(family) > 2 else [
+            v for k, v in self.match.groupdict().items()
+            if k in {'LANGS', 'MACROS', 'OPERATINGSYSTEM', 'ARCHIVES', 'LABEL'} if v
+        ]
+        result = '.'.join(filter(None, prefix + [self.values.get('VARIANT', self.values.get('SUFFIX'))]))
+        return result
 
     @property
     def operating_system(self) -> str:
@@ -111,61 +121,58 @@ class BaseNameScheme:
     def label(self) -> List[str]:
         return LABELS.find(self.values, every=True)
 
-    def build_values(self, classification):
-        self.match = self.rgx.match(classification)
-        values = {}
-        if self.match:
-            for k, v in self.match.groupdict().items():
-                if not k.isupper():
-                    raise ValueError("Must supply upper-cased group names")
-                values[k] = v if v else ''
-        return values
-
 
 class Alibaba(BaseNameScheme):
-    rgx = re.compile(rf"^({LABELS}:)?({PLATFORM}\/)?({IDENT})$", re.IGNORECASE)
+    rgx = re.compile(rf"^(?:{LABELS}:)?(?:{PLATFORM}\/)?(?:{IDENT})$", re.IGNORECASE)
 
 
 class ClamAV(BaseNameScheme):
     rgx = re.compile(
-        r"^((?P<PREFIX>BC|Clamav))?"
-        rf"((\.|^){PLATFORM})?"
-        r"((\.|^)(?P<LABEL>[-\w]+))"
-        r"((\.|^)(?P<NAME>((?P<FAMILY>\w+)((\:\w)|(\/\w+))*(\-(?P<VARIANT>[\-0-9]+)))))?$", re.IGNORECASE
+        r"^(?:(?P<PREFIX>BC|Clamav))?"
+        rf"(?:(\.|^){PLATFORM})?"
+        r"(?:(\.|^)(?P<LABEL>[-\w]+))"
+        r"(?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$", re.IGNORECASE
     )
 
 
 class DrWeb(BaseNameScheme):
     rgx = re.compile(
-        rf"^((?i:{HEURISTICS})(\s+(of\s*)?)?)?"
-        rf"((\.|\A)(?i:({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)})))?"
-        rf"((\.|\A)(?i:{LABELS}))?"
-        r"((\.|\b)((?P<NAME>("
-        r"(?P<FAMILY>[A-Za-z][-\w\.]+?)"
-        r"((\.|$)(?P<VARIANT>[0-9]+))?"
-        r"(\.?(?P<SUFFIX>(origin|based)))?))))?$"
+        rf"""^
+        ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
+        ((\.|\A|\b)(?i:({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)})))?
+        ((\.|\A|\b)(?i:{LABELS}))?
+        ((\.|\b)( # MulDrop6.38732 can appear alone or in front of another `.`
+            (?P<FAMILY>[A-Za-z][-\w\.]+?)
+            (\.|\Z) # and either end or continue with `.`
+            (?P<VARIANT>[0-9]+)?
+            (\.?(?P<SUFFIX>(origin|based)))?
+        ))?
+        $""", re.VERBOSE
     )
 
 
 class Ikarus(BaseNameScheme):
     rgx = re.compile(
-        rf"^({OBFUSCATIONS}\.)?"
-        rf"(?P<HEURISTIC>[-\w+]+?\:)?"
-        r"((?P<LABEL>[\w-]*?))?"
-        rf"((\.){EXPLOITS})?"
-        rf"((^|[^\w]){PLATFORM})?"
-        rf"(\.{IDENT})?$", re.IGNORECASE
+        rf"""^
+        ({OBFUSCATIONS}\.)?
+        (?P<HEURISTIC>[-\w+]+?\:)?
+        ({LABELS})?
+        ((\.){EXPLOITS})?
+        ((^|[^\w]){PLATFORM})?
+        (\.{IDENT})?
+        $""", re.VERBOSE
     )
 
 
 class Jiangmin(BaseNameScheme):
     rgx = re.compile(
-        r"^(?P<HEURISTIC>(Variant|heur:))?"
-        rf"((\b|\.|\A)({OBFUSCATIONS}))?"
-        rf"((\b|\.|\/|\A)((?i:{LABELS})|({PLATFORM})))*"
-        r"((\.|\/|\A|\b)(?P<NAME>("
-        r"((?P<FAMILY>(CVE-[\d-]*|\w+))(?P<SUFFIX>(\-(\w+)))?(\.|$))?"
-        r"((?P<VARIANT>((\d+\.)?\w*)))?)))?$", re.IGNORECASE
+        rf"""^
+        (?P<HEURISTIC>(Variant|heur:))?
+        ((\b|\.|\/|\A)({OBFUSCATIONS}|{LABELS}|{PLATFORM}))*
+        ((\.|\/|\A|\b)
+            ((?P<FAMILY>(CVE-[\d-]*|[A-Z]\w*))(?P<SUFFIX>(\-(\w+)))?(\.|\Z))?
+            ((?P<VARIANT>((\d+\.)?\w*)))?
+        )?$""", re.VERBOSE
     )
 
 
@@ -184,50 +191,58 @@ class Lionic(BaseNameScheme):
 
 class NanoAV(BaseNameScheme):
     rgx = re.compile(
-        rf"^({LABELS})?"
-        r"((\.)(?P<NANO_TYPE>(Macro|Text|(Url\.(\w+)))))?"
-        rf"((\.)({PLATFORM}))?"
-        rf"((\.|\A|\b){IDENT})$", re.IGNORECASE
+        rf"""^
+        ({LABELS})?
+        ((\.)(?P<NANO_TYPE>(Macro|Text|Url)))?
+        ((\.)({PLATFORM}))*?
+        ((\.|\A|\b){IDENT})
+        $""", re.VERBOSE
     )
 
 
 class Qihoo360(BaseNameScheme):
     rgx = re.compile(
-        r"^((?P<HEURISTIC>(VirusOrg|Generic|HEUR))(/|((?<=VirusOrg)\.)))?"
-        r"(macro|tif)?"
-        rf"(((\.|\b)(url|iframe|{MACROS}|{LANGS}|{OSES}|{ARCHIVES}))|(\.|\b|/){LABELS}|"
-        r"((\.|\b)(QVM\d*(\.\d)?(\.[0-9A-F]+)?)))*"
-        rf"((\.|/){IDENT})?$", re.IGNORECASE
+        rf"""^
+        ((?P<HEURISTIC>(VirusOrg|Generic|HEUR))(/|((?<=VirusOrg)\.)))?
+        (
+            ((\.|\b|^)({MACROS}|{LANGS}|{OSES}|{ARCHIVES}))
+            |(\.|\b|/|^){LABELS}
+            |((\.|\b)(QVM\d*(\.\d)?(\.[0-9A-F]+)?))
+        )*?
+        ((\.|/){IDENT})?$""", re.VERBOSE
     )
 
 
 class QuickHeal(BaseNameScheme):
     rgx = re.compile(
-        rf"^({HEURISTICS}\.)?"
+        rf"""^
+        ({HEURISTICS}\.)?
         # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
-        rf"((\.|^){LABELS}(\)$)?)?"
-        rf"((\.|^)({PLATFORM}))?"
-        r"((\.|\/|^)(?P<NAME>(((?P<FAMILY>[-\w]+))(\.(?P<VARIANT>\w+))?(\.(?P<SUFFIX>\w+))?)))?$",
-        re.IGNORECASE
+        ((\.|^){LABELS}(\)$)?)?
+        ((\.|^)({PLATFORM}))?
+        ((\.|\/|^)
+            ((?P<FAMILY>[-\w]+))
+            (\.(?P<VARIANT>\w+))?
+            (\.(?P<SUFFIX>\w+))?)?
+        $""", re.VERBOSE
     )
 
 
 class Rising(BaseNameScheme):
     rgx = re.compile(
-        rf"^({LABELS})?"
-        rf"(((((^|\/|\.)({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS, include=['System', 'Macro'])})))"
-        r"|((\.|\/)(?P<FAMILY>[\-\w]+))))*"
-        rf"((?P<VARIANTSEP>(\#|\@|\!|\.))(?P<VARIANT>.*))$", re.IGNORECASE
+        rf"""^
+        ({LABELS})?
+        ((
+             (((?:^|\/|\.)({OSES.combine('PLATFORM', ARCHIVES, MACROS, LANGS)}))) |
+             ((\.|\/) (?P<FAMILY>[A-Z][\-\w]+)))
+        )*
+        ((?P<VARIANTSEP>(\#|\@|\!|\.))(?P<VARIANT>.*))
+        $""", re.VERBOSE
     )
-
-    @property
-    def name(self) -> str:
-        return self.values.get('FAMILY', '') + self.values.get('VARIANTSEP',
-                                                               '') + self.values.get('VARIANT', '')
 
 
 class Virusdie(BaseNameScheme):
     rgx = re.compile(
-        rf"^({HEURISTICS})?((^|\.){LABELS})?((^|\.){PLATFORM})?"
-        rf"((^|\.){IDENT})$", re.IGNORECASE
+        rf"^(?:{HEURISTICS})?(?:(?:^|\.){LABELS})?(?:(?:^|\.){PLATFORM})?"
+        rf"(?:(?:^|\.){IDENT})$", re.IGNORECASE
     )
