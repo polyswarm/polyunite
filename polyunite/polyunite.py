@@ -145,11 +145,6 @@ class Jiangmin(BaseNameScheme):
 class K7(BaseNameScheme):
     rgx = re.compile(rf"^(?i:{LABELS})\s*(\s*\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?")
 
-    @property
-    def name(self):
-        variant = self.values.get("VARIANT")
-        return self.values['LABELS'] + (f':{variant}' if variant else '')
-
 
 class Lionic(BaseNameScheme):
     rgx = re.compile(rf"^({LABELS})?" rf"((^|\.)(?:{PLATFORM}))?" rf"((\.|^){IDENT})?$", re.IGNORECASE)

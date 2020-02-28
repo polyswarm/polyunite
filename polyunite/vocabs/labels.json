@@ -161,7 +161,7 @@
         "__alias__": [
             "pws",
             "psw",
-            "stealer",
+            "(?:password-)?stealer",
             "pwsteal(:er)?",
             "infosteal(?:er)?"
         ],
