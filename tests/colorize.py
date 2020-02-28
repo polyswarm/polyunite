@@ -13,6 +13,7 @@ def seen():
         with zf.open('engine_families.csv') as csvfile:
             yield from csv.reader(map(bytes.decode, csvfile.readlines()))
 
+
 if len(sys.argv) == 1:
     missing = set()
     errors = []
@@ -27,7 +28,7 @@ if len(sys.argv) == 1:
                     '{:<10} {:1} {:1} {:<10.10} {:<8.8} {:<10.10} {:30.30} {:>16.16} {}'.format(
                         engine,
                         sch.heuristic and 'H' or ' ',
-                        sch.malice_unlikely and 'T' or ' ',
+                        sch.peripheral and 'T' or ' ',
                         sch.operating_system or '    ',
                         sch.language or '    ',
                         sch.macro or '    ',
@@ -36,13 +37,13 @@ if len(sys.argv) == 1:
                         colorized,
                     )
                 )
-            except TypeError:
-                errors.append((engine, family))
+            except TypeError as e:
+                errors.append((engine, family, e))
         else:
             missing.add(engine)
     print("{:-^100}".format("FAILURES"))
-    for engine, family in errors:
-        print("{:<15}: {:85}".format(engine, family))
+    for engine, family, err in errors:
+        print("{:<15}: {:85} : {}".format(engine, family, err))
     print("\nNo name scheme found for: ", missing)
     sys.exit(0)
 

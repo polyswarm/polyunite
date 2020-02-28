@@ -20,61 +20,40 @@ import pkg_resources
 class VocabRegex(string.Formatter):
     name: str
     fields: Dict[str, Union[Dict, str]]
-
-    def __str__(self):
-        return self.build()
+    _tok_regex: str
 
     def __init__(self, name, fields):
         self.name = name
         self.fields = fields
+        self._tok_regex = None
 
-    def named_group(
-        self, name: str = None, fields: Iterable[str] = [], include: Iterable = [], exclude: Iterable = []
-    ):
-        fs = set(map(str, (*fields, *include))).difference(map(str, exclude))
-        return '(?i:(?P<{name}>{fields}))'.format(name=name or self.name, fields='|'.join(fs))
-
-    def build(self, **kwargs) -> str:
-        return self.named_group(
-            name=kwargs.get('name', self.name),
-            fields=[k for k, _ in self.visitor(self.fields)],
-            **kwargs
-        )
-
-    def combine(self, name, *vocabs, **kwargs) -> str:
-        return self.named_group(name=name, fields=[self, *vocabs], **kwargs)
-
-    def find(self, groups=None, value=None, every=False) -> Optional[str]:
+    def find(self, value={}, *, backup=iter(())) -> Optional[str]:
         "Attempt to extract & normalize a group with the same name as this ``VocabRegex``"
-        needle = value or groups.get(self.name)
-        results = set()
-        if needle:
-            for k, (category, *_) in self.visitor(self.fields):
-                if re.fullmatch(k, needle, re.IGNORECASE):
-                    if not every:
-                        return category
-                    if category not in results:
-                        results.add(category)
-        return list(results)
+        needle = value.get(self.name) if type(value) == dict else value
+        yield from filter(None, re.finditer(self.token_regex(), needle or r'\Z\A', re.IGNORECASE))
 
-    def visitor(self, kv, exclude=[], path=[]) -> Iterator[Tuple[str, List[str]]]:
-        for k in kv:
-            if k == '__alias__':
-                for alias in kv[k]:
-                    yield (alias, path)
-            elif k.startswith('__'):
-                continue
-            elif k not in exclude:
-                yield (k, path + [k])
-            if isinstance(kv[k], Mapping):
-                yield from self.visitor(kv[k], exclude=exclude, path=path + [k])
+    def visitor(self, kv, *, path=()) -> Iterator[Tuple[str, List[str]]]:
+        yield from ((alias, path) for alias in kv.get('__alias__', ()))
+        for npath, k, v in ((path + (k, ), k, v) for k, v in kv.items() if not k.startswith('__')):
+            yield (k, npath)
+            if isinstance(v, Mapping):
+                yield from self.visitor(v, path=npath)
+
+    def __str__(self):
+        fields = '|'.join({str(kv[0]) for kv in self.visitor(self.fields)})
+        return fr'(?i:(?P<{self.name}>{fields}))'
+
+    def token_regex(self, rebuild=False):
+        if not self._tok_regex or rebuild:
+            gs = {}
+            for (key, (name, *_)) in self.visitor(self.fields):
+                gs.setdefault(name, set()).add(key)
+            self._tok_regex = '|'.join(fr'(?P<{g}>{"|".join(rx)})' for g, rx in gs.items())
+        return self._tok_regex
 
     @classmethod
     def load_vocab(cls, name):
-        return cls(
-            name.upper(),
-            json.load(pkg_resources.resource_stream(__name__, f'vocabs/{name}.json'))
-        )
+        return cls(name.upper(), json.load(pkg_resources.resource_stream(__name__, f'vocabs/{name}.json')))
 
 
 # Provides extra detail about the malware, including how it is used as part of a multicomponent
