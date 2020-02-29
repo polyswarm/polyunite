@@ -1,11 +1,15 @@
 import csv
 import os
 import sys
-import zipfile
+import zipfile  # noqa
 
-import pkg_resources
+import pkg_resources  # noqa
 
-import polyunite
+try:
+    import polyunite  # noqa
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    import polyunite
 
 
 def seen():
@@ -51,7 +55,7 @@ elif len(sys.argv) == 2:
     if sys.argv[1] == '-r':
         # print regular expressions for each engine
         for engine, obj in polyunite.Schemes.items():
-            print("%s: \n%s\n" % (engine, obj.rgx.pattern))
+            print("%s: \n%s\n" % (engine, obj.pattern.pattern))
         sys.exit(0)
 
 raise NotImplementedError

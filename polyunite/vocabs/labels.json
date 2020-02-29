@@ -1,8 +1,6 @@
 {
     "adware": "Any software that is funded by advertising. Adware may also gather sensitive user information from a system.",
-    "appender": {
-        "__desc__": "File-infecting malware that places its code at the end of the files it infects, adjusting the file's entry point to cause its code to be executed before that in the original file."
-    },
+    "appender": "File-infecting malware that places its code at the end of the files it infects, adjusting the file's entry point to cause its code to be executed before that in the original file.",
     "backdoor": "Malware which, once running on a system, opens a communication vector to the outside so the computer can be accessed remotely by an attacker.",
     "boot_sector_virus": "Malware that infects the master boot record of a storage device.",
     "bot": "Malware that resides on an infected system, communicating with and forming part of a botnet. The bot may be implanted by a worm or trojan, which opens a backdoor. The bot then monitors the backdoor for further instructions.",
@@ -45,6 +43,7 @@
             "dload",
             "downware",
             "downagent",
+            "trojan(?:\\.|-|/|\\s)?downloader",
             "trojandwnldr",
             "trjndwnlder",
             "exedown",
@@ -59,7 +58,6 @@
     },
     "dropper": {
         "__alias__": [
-            "[a-z]*.?dropper",
             "docdrop",
             "docdrp",
             "drop",
@@ -127,7 +125,8 @@
             "spammer",
             "smtp",
             "spam",
-            "spambot"
+            "spambot",
+            "phishing"
         ],
         "__desc__": "A worm that uses email to propagate across the internet."
     },
@@ -138,7 +137,7 @@
     "nonmalware": {
         "__alias__": [
             "not-?a-?virus",
-            "eicar",
+            ".*eicar.*",
             "test",
             "testfile",
             "test.file",
@@ -161,9 +160,9 @@
         "__alias__": [
             "pws",
             "psw",
-            "(?:password-)?stealer",
-            "pwsteal(:er)?",
-            "infosteal(?:er)?"
+            "(password-)?stealer",
+            "pwsteal(er)?",
+            "infosteal(er)?"
         ],
         "__desc__": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system."
     },
@@ -220,7 +219,7 @@
         "__alias__": [
             "rat",
             "remote-access",
-            "(?i:remote\\W?admin)"
+            "(remote\\W?admin)"
         ],
         "__desc__": "A remote access trojan program (or RAT), is a trojan horse capable of controlling a machine through commands issued by a remote attacker."
     },
@@ -247,12 +246,12 @@
             "pswtool",
             "tool",
             "risk-?tool",
-            "hacktool",
+            "hack(?:tool)?",
             "hktl",
             "securitytool",
             "security-?tool",
-            "spam(tool)?",
-            "crack(tool)?",
+            "spam(?:tool)?",
+            "crack(?:tool)?",
             "gamehack"
         ],
         "__desc__": "A program that can be used to gather information for unauthorized access to computer systems."
@@ -260,7 +259,6 @@
     "shellcode": {
         "__alias__": [
             "shellkode",
-            "hack",
             "hack\\Wexploit",
             "exp\\b",
             "exploit"
@@ -275,7 +273,7 @@
     },
     "test": {
         "__alias__": [
-            ".*(?i:(eicar(\\W?test\\W?file)?)).*",
+            ".*eicar.*",
             "testfile",
             "test.file",
             "testvirus"
@@ -288,7 +286,7 @@
     },
     "trojan": {
         "__alias__": [
-            "(?i:(trojan(\\.|\\s|_|\/|-)?(ransom|pws|dwnldr|dropper|downloader|miner|proxy|dialer|psw|spy|banker|ddos|ddoser|dialer|sms)))",
+            "(?:(?:\\.|-|/|\\s)?(?:(?:ransom|pws|dwnldr|dropper|downloader|miner|proxy|dialer|psw|spy|banker|ddos|ddoser|dialer|sms)|trojan)){2}",
             "proxy.?(program)"
         ],
         "__desc__": "Malware disguised as something inert or benign."
@@ -307,8 +305,7 @@
     "web_bug": "Code embedded in a web page or email that checks whether a user has accessed the content (e.g., a tiny, transparent GIF image).",
     "worm": {
         "__alias__": [
-            "(IM|net|i|email|p2p|smtp)(?:\\.|\\-|\\/)?worm",
-            "(?i:(worm(?:\\.|\\-|\\/)(P2p|p2p|mail|smtp)))",
+            "(?:(?:\\.|-|/|\\s)?(?:(?:im|net|i|email|p2p|smtp)|worm)){2}",
             "hllw"
         ],
         "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."

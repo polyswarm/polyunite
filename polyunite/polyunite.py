@@ -1,4 +1,4 @@
-from itertools import chain
+from itertools import chain, islice
 import re
 from typing import Any, Dict, List, Optional
 
@@ -23,10 +23,14 @@ def first_match(gen):
     return next((m.lastgroup for m in gen), None)
 
 
+def build_pattern(pattern_str: str, options=re.VERBOSE):
+    return re.compile(pattern_str, options)
+
+
 class BaseNameScheme:
     match: Optional[re.Match]
     values: Dict[str, Any]
-    rgx: re.Pattern
+    pattern: re.Pattern
 
     @classmethod
     def __init_subclass__(cls):
@@ -37,7 +41,7 @@ class BaseNameScheme:
         self.values = self.build_values(classification)
 
     def build_values(self, classification):
-        self.match = self.rgx.match(classification)
+        self.match = self.pattern.search(classification)
         if self.match:
             return {k: v for k, v in self.match.groupdict().items() if v}
 
@@ -50,11 +54,6 @@ class BaseNameScheme:
                 ss = ''.join(chain(*zip(ss.rpartition(match), (GROUP_COLORS[name], reset, ''))))
         return ss
 
-    def __repr__(self):
-        keys = ('name', 'operating_system', 'script', 'labels')
-        fields = ', '.join('='.join(map(lambda f: (f, getattr(self, f, None)), keys)))
-        return f'<{self.av_vendor}.scheme({fields})>'
-
     @property
     def classification_name(self) -> Optional[str]:
         return self.match and self.match.string
@@ -66,130 +65,142 @@ class BaseNameScheme:
     @property
     def heuristic(self) -> Optional[bool]:
         keys = ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')
-        return any(map(any, map(HEURISTICS.find, filter(None, map(self.values.get, keys)))))
+        pattern = re.compile(HEURISTICS.compile(1), re.IGNORECASE)
+        return any(map(pattern.search, filter(None, map(self.values.get, keys))))
 
     @property
     def peripheral(self) -> bool:
-        labels = {'test', 'nonmalware', 'greyware', 'shellcode', 'security_assessment_tool'}
-        return not self.labels.isdisjoint(labels)
+        return not self.labels.isdisjoint({
+            'test', 'nonmalware', 'greyware', 'shellcode', 'security_assessment_tool'
+        })
 
     @property
     def name(self) -> str:
         try:
-            groups = ('FAMILY', 'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'LABELS')
-            suffix = self.values.get('VARIANT') or self.values.get('SUFFIX', '')
-            return next(filter(None, map(self.values.get, groups))) + (suffix and '.' + suffix)
+            keys = ('FAMILY', 'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'LABELS')
+            prefix = next(filter(None, map(self.values.get, keys)))
+            suffix = self.values.get('VARIANT') or self.values.get('SUFFIX')
+            return prefix + (f'.{suffix}' if suffix else '')
         except StopIteration:
             return self.classification_name
 
+    def nmatch(self, name):
+        span = self.values.get(name)
+        return span and next((k for k, v in self.values.items() if k != name and v == span), None)
+
     @property
     def operating_system(self) -> str:
-        return first_match(OSES.find(self.values))
+        return self.nmatch(OSES.name)
 
     @property
     def language(self) -> str:
-        return first_match(LANGS.find(self.values))
+        return self.nmatch(LANGS.name)
 
     @property
     def macro(self) -> str:
-        return first_match(MACROS.find(self.values))
+        return self.nmatch(MACROS.name)
 
     @property
     def labels(self) -> List[str]:
-        return set((m.lastgroup for m in LABELS.find(self.values)))
+        group = self.values.get(LABELS.name, r'\Z\A')
+        return set(map(lambda m: m.lastgroup, re.finditer(LABELS.compile(1), group)))
 
 
 class Alibaba(BaseNameScheme):
-    rgx = re.compile(rf"^(?:{LABELS}:)?(?:({PLATFORM})\/)?(?:{IDENT})$", re.IGNORECASE)
+    pattern = build_pattern(rf"^(?:{LABELS}:)?(?:({PLATFORM})\/)?(?:{IDENT})$")
 
 
 class ClamAV(BaseNameScheme):
-    rgx = re.compile(
-        r"^(?:(?P<PREFIX>BC|Clamav))?"
-        rf"(?:(\.|^)({PLATFORM}))?"
-        r"(?:(\.|^)(?P<LABELS>[-\w]+))"
-        r"(?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$", re.IGNORECASE)
+    pattern = build_pattern(rf"""^
+        (?:(?P<PREFIX>BC|Clamav))?
+        (?:(\.|^)({PLATFORM}))?
+        (?:(\.|^)(?P<LABELS>[-\w]+))
+        (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$""")
 
 
 class DrWeb(BaseNameScheme):
-    rgx = re.compile(
-        rf"""^((?i:{HEURISTICS})(\s+(of\s*)?)?)?
-              ((\.|\A|\b)(?i:({PLATFORM})))?
-              ((\.|\A|\b)(?i:{LABELS}))?
-              ((\.|\b)( # MulDrop6.38732 can appear alone or in front of another `.`
+    pattern = build_pattern(rf"""^
+    ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
+              (?:(\.|\A|\b)(?i:({PLATFORM})))?
+              (?:(\.|\A|\b)(?i:{LABELS}))?
+              (?:(\.|\b)( # MulDrop6.38732 can appear alone or in front of another `.`
                   (?P<FAMILY>[A-Za-z][-\w\.]+?)
-                  (\.|\Z) # and either end or continue with `.`
+                  (?:\.|\Z) # and either end or continue with `.`
                   (?P<VARIANT>[0-9]+)?
-                  (\.?(?P<SUFFIX>(origin|based)))?
-              ))?$""", re.VERBOSE)
+                  (\.?(?P<SUFFIX>(origin|based)))?))?$""")
 
 
 class Ikarus(BaseNameScheme):
-    rgx = re.compile(
-        rf"""^({OBFUSCATIONS}\.)?
+    pattern = build_pattern(rf"""
+        ^({OBFUSCATIONS}\.)?
               (?:{HEURISTICS}\:?)?
-              ((\A|\.|\b)({LABELS}|{EXPLOITS}|{PLATFORM}))*
-              (\.{IDENT})?$""", re.VERBOSE)
+              ((?:\A|\.|\b)({LABELS}|{EXPLOITS}|{PLATFORM}))*?
+              (\.{IDENT})?$""")
 
 
 class Jiangmin(BaseNameScheme):
-    rgx = re.compile(
+    pattern = build_pattern(
         rf"""^(?:{HEURISTICS}:?)?
-              ((\b|\.|\/|\A)({OBFUSCATIONS}|{LABELS}|{PLATFORM}))*
-              ((\.|\/|\A|\b)
+              (?:(?:\b|\.|/|^)({OBFUSCATIONS}|{LABELS}|{PLATFORM}))*
+              (?:(?:\.|/|^|\b)
                   ((?P<FAMILY>(CVE-[\d-]*|[A-Z]\w*))(?P<SUFFIX>(\-(\w+)))?(\.|\Z))?
-                  ((?P<VARIANT>((\d+\.)?\w*)))?
-              )?$""", re.VERBOSE)
+                  ((?P<VARIANT>((\d+\.)?\w*)))?)?$""")
 
 
 class K7(BaseNameScheme):
-    rgx = re.compile(rf"^(?i:{LABELS})\s*(\s*\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?")
+    pattern = build_pattern(rf"^{LABELS}?\s*(\s*\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?")
 
 
 class Lionic(BaseNameScheme):
-    rgx = re.compile(rf"^({LABELS})?" rf"((^|\.)(?:{PLATFORM}))?" rf"((\.|^){IDENT})?$", re.IGNORECASE)
+    pattern = build_pattern(rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?((\.|^){IDENT})?$")
 
 
 class NanoAV(BaseNameScheme):
-    rgx = re.compile(
-        rf"""^({LABELS})?
-              ((\.)(?P<NANO_TYPE>(Macro|Text|Url)))?
-              ((\.)(?:{PLATFORM}))*?
-              ((\.|\A|\b){IDENT})$""", re.VERBOSE)
+    pattern = build_pattern(rf"""^
+        ({LABELS})?
+              ((?:\.)(?P<NANO_TYPE>(Macro|Text|Url)))?
+              ((?:\.)(?:{PLATFORM}))*?
+              ((?:\.|\A|\b){IDENT})$""")
 
 
 class Qihoo360(BaseNameScheme):
-    rgx = re.compile(
-        rf"""^((?P<HEURISTIC>(VirusOrg|Generic|HEUR))(/|((?<=VirusOrg)\.)))?
+    pattern = build_pattern(rf"""
+        ^({HEURISTICS}(/|((?<=VirusOrg)\.)))?
               (
-                  ((\.|\b|^)({MACROS}|{LANGS}|{OSES}|{ARCHIVES}))
-                  |(\.|\b|/|^){LABELS}
+                  ((\.|\b|\A)({MACROS}|{LANGS}|{OSES}|{ARCHIVES}))
+                  |(\.|\b|\/|\A){LABELS}
                   |((\.|\b)(QVM\d*(\.\d)?(\.[0-9A-F]+)?))
-              )*?
-              ((\.|/){IDENT})?$""", re.VERBOSE)
+              )*
+              ((\.|/){IDENT})?$""")
 
 
 class QuickHeal(BaseNameScheme):
-    rgx = re.compile(
-        rf"""^({HEURISTICS}\.)?
+    pattern = build_pattern(rf"""
+        ^(?:{HEURISTICS}\.)?
               # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
-              ((\.|^){LABELS}(\)$)?)?
-              ((\.|^)(?:{PLATFORM}))?
-              ((\.|\/|^)
+              ((?:\.|^){LABELS}(\)$)?)?
+              ((?:\.|^)(?:{PLATFORM}))?
+              ((?:\.|\/|^)
                   ((?P<FAMILY>[-\w]+))
                   (\.(?P<VARIANT>\w+))?
-                  (\.(?P<SUFFIX>\w+))?)?$""", re.VERBOSE)
+                  (\.(?P<SUFFIX>\w+))?)?$""")
 
 
 class Rising(BaseNameScheme):
-    rgx = re.compile(
-        rf"""^({LABELS})?
-              ((
-                  (((?:^|\/|\.)(?:{PLATFORM}))) |
-                  ((\.|\/) (?P<FAMILY>[A-Z][\-\w]+)))
-              )*
-              ((?P<VARIANTSEP>(\#|\@|\!|\.))(?P<VARIANT>.*))$""", re.VERBOSE)
+    pattern = build_pattern(rf"""^
+            {LABELS}?
+            (
+                ((?:^|\/|\.)(?:{PLATFORM})) |
+                ((?:\.|\/)(?P<FAMILY>[A-Z][\-\w]+))
+            )*
+            (?:(?P<VARIANTSEP>(\#|@|!|\.))(?P<VARIANT>.*))
+    $""")
 
 
 class Virusdie(BaseNameScheme):
-    rgx = re.compile(rf"^({HEURISTICS})?((^|\.){LABELS})?((^|\.){PLATFORM})?" rf"((^|\.){IDENT})$")
+    pattern = build_pattern(rf"""^
+        (?:{HEURISTICS})?
+        (?:(?:^|\.){LABELS})?
+        (?:(?:^|\.){PLATFORM})?
+        (?:(?:^|\.){IDENT})
+    $""")

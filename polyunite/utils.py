@@ -1,5 +1,5 @@
 from collections import UserDict
-from string import (ascii_uppercase, ascii_lowercase, whitespace)
+from string import ascii_lowercase, ascii_uppercase, whitespace
 
 
 def trx(ss: str):
@@ -33,7 +33,6 @@ GROUP_COLORS = {
 
 class EngineSchemes(UserDict):
     """A fancy dictionary for holding each engine, with easy lookup"""
-
     def __setitem__(self, k, v):
         return super().__setitem__(trx(k), v)
 

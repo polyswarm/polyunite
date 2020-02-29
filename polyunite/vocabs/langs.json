@@ -9,16 +9,24 @@
     "BAT": "Basic scripts",
     "CS": "Uses the CorelScript interpreter found in many Corel products",
     "HTA": "HTML Application scripts",
-    "HTML": "HTML Application scripts",
+    "HTML": {
+        "__alias__": [
+            "url",
+            "iframe"
+        ],
+        "__desc__": "HTML Application scripts"
+    },
     "IDA": "Uses the IDA Pro application",
     "IMAGE": {
-        "BMP": "BMP image",
-        "GIF": "GIF image",
-        "IMG-[A-Z]+": "Image file",
-        "JPE?G": "JPEG",
-        "PNG": "PNG",
-        "TIFF": "TIFF image",
-        "_desc": "Image files"
+        "__alias__": [
+            "BMP",
+            "GIF",
+            "IMG-[A-Z]+",
+            "JPE?G",
+            "PNG",
+            "TIFF"
+        ],
+        "__desc__": "Image files"
     },
     "TXT": "Text file",
     "INF": "Uses Windows INF files",
@@ -43,9 +51,10 @@
     "SH": "Shell scripts",
     "SMS": "Uses Short Messaging System (SMS) messages",
     "VBS": {
-        "VB": "Visual Basic scripts",
-        "VBA": "Visual Basic for Applications scripts",
-        "_desc": "Visual Basic scripts"
+        "__alias__": [
+            "VB", "VBA"
+        ],
+        "__desc__": "Visual Basic scripts"
     },
     "WinBAT": "Winbatch scripts",
     "WinHlp": {
