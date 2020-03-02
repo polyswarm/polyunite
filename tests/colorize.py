@@ -22,29 +22,30 @@ if len(sys.argv) == 1:
     missing = set()
     errors = []
     for engine, family in seen():
-        sch = polyunite.Schemes.parse(engine, family)
-        if sch:
-            try:
-                colorized = sch.colorize()
-                if not colorized:
-                    raise TypeError
-                print(
-                    '{:<10} {:1} {:1} {:<10.10} {:<8.8} {:<10.10} {:30.30} {:>16.16} {}'.format(
-                        engine,
-                        sch.heuristic and 'H' or ' ',
-                        sch.peripheral and 'T' or ' ',
-                        sch.operating_system or '    ',
-                        sch.language or '    ',
-                        sch.macro or '    ',
-                        ', '.join(sch.labels),
-                        sch.name,
-                        colorized,
-                    )
+        try:
+            sch = polyunite.parse(engine, family)
+            if not sch:
+                missing.add(engine)
+                continue
+            colorized = sch.colorize()
+            if not colorized:
+                errors.append((engine, family, ''))
+                continue
+            print(
+                '{:<10} {:1} {:1} {:<10.10} {:<8.8} {:<10.10} {:30.30} {:>16.16} {}'.format(
+                    engine,
+                    sch.heuristic and 'H' or ' ',
+                    sch.peripheral and 'T' or ' ',
+                    sch.operating_system or '    ',
+                    sch.language or '    ',
+                    sch.macro or '    ',
+                    ', '.join(sch.labels),
+                    sch.name,
+                    colorized,
                 )
-            except TypeError as e:
-                errors.append((engine, family, e))
-        else:
-            missing.add(engine)
+            )
+        except AttributeError as e:
+            errors.append((engine, family, e))
     print("{:-^100}".format("FAILURES"))
     for engine, family, err in errors:
         print("{:<15}: {:85} : {}".format(engine, family, err))

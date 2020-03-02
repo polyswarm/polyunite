@@ -1,4 +1,5 @@
 from collections import UserDict
+import re
 from string import ascii_lowercase, ascii_uppercase, whitespace
 
 
@@ -42,7 +43,35 @@ class EngineSchemes(UserDict):
     def __contains__(self, k):
         return super().__contains__(trx(k))
 
-    def parse(self, name, classification: str):
-        if name in self:
-            return self[name](classification)
-        return None
+
+Schemes = EngineSchemes()
+
+
+def parse(name, classification: str):
+    return name in Schemes and Schemes[name](classification)
+
+
+def MAEC_ATTRIBUTE(src, every=False, container=set):
+    span = getattr(src, 'name', src)
+
+    if callable(span):
+        fn = span
+    elif every:
+
+        def fetch_all(self):
+            group = self.values.get(span, r'\Z\A')
+            return container(filter(None, (m.lastgroup for m in pattern.finditer(group))))
+
+        pattern = src.compile(1)
+        fn = fetch_all
+    else:
+
+        def driver(self):
+            match = self.values.get(span)
+            if match:
+                gen = (k for k, v in self.values.items() if v == match and k != span)
+                return next(gen, None)
+
+        fn = driver
+
+    return property(fn)

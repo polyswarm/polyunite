@@ -1,8 +1,8 @@
-from itertools import chain, islice
+from itertools import chain
 import re
-from typing import Any, Dict, List, Optional
+from typing import Dict, Optional
 
-from polyunite.utils import GROUP_COLORS, EngineSchemes, reset
+from polyunite.utils import GROUP_COLORS, MAEC_ATTRIBUTE, Schemes, reset
 from polyunite.vocab import (
     ARCHIVES,
     EXPLOITS,
@@ -16,57 +16,38 @@ from polyunite.vocab import (
     PLATFORM,
 )
 
-Schemes = EngineSchemes()
 
-
-def first_match(gen):
-    return next((m.lastgroup for m in gen), None)
-
-
-def build_pattern(pattern_str: str, options=re.VERBOSE):
-    return re.compile(pattern_str, options)
-
-
-class BaseNameScheme:
-    match: Optional[re.Match]
-    values: Dict[str, Any]
+class EnginePattern:
+    match: re.Match
+    values: Dict[str, str]
     pattern: re.Pattern
 
     @classmethod
     def __init_subclass__(cls):
-        super().__init_subclass__()
+        if not isinstance(cls.pattern, re.Pattern):
+            cls.pattern = re.compile(cls.pattern, re.VERBOSE)
         Schemes[cls.__name__] = cls
 
     def __init__(self, classification: str):
-        self.values = self.build_values(classification)
-
-    def build_values(self, classification):
         self.match = self.pattern.search(classification)
-        if self.match:
-            return {k: v for k, v in self.match.groupdict().items() if v}
+        self.values = {k: v for k, v in self.match.groupdict().items() if v}
 
     def colorize(self) -> str:
         """Colorize a classification string"""
         ss = self.classification_name
-        if ss:
-            # interleave the color, match & reset between the part before & after the match (from rpartition)
-            for name, match in filter(lambda kv: kv[0] in GROUP_COLORS, self.values.items()):
-                ss = ''.join(chain(*zip(ss.rpartition(match), (GROUP_COLORS[name], reset, ''))))
+        # interleave the color, match & reset between the part before & after the match (from rpartition)
+        for name, match in filter(lambda kv: kv[0] in GROUP_COLORS, self.values.items()):
+            ss = ''.join(chain(*zip(ss.rpartition(match), (GROUP_COLORS[name], reset, ''))))
         return ss
 
-    @property
-    def classification_name(self) -> Optional[str]:
-        return self.match and self.match.string
-
-    @property
-    def av_vendor(self) -> str:
-        return str(self.__class__.__name__)
+    def first(self, keys):
+        return filter(None, map(self.values.get, keys))
 
     @property
     def heuristic(self) -> Optional[bool]:
-        keys = ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')
-        pattern = re.compile(HEURISTICS.compile(1), re.IGNORECASE)
-        return any(map(pattern.search, filter(None, map(self.values.get, keys))))
+        return any(
+            map(HEURISTICS.compile(1).search, self.first(('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')))
+        )
 
     @property
     def peripheral(self) -> bool:
@@ -77,49 +58,42 @@ class BaseNameScheme:
     @property
     def name(self) -> str:
         try:
-            keys = ('FAMILY', 'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'LABELS')
-            prefix = next(filter(None, map(self.values.get, keys)))
-            suffix = self.values.get('VARIANT') or self.values.get('SUFFIX')
-            return prefix + (f'.{suffix}' if suffix else '')
+            return '.'.join(
+                next(
+                    zip(
+                        self.first(('FAMILY', 'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'LABELS')),
+                        self.first(('VARIANT', 'SUFFIX'))
+                    )
+                )
+            )
         except StopIteration:
             return self.classification_name
 
-    def nmatch(self, name):
-        span = self.values.get(name)
-        return span and next((k for k, v in self.values.items() if k != name and v == span), None)
+    @MAEC_ATTRIBUTE
+    def classification_name(self) -> Optional[str]:
+        return self.match and self.match.string
 
-    @property
-    def operating_system(self) -> str:
-        return self.nmatch(OSES.name)
-
-    @property
-    def language(self) -> str:
-        return self.nmatch(LANGS.name)
-
-    @property
-    def macro(self) -> str:
-        return self.nmatch(MACROS.name)
-
-    @property
-    def labels(self) -> List[str]:
-        group = self.values.get(LABELS.name, r'\Z\A')
-        return set(map(lambda m: m.lastgroup, re.finditer(LABELS.compile(1), group)))
+    av_vendor = MAEC_ATTRIBUTE(lambda self: self.__class__.__name__)
+    operating_system = MAEC_ATTRIBUTE(OSES)
+    language = MAEC_ATTRIBUTE(LANGS)
+    macro = MAEC_ATTRIBUTE(MACROS)
+    labels = MAEC_ATTRIBUTE(LABELS, every=True, container=set)
 
 
-class Alibaba(BaseNameScheme):
-    pattern = build_pattern(rf"^(?:{LABELS}:)?(?:({PLATFORM})\/)?(?:{IDENT})$")
+class Alibaba(EnginePattern):
+    pattern = rf"^(?:{LABELS}:)?(?:({PLATFORM})\/)?(?:{IDENT})$"
 
 
-class ClamAV(BaseNameScheme):
-    pattern = build_pattern(rf"""^
+class ClamAV(EnginePattern):
+    pattern = rf"""^
         (?:(?P<PREFIX>BC|Clamav))?
         (?:(\.|^)({PLATFORM}))?
         (?:(\.|^)(?P<LABELS>[-\w]+))
-        (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$""")
+        (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$"""
 
 
-class DrWeb(BaseNameScheme):
-    pattern = build_pattern(rf"""^
+class DrWeb(EnginePattern):
+    pattern = rf"""^
     ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
               (?:(\.|\A|\b)(?i:({PLATFORM})))?
               (?:(\.|\A|\b)(?i:{LABELS}))?
@@ -127,55 +101,54 @@ class DrWeb(BaseNameScheme):
                   (?P<FAMILY>[A-Za-z][-\w\.]+?)
                   (?:\.|\Z) # and either end or continue with `.`
                   (?P<VARIANT>[0-9]+)?
-                  (\.?(?P<SUFFIX>(origin|based)))?))?$""")
+                  (\.?(?P<SUFFIX>(origin|based)))?))?$"""
 
 
-class Ikarus(BaseNameScheme):
-    pattern = build_pattern(rf"""
+class Ikarus(EnginePattern):
+    pattern = rf"""
         ^({OBFUSCATIONS}\.)?
               (?:{HEURISTICS}\:?)?
               ((?:\A|\.|\b)({LABELS}|{EXPLOITS}|{PLATFORM}))*?
-              (\.{IDENT})?$""")
+              (\.{IDENT})?$"""
 
 
-class Jiangmin(BaseNameScheme):
-    pattern = build_pattern(
-        rf"""^(?:{HEURISTICS}:?)?
+class Jiangmin(EnginePattern):
+    pattern = rf"""^(?:{HEURISTICS}:?)?
               (?:(?:\b|\.|/|^)({OBFUSCATIONS}|{LABELS}|{PLATFORM}))*
               (?:(?:\.|/|^|\b)
                   ((?P<FAMILY>(CVE-[\d-]*|[A-Z]\w*))(?P<SUFFIX>(\-(\w+)))?(\.|\Z))?
-                  ((?P<VARIANT>((\d+\.)?\w*)))?)?$""")
+                  ((?P<VARIANT>((\d+\.)?\w*)))?)?$"""
 
 
-class K7(BaseNameScheme):
-    pattern = build_pattern(rf"^{LABELS}?\s*(\s*\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?")
+class K7(EnginePattern):
+    pattern = rf"^{LABELS}?\s*(\s*\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?"
 
 
-class Lionic(BaseNameScheme):
-    pattern = build_pattern(rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?((\.|^){IDENT})?$")
+class Lionic(EnginePattern):
+    pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?((\.|^){IDENT})?$"
 
 
-class NanoAV(BaseNameScheme):
-    pattern = build_pattern(rf"""^
+class NanoAV(EnginePattern):
+    pattern = rf"""^
         ({LABELS})?
               ((?:\.)(?P<NANO_TYPE>(Macro|Text|Url)))?
               ((?:\.)(?:{PLATFORM}))*?
-              ((?:\.|\A|\b){IDENT})$""")
+              ((?:\.|\A|\b){IDENT})$"""
 
 
-class Qihoo360(BaseNameScheme):
-    pattern = build_pattern(rf"""
+class Qihoo360(EnginePattern):
+    pattern = rf"""
         ^({HEURISTICS}(/|((?<=VirusOrg)\.)))?
               (
                   ((\.|\b|\A)({MACROS}|{LANGS}|{OSES}|{ARCHIVES}))
                   |(\.|\b|\/|\A){LABELS}
                   |((\.|\b)(QVM\d*(\.\d)?(\.[0-9A-F]+)?))
               )*
-              ((\.|/){IDENT})?$""")
+              ((\.|/){IDENT})?$"""
 
 
-class QuickHeal(BaseNameScheme):
-    pattern = build_pattern(rf"""
+class QuickHeal(EnginePattern):
+    pattern = rf"""
         ^(?:{HEURISTICS}\.)?
               # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
               ((?:\.|^){LABELS}(\)$)?)?
@@ -183,24 +156,24 @@ class QuickHeal(BaseNameScheme):
               ((?:\.|\/|^)
                   ((?P<FAMILY>[-\w]+))
                   (\.(?P<VARIANT>\w+))?
-                  (\.(?P<SUFFIX>\w+))?)?$""")
+                  (\.(?P<SUFFIX>\w+))?)?$"""
 
 
-class Rising(BaseNameScheme):
-    pattern = build_pattern(rf"""^
+class Rising(EnginePattern):
+    pattern = rf"""^
             {LABELS}?
             (
                 ((?:^|\/|\.)(?:{PLATFORM})) |
                 ((?:\.|\/)(?P<FAMILY>[A-Z][\-\w]+))
             )*
             (?:(?P<VARIANTSEP>(\#|@|!|\.))(?P<VARIANT>.*))
-    $""")
+    $"""
 
 
-class Virusdie(BaseNameScheme):
-    pattern = build_pattern(rf"""^
+class Virusdie(EnginePattern):
+    pattern = rf"""^
         (?:{HEURISTICS})?
         (?:(?:^|\.){LABELS})?
         (?:(?:^|\.){PLATFORM})?
         (?:(?:^|\.){IDENT})
-    $""")
+    $"""

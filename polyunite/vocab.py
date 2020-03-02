@@ -1,7 +1,8 @@
 from functools import lru_cache
 from itertools import chain
 import json
-from typing import Dict, Iterator, List, Mapping, Tuple, Union
+import re
+from typing import Dict, Mapping, Union
 
 import pkg_resources
 
@@ -14,23 +15,23 @@ class VocabRegex:
         self.name = name
         self.fields = fields
 
-    @lru_cache(maxsize=8)
+    @lru_cache(maxsize=32)
     def compile(self, min=0, max=1):
         def driver(group, elt, depth=0):
             result = '|'.join(
                 set(
-                    isinstance(elt, Mapping) and chain(
-                        elt.get('__alias__', ()),
+                    chain(
+                        elt.get('__alias__', []),
                         (driver(k, elt[k], depth + 1) for k in elt if not k.startswith('__'))
-                    ) or tuple()
-                ) | set((group, ) if depth else tuple())
+                    ) if isinstance(elt, Mapping) else ()
+                ).union({group} if depth else ())
             )
             return fr'(?P<{group}>{result})' if min <= depth <= max and group.isidentifier() else result
 
-        return '(?i:{})'.format(driver(self.name, self.fields))
+        return re.compile(driver(self.name, self.fields), re.IGNORECASE)
 
     def __str__(self):
-        return self.compile()
+        return '(?i:%s)' % self.compile(min=0, max=1).pattern
 
     @classmethod
     def load_vocab(cls, name):
