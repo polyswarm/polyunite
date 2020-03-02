@@ -1,252 +1,179 @@
-from collections import UserDict
+from itertools import chain
 import re
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
-from polyunite.utils import (
-    GROUP_COLORS,
-    black,
-    blue,
-    cyan,
-    green,
-    magenta,
-    red,
-    reset,
-    trx,
-    underline,
-    white,
-    yellow,
-)
+from polyunite.utils import GROUP_COLORS, MAEC_ATTRIBUTE, Schemes, reset
 from polyunite.vocab import (
     ARCHIVES,
     EXPLOITS,
+    HEURISTICS,
+    IDENT,
     LABELS,
     LANGS,
     MACROS,
+    OBFUSCATIONS,
     OSES,
-    PLATFORM_REGEXES,
-    VocabRegex,
+    PLATFORM,
 )
 
 
-class EngineSchemes(UserDict):
-    """A fancy dictionary for holding each engine, with easy lookup"""
-    def __setitem__(self, k, v):
-        return super().__setitem__(trx(k), v)
-
-    def __getitem__(self, k):
-        return super().__getitem__(trx(k))
-
-    def __contains__(self, k):
-        return super().__contains__(trx(k))
-
-
-Schemes = EngineSchemes()
-
-
-class BaseNameScheme:
-    match: Optional[re.Match]
-    values: Dict[str, Any]
-    rgx: re.Pattern
+class EnginePattern:
+    match: re.Match
+    values: Dict[str, str]
+    pattern: re.Pattern
 
     @classmethod
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
+    def __init_subclass__(cls):
+        if not isinstance(cls.pattern, re.Pattern):
+            cls.pattern = re.compile(cls.pattern, re.VERBOSE)
         Schemes[cls.__name__] = cls
 
     def __init__(self, classification: str):
-        self.match = self.rgx.match(classification)
-        self.build_values(self.match)
-
-    def __repr__(self):
-        fields = {f: getattr(self, f, None) for f in ('name', 'operating_system', 'script', 'label')}
-        return '<{engine}.scheme({fields})>'.format(
-            engine=self.engine, fields=", ".join([f'{f}={v}' for f, v in fields.items() if v])
-        )
+        self.match = self.pattern.search(classification)
+        self.values = {k: v for k, v in self.match.groupdict().items() if v}
 
     def colorize(self) -> str:
         """Colorize a classification string"""
-        if not self.match:
-            return None
         ss = self.classification_name
-        for name, mt in ((k, v) for k, v in self.match.groupdict().items() if v):
-            # be lazyi in finding the new location mod ANSI color codes.
-            idx = ss.rfind(mt)
-            end = idx + len(mt)
-            ss = ss[:idx] + GROUP_COLORS.get(name, '') + mt + (reset if ss[end:].find(reset) == -1 else '') + ss[end:]
+        # interleave the color, match & reset between the part before & after the match (from rpartition)
+        for name, match in filter(lambda kv: kv[0] in GROUP_COLORS, self.values.items()):
+            ss = ''.join(chain(*zip(ss.rpartition(match), (GROUP_COLORS[name], reset, ''))))
         return ss
 
-    def match_raw(self, rgx) -> Optional[re.Match]:
-        """Return a match on the raw classification name string"""
-        return re.match(rgx, self.classification_name, re.IGNORECASE)
-
-    # override these methods to change how an engine sources particular features.
-    # extracted from the source match.
-    @property
-    def classification_name(self) -> str:
-        return self.match.string
+    def first(self, keys):
+        return filter(None, map(self.values.get, keys))
 
     @property
-    def av_vendor(self) -> str:
-        return str(self.__class__.__name__)
+    def heuristic(self) -> Optional[bool]:
+        return any(
+            map(HEURISTICS.compile(1).search, self.first(('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')))
+        )
 
     @property
-    def heuristic(self) -> Optional[int]:
-        if self.match_raw(r'[^a-z](Heur|Heuristic)[^a-z]'):
-            return 50
-        if self.match_raw(r'[^a-z]Agent[^a-z]'):
-            25
-        if self.match_raw(r'[^a-z][a-z]?Generic\w*[^a-z]'):
-            15
-        if self.label == 'greyware':
-            return 35
-        return 0
-
-    @property
-    def is_test(self) -> bool:
-        """*IMPERFECT* predicate for checking if a classification string suggests the file isn't malware"""
-        if self.match_raw(r'\WEICAR[^a-z]'):
-            return True
-        return self.label == 'test'
+    def peripheral(self) -> bool:
+        return not self.labels.isdisjoint({
+            'test', 'nonmalware', 'greyware', 'shellcode', 'security_assessment_tool'
+        })
 
     @property
     def name(self) -> str:
-        return self.values.get('NAME')
+        try:
+            return '.'.join(
+                next(
+                    zip(
+                        self.first(('FAMILY', 'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'LABELS')),
+                        self.first(('VARIANT', 'SUFFIX'))
+                    )
+                )
+            )
+        except StopIteration:
+            return self.classification_name
 
-    @property
-    def operating_system(self) -> str:
-        return OSES.find(self.values)
+    @MAEC_ATTRIBUTE
+    def classification_name(self) -> Optional[str]:
+        return self.match and self.match.string
 
-    @property
-    def script(self) -> str:
-        return LANGS.find(self.values)
-
-    @property
-    def label(self) -> str:
-        return LABELS.find(self.values)
-
-    def build_values(self, match):
-        self.values = {}
-        if match:
-            for k, v in match.groupdict().items():
-                if not k.isupper():
-                    raise ValueError("Must supply upper-cased group names")
-                self.values[k] = v if v else ''
-
-
-class Alibaba(BaseNameScheme):
-    rgx = re.compile(
-        rf"^((?P<LABEL>\w+):)?"
-        rf"({PLATFORM_REGEXES}\/)?"
-        rf"((?P<NAME>[^.]+))"
-        rf"(\.(?P<VENDORID>.*))?$",
-        flags=re.IGNORECASE
-    )
+    av_vendor = MAEC_ATTRIBUTE(lambda self: self.__class__.__name__)
+    operating_system = MAEC_ATTRIBUTE(OSES)
+    language = MAEC_ATTRIBUTE(LANGS)
+    macro = MAEC_ATTRIBUTE(MACROS)
+    labels = MAEC_ATTRIBUTE(LABELS, every=True, container=set)
 
 
-class ClamAV(BaseNameScheme):
-    rgx = re.compile(
-        rf"^((?P<PREFIX>BC|Clamav)\.)?"
-        rf"({PLATFORM_REGEXES}\.)?"
-        rf"((?P<LABEL>\w+)\.)?"
-        rf"(?P<NAME>.+?)?"
-        rf"(\-(?P<VENDORID>[-0-9]+))?$"
-    )
+class Alibaba(EnginePattern):
+    pattern = rf"^(?:{LABELS}:)?(?:({PLATFORM})\/)?(?:{IDENT})$"
 
 
-class DrWeb(BaseNameScheme):
-    rgx = re.compile(
-        rf"^((?P<CONFIDENCE>probably|modification)\s*(of)?\s*)?"
-        rf"({EXPLOITS}\.)?"
-        rf"{PLATFORM_REGEXES}?"
-        rf"((\.|^)(?P<LABEL>[A-Za-z]*))?"
-        rf"((\.|^)((?P<NAME>(?P<FAMILY>[A-Za-z][-\w\.]+?))((\.|$)(?P<VARIANT>[0-9]+))?))?"
-        rf"(\.?(?P<SUFFIX>(origin|based)))?$"
-    )
+class ClamAV(EnginePattern):
+    pattern = rf"""^
+        (?:(?P<PREFIX>BC|Clamav))?
+        (?:(\.|^)({PLATFORM}))?
+        (?:(\.|^)(?P<LABELS>[-\w]+))
+        (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$"""
 
 
-class Ikarus(BaseNameScheme):
-    rgx = re.compile(
-        r"^((?P<OBFUSCATION>Packed)\.)?"
-        r"((?P<CONFIDENCE>not\-a\-virus|HEUR)(\.|\:))?"
-        r"((?P<LABEL>[\w-]*?))?"
-        rf"((^|[^\w]){PLATFORM_REGEXES})?"
-        r"(\.(?P<NAME>..+))?$"
-    )
+class DrWeb(EnginePattern):
+    pattern = rf"""^
+    ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
+              (?:(\.|\A|\b)(?i:({PLATFORM})))?
+              (?:(\.|\A|\b)(?i:{LABELS}))?
+              (?:(\.|\b)( # MulDrop6.38732 can appear alone or in front of another `.`
+                  (?P<FAMILY>[A-Za-z][-\w\.]+?)
+                  (?:\.|\Z) # and either end or continue with `.`
+                  (?P<VARIANT>[0-9]+)?
+                  (\.?(?P<SUFFIX>(origin|based)))?))?$"""
 
 
-class Jiangmin(BaseNameScheme):
-    rgx = re.compile(
-        rf"^((?P<LABEL>[-\w]+)"
-        rf"(\.|\/))?({PLATFORM_REGEXES}\.?)"
-        rf"?((?P<NAME>[\.\-\w]+?)\.)?"
-        rf"(?P<EXTRA>\w*)?$"
-    )
+class Ikarus(EnginePattern):
+    pattern = rf"""
+        ^({OBFUSCATIONS}\.)?
+              (?:{HEURISTICS}\:?)?
+              ((?:\A|\.|\b)({LABELS}|{EXPLOITS}|{PLATFORM}))*?
+              (\.{IDENT})?$"""
 
 
-class K7(BaseNameScheme):
-    rgx = re.compile(rf"(?P<LABEL>[\w-]+)" rf"( \( (?P<EXTRA>[a-f0-9]+) \))?")
+class Jiangmin(EnginePattern):
+    pattern = rf"""^(?:{HEURISTICS}:?)?
+              (?:(?:\b|\.|/|^)({OBFUSCATIONS}|{LABELS}|{PLATFORM}))*
+              (?:(?:\.|/|^|\b)
+                  ((?P<FAMILY>(CVE-[\d-]*|[A-Z]\w*))(?P<SUFFIX>(\-(\w+)))?(\.|\Z))?
+                  ((?P<VARIANT>((\d+\.)?\w*)))?)?$"""
 
 
-class Lionic(BaseNameScheme):
-    rgx = re.compile(
-        rf"^((?P<LABEL>\w+)\.)?"
-        rf"({PLATFORM_REGEXES}\.)?"
-        rf"((?P<NAME>[-\w\.]+))"
-        rf"(\!\w.*)?"
-    )
+class K7(EnginePattern):
+    pattern = rf"^{LABELS}?\s*(\s*\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?"
 
 
-class NanoAV(BaseNameScheme):
-    rgx = re.compile(
-        rf"^((?P<CONFIDENCE>HEUR)\/)?"
-        rf"((?P<PLATFORM1>\w+)\/)"
-        rf"?((?P<LABEL>[\w\/]+))?\.?"
-        rf"({PLATFORM_REGEXES}\.)?"
-        rf"(?P<NAME>[\-\.\w]+(\.[A-Z]+)?)?$"
-    )
+class Lionic(EnginePattern):
+    pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?((\.|^){IDENT})?$"
 
 
-class Qihoo360(BaseNameScheme):
-    rgx = re.compile(rf"^({PLATFORM_REGEXES}\/)?((?P<LABEL>[^.]+)\.)((?P<NAME>\w+)\.)?(.*)$")
+class NanoAV(EnginePattern):
+    pattern = rf"""^
+        ({LABELS})?
+              ((?:\.)(?P<NANO_TYPE>(Macro|Text|Url)))?
+              ((?:\.)(?:{PLATFORM}))*?
+              ((?:\.|\A|\b){IDENT})$"""
 
 
-class QuickHeal(BaseNameScheme):
-    rgx = re.compile(
-        rf"^{EXPLOITS}?"
-        rf"({PLATFORM_REGEXES})?"
-        rf"((^|\.)(?P<LABEL>\w+))?"
-        rf"(\/(?P<FAMILY>\w+))?"
-        rf"((\.(?P<NAME>[-\w]+))"
-        rf"(\.(?P<VARIANT>[\.\w]*))?)?$"
-    )
+class Qihoo360(EnginePattern):
+    pattern = rf"""
+        ^({HEURISTICS}(/|((?<=VirusOrg)\.)))?
+              (
+                  ((\.|\b|\A)({MACROS}|{LANGS}|{OSES}|{ARCHIVES}))
+                  |(\.|\b|\/|\A){LABELS}
+                  |((\.|\b)(QVM\d*(\.\d)?(\.[0-9A-F]+)?))
+              )*
+              ((\.|/){IDENT})?$"""
 
 
-class Rising(BaseNameScheme):
-    rgx = re.compile(
-        rf"^((?P<LABEL>\w+))?"
-        r"(\.(?P<EXPLOIT>Exploit))?"
-        r"(\.(?P<DDOS>DDoSer))?"
-        # this hellscape is there to cover the 3 different formats rising can emit:
-        # Label.Name/OS ...
-        # Label.OS.Name ...
-        # Label.Name.OS ..
-        rf"(((((^|\/|\.)({PLATFORM_REGEXES})))|((\.|\/)(?P<FAMILY>[\-\w]+))))*"
-        rf"((\#|\@|\!|\.)(?P<VARIANT>.*))$"
-    )
-
-    @property
-    def heuristic(self):
-        cf = trx(self.CONFIDENCE)
-        lb = trx(self.LABEL)
-        if cf == trx('Heuristic'):
-            # extract number from ET#96%
-            return self.VARIANT[4:6]
-        elif cf == trx('Agent'):
-            return 80
-        elif cf == "Heur" or lb == 'Heur' or lb == 'Generic':
-            return 65
-        return False
+class QuickHeal(EnginePattern):
+    pattern = rf"""
+        ^(?:{HEURISTICS}\.)?
+              # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
+              ((?:\.|^){LABELS}(\)$)?)?
+              ((?:\.|^)(?:{PLATFORM}))?
+              ((?:\.|\/|^)
+                  ((?P<FAMILY>[-\w]+))
+                  (\.(?P<VARIANT>\w+))?
+                  (\.(?P<SUFFIX>\w+))?)?$"""
 
 
-class Virusdie(BaseNameScheme):
-    rgx = re.compile(rf"((?P<LABEL>\w+)\.)?((?P<BEHAVIOR>\w+)\.)?(?P<EXTRA>\w*)")
+class Rising(EnginePattern):
+    pattern = rf"""^
+            {LABELS}?
+            (
+                ((?:^|\/|\.)(?:{PLATFORM})) |
+                ((?:\.|\/)(?P<FAMILY>[A-Z][\-\w]+))
+            )*
+            (?:(?P<VARIANTSEP>(\#|@|!|\.))(?P<VARIANT>.*))
+    $"""
+
+
+class Virusdie(EnginePattern):
+    pattern = rf"""^
+        (?:{HEURISTICS})?
+        (?:(?:^|\.){LABELS})?
+        (?:(?:^|\.){PLATFORM})?
+        (?:(?:^|\.){IDENT})
+    $"""

@@ -29,4 +29,6 @@ To view a sample of how each ``polyunite`` breaks down each classification strin
 
   python tests/colorize.py
 
-Each color corresponds to a different feature (such as "family", "label", "is heuristic", ...)
+The output is color-coded by malware family feature (e.g `label`, `family name`, `variant id`, etc.)
+
+.. image:: https://raw.githubusercontent.com/polyswarm/polyunite/master/docs/images/colorized.png

@@ -1,26 +1,62 @@
 import csv
 import os
 import sys
+import zipfile  # noqa
 
-import polyunite
+import pkg_resources  # noqa
+
+try:
+    import polyunite  # noqa
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    import polyunite
 
 
-def seen(f):
-    with open(f, newline='') as csvfile:
-        yield from csv.reader(csvfile)
+def seen():
+    with zipfile.ZipFile(pkg_resources.resource_filename(__name__, f'fixtures/engine_families.zip')) as zf:
+        with zf.open('engine_families.csv') as csvfile:
+            yield from csv.reader(map(bytes.decode, csvfile.readlines()))
 
 
 if len(sys.argv) == 1:
-    for name, family in seen(f'{os.path.dirname(__file__)}/fixtures/engine_families.csv'):
-        if name in polyunite.Schemes:
-            print('%-10s' % name, polyunite.Schemes[name](family).colorize())
+    missing = set()
+    errors = []
+    for engine, family in seen():
+        try:
+            sch = polyunite.parse(engine, family)
+            if not sch:
+                missing.add(engine)
+                continue
+            colorized = sch.colorize()
+            if not colorized:
+                errors.append((engine, family, ''))
+                continue
+            print(
+                '{:<10} {:1} {:1} {:<10.10} {:<8.8} {:<10.10} {:30.30} {:>16.16} {}'.format(
+                    engine,
+                    sch.heuristic and 'H' or ' ',
+                    sch.peripheral and 'T' or ' ',
+                    sch.operating_system or '    ',
+                    sch.language or '    ',
+                    sch.macro or '    ',
+                    ', '.join(sch.labels),
+                    sch.name,
+                    colorized,
+                )
+            )
+        except AttributeError as e:
+            errors.append((engine, family, e))
+    print("{:-^100}".format("FAILURES"))
+    for engine, family, err in errors:
+        print("{:<15}: {:85} : {}".format(engine, family, err))
+    print("\nNo name scheme found for: ", missing)
     sys.exit(0)
 
 elif len(sys.argv) == 2:
     if sys.argv[1] == '-r':
         # print regular expressions for each engine
-        for name, engine in polyunite.Schemes.items():
-            print("%s: \n%s\n" % (name, engine.rgx.pattern))
+        for engine, obj in polyunite.Schemes.items():
+            print("%s: \n%s\n" % (engine, obj.pattern.pattern))
         sys.exit(0)
 
 raise NotImplementedError

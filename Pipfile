@@ -3,17 +3,13 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [dev-packages]
-bumpversion = "*"
 wheel = "*"
-watchdog = "*"
 flake8 = "*"
-tox = "*"
 coverage = "*"
 pytest = "*"
 pytest-runner = "*"
 Sphinx = "*"
-twine = "*"
+mypy = "*"
 
 [packages]
 polyunite = {path = ".",editable = true}
-pyparsing = "*"

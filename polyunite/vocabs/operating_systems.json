@@ -15,13 +15,10 @@
     "DOS": "MS-DOS",
     "EPOC": "Psion devices",
     "FreeBSD": "FreeBSD platform",
-    "Generic": {
+    "Multi": {
         "__alias__": [
-            "IGeneric",
-            "GenericPMF",
-            "GenericRI",
-            "GenericFC",
-            "Generic",
+            "Application",
+            "Any",
             "Legacy",
             "multios",
             "Multi"
@@ -29,15 +26,15 @@
     },
     "Linux": {
         "__alias__": [
-            "ELF",
-            "ELF.Linux"
+            "(?i:ELF.?(Linux|ARM|x)?\\d*)"
         ],
         "__desc__": "Linux platform"
     },
-    "MacOS": {
+    "MacOSX": {
         "__alias__": [
             "OSX",
-            "Mac OSX",
+            "Mac(?:\\_|\\s|\\.)?OS(?:\\_|\\s|\\.)?X?",
+            "MacOS",
             "Mac"
         ],
         "__desc__": "MACOSX 10.0 or later"
@@ -72,7 +69,8 @@
         "WinCE": "Windows CE platform",
         "WinNT": "WinNT",
         "__alias__": [
-            "Win32/64"
+            "Win32.64",
+            "Win"
         ],
         "__desc__": "Microsoft windows"
     },
