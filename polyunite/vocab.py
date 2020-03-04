@@ -7,6 +7,10 @@ from typing import Dict, Mapping, Union
 import pkg_resources
 
 
+def group(*choices, fmt='(?:{})'):
+    return fmt.format('|'.join(set(str(c) for c in choices if c)))
+
+
 class VocabRegex:
     name: str
     fields: Dict[str, Union[Dict, str]]
@@ -17,18 +21,14 @@ class VocabRegex:
 
     @lru_cache(maxsize=32)
     def compile(self, min=0, max=1):
-        def driver(group, elt, depth=0):
-            result = '|'.join(
-                set(
-                    chain(
-                        elt.get('__alias__', []),
-                        (driver(k, elt[k], depth + 1) for k in elt if not k.startswith('__'))
-                    ) if isinstance(elt, Mapping) else ()
-                ).union({group} if depth else ())
-            )
-            return fr'(?P<{group}>{result})' if min <= depth <= max and group.isidentifier() else result
-
+        def driver(name, elt, depth=0):
+            return group(name) if not isinstance(elt, Mapping) else group(
+                depth != 0 and name,
+                *elt.get('__alias__', ()),
+                *(driver(k, v, depth + 1) for k, v in elt.items() if not k.startswith('_')),
+                fmt=("(?P<%s>{})" % name) if min <= depth <= max and name.isidentifier() else r'{}')
         return re.compile(driver(self.name, self.fields), re.IGNORECASE)
+
 
     def __str__(self):
         return '(?i:%s)' % self.compile(min=0, max=1).pattern
