@@ -45,9 +45,8 @@ class EnginePattern:
 
     @property
     def heuristic(self) -> Optional[bool]:
-        return any(
-            map(HEURISTICS.compile(1).search, self.first(('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')))
-        )
+        matches = self.first(('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT'))
+        return any(map(HEURISTICS.compile(1).search, matches))
 
     @property
     def peripheral(self) -> bool:
@@ -58,14 +57,11 @@ class EnginePattern:
     @property
     def name(self) -> str:
         try:
-            return '.'.join(
-                next(
-                    zip(
-                        self.first(('FAMILY', 'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'LABELS')),
-                        self.first(('VARIANT', 'SUFFIX'))
-                    )
-                )
+            pairs = zip(
+                self.first(('FAMILY', 'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'LABELS')),
+                self.first(('VARIANT', 'SUFFIX'))
             )
+            return '.'.join(next(pairs))
         except StopIteration:
             return self.classification_name
 
