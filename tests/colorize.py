@@ -24,39 +24,34 @@ if len(sys.argv) == 1:
     for engine, family in seen():
         try:
             sch = polyunite.parse(engine, family)
-            if not sch:
-                missing.add(engine)
-                continue
-            colorized = sch.colorize()
-            if not colorized:
-                errors.append((engine, family, ''))
-                continue
-            print(
-                '{:<10} {:1} {:1} {:<10.10} {:<8.8} {:<10.10} {:30.30} {:>16.16} {}'.format(
-                    engine,
-                    sch.heuristic and 'H' or ' ',
-                    sch.peripheral and 'T' or ' ',
-                    sch.operating_system or '    ',
-                    sch.language or '    ',
-                    sch.macro or '    ',
-                    ', '.join(sch.labels),
-                    sch.name,
-                    colorized,
+            if sch:
+                colorized = sch.colorize()
+                print(
+                    ' | '.join((
+                        '{:<10}', '{:1}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}',
+                        '{}'
+                    )).format(
+                        engine,
+                        sch.heuristic and 'H' or '',
+                        sch.peripheral and 'T' or '',
+                        sch.operating_system or '',
+                        sch.language or '',
+                        sch.macro or '',
+                        ', '.join(sch.labels),
+                        sch.name,
+                        colorized,
+                    )
                 )
-            )
+            else:
+                missing.add(engine)
         except AttributeError as e:
             errors.append((engine, family, e))
-    print("{:-^100}".format("FAILURES"))
+    print("{:-^150}".format("FAILURES"))
+    print("Missing: ", missing)
     for engine, family, err in errors:
         print("{:<15}: {:85} : {}".format(engine, family, err))
-    print("\nNo name scheme found for: ", missing)
-    sys.exit(0)
 
-elif len(sys.argv) == 2:
-    if sys.argv[1] == '-r':
-        # print regular expressions for each engine
-        for engine, obj in polyunite.Schemes.items():
-            print("%s: \n%s\n" % (engine, obj.pattern.pattern))
-        sys.exit(0)
-
-raise NotImplementedError
+elif len(sys.argv) == 2 and sys.argv[1] == '-r':
+    # print regular expressions for each engine
+    for engine, obj in polyunite.engines.items():
+        print("%s: \n%s\n" % (engine, obj.pattern.pattern))
