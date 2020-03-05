@@ -31,7 +31,7 @@ class EnginePattern:
         engines[cls.__name__.lower()] = cls
 
     def __init__(self, classification: str):
-        self.match = self.pattern.search(classification)
+        self.match = self.pattern.fullmatch(classification)
         self.values = {k: v for k, v in self.match.groupdict().items() if v}
 
     def colorize(self) -> str:
@@ -79,14 +79,13 @@ class EnginePattern:
 
 
 class Alibaba(EnginePattern):
-    pattern = rf"^(?:{LABELS}:)?(?:({PLATFORM})\/)?(?:{IDENT})$"
+    pattern = rf"^(?:{LABELS:x}:)?(?:({PLATFORM})\/)?(?:{IDENT})$"
 
 
 class ClamAV(EnginePattern):
     pattern = rf"""^
         (?:(?P<PREFIX>BC|Clamav))?
-        (?:(\.|^)({PLATFORM}))?
-        (?:(\.|^)(?P<LABELS>[-\w]+))
+        (?:(\.|^)(?:{PLATFORM}|{LABELS}))*
         (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$"""
 
 
@@ -106,20 +105,19 @@ class Ikarus(EnginePattern):
     pattern = rf"""
         ^({OBFUSCATIONS}\.)?
               (?:{HEURISTICS}\:?)?
-              ((?:\A|\.|\b)({LABELS}|{EXPLOITS}|{PLATFORM}))*?
+              ((?:\A|\.|\b)({LABELS:x}|{EXPLOITS}|{PLATFORM}))*?
               (\.{IDENT})?$"""
 
 
 class Jiangmin(EnginePattern):
     pattern = rf"""^(?:{HEURISTICS}:?)?
-              (?:(?:\b|\.|/|^)({OBFUSCATIONS}|{LABELS}|{PLATFORM}))*
-              (?:(?:\.|/|^|\b)
-                  ((?P<FAMILY>(CVE-[\d-]*|[A-Z]\w*))(?P<SUFFIX>(\-(\w+)))?(\.|\Z))?
-                  ((?P<VARIANT>((\d+\.)?\w*)))?)?$"""
+              (?:(?:\b|\.|/|^)?{LABELS:x=[-/.]})?
+              ((?:\b|\.|/|^)?({OBFUSCATIONS}|{PLATFORM}))*?
+              (?:(?:\.|/|\A|\b){IDENT})?$"""
 
 
 class K7(EnginePattern):
-    pattern = rf"^{LABELS}?\s*(\s*\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?"
+    pattern = rf"^{LABELS:x}? (\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
 
 
 class Lionic(EnginePattern):
@@ -139,17 +137,17 @@ class Qihoo360(EnginePattern):
         ^({HEURISTICS}(/|((?<=VirusOrg)\.)))?
               (
                   ((\.|\b|\A)({MACROS}|{LANGS}|{OSES}|{ARCHIVES}))
-                  |(\.|\b|\/|\A){LABELS}
+                  |(\.|\b|/|\A){LABELS:x}
                   |((\.|\b)(QVM\d*(\.\d)?(\.[0-9A-F]+)?))
-              )*
-              ((\.|/){IDENT})?$"""
+              )*?
+              ((\.)(?i:{IDENT}))?$"""
 
 
 class QuickHeal(EnginePattern):
     pattern = rf"""
         ^(?:{HEURISTICS}\.)?
               # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
-              ((?:\.|^){LABELS}(\)$)?)?
+              ((?:\.|\A)?{LABELS:x}(\)$)?)?
               ((?:\.|^)(?:{PLATFORM}))?
               ((?:\.|\/|^)
                   ((?P<FAMILY>[-\w]+))
@@ -159,7 +157,7 @@ class QuickHeal(EnginePattern):
 
 class Rising(EnginePattern):
     pattern = rf"""^
-            {LABELS}?
+            {LABELS:x}?
             (
                 ((?:^|\/|\.)(?:{PLATFORM})) |
                 ((?:\.|\/)(?P<FAMILY>[A-Z][\-\w]+))
@@ -171,7 +169,10 @@ class Rising(EnginePattern):
 class Virusdie(EnginePattern):
     pattern = rf"""^
         (?:{HEURISTICS})?
-        (?:(?:^|\.){LABELS})?
+        (
+            (?:(?:^|\.){LANGS})?
+            (?:(?:^|\.){LABELS})?
+        )*
 
         (?:(?:^|\.){IDENT})
     $"""

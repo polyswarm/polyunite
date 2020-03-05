@@ -1,7 +1,12 @@
 {
     "adware": "Any software that is funded by advertising. Adware may also gather sensitive user information from a system.",
     "appender": "File-infecting malware that places its code at the end of the files it infects, adjusting the file's entry point to cause its code to be executed before that in the original file.",
-    "backdoor": "Malware which, once running on a system, opens a communication vector to the outside so the computer can be accessed remotely by an attacker.",
+    "backdoor": {
+        "__alias__": [
+            "proxy"
+        ],
+        "__desc__": "Malware which, once running on a system, opens a communication vector to the outside so the computer can be accessed remotely by an attacker."
+    },
     "boot_sector_virus": "Malware that infects the master boot record of a storage device.",
     "bot": "Malware that resides on an infected system, communicating with and forming part of a botnet. The bot may be implanted by a worm or trojan, which opens a backdoor. The bot then monitors the backdoor for further instructions.",
     "browser_modifier": {
@@ -15,7 +20,7 @@
     "cavity_filler": "A type of file-infecting virus that seeks unused space within the files it infects, inserting its code into these gaps to avoid changing the size of the file and thus not alerting integrity-checking software to its presence.",
     "clicker": {
         "__alias__": [
-            "trojan-?clicker"
+            "cliqker"
         ],
         "__desc__": "A trojan that makes a system visit a specific web page, often very frequently and usually with the aim of increasing the traffic recorded by the site and thus increasing revenue from advertising. Clickers may also be used to carry out DDoS attacks."
     },
@@ -25,7 +30,6 @@
         "__alias__": [
             "DoS",
             "hack\\Wddoser",
-            "(trojan.)?ddos",
             "flooder",
             "[a-z]+flooder"
         ],
@@ -40,12 +44,10 @@
             "dloadr",
             "dloade",
             "download",
+            "(?<=\\W)DL",
             "dload",
             "downware",
             "downagent",
-            "trojan(?:\\.|-|/|\\s)?downloader",
-            "trojandwnldr",
-            "trjndwnlder",
             "exedown",
             "downldexe",
             "dropped",
@@ -160,7 +162,9 @@
         "__alias__": [
             "pws",
             "psw",
+            "stealer",
             "(password-)?stealer",
+            "banker",
             "pwsteal(er)?",
             "infosteal(er)?"
         ],
@@ -192,7 +196,7 @@
         "__desc__": "A type of virus that encrypts its code differently with each infection (or with each generation of infections)."
     },
     "premium_dialer_smser": {
-        "__alias__": ["dialer", "porn\\W?dialer", "trojansms"],
+        "__alias__": ["dialer", "porn\\W?dialer", "((?<=trojan.)|(?<=[./-_\\s]))(?-i:SMS)(?!\\w)"],
       "__desc__": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers."
     },
     "prepender": {
@@ -204,7 +208,7 @@
             "ansom",
             "ransom",
             "ransom-?encoder",
-            "trojan\\Wransom",
+            "(?=trojan\\W)ransom",
             "ransomlock",
             "virlock",
             "virus-ransom",
@@ -219,7 +223,7 @@
         "__alias__": [
             "rat",
             "remote-access",
-            "(remote\\W?admin)"
+            "remote\\W?admin"
         ],
         "__desc__": "A remote access trojan program (or RAT), is a trojan horse capable of controlling a machine through commands issued by a remote attacker."
     },
@@ -227,7 +231,7 @@
         "__alias__": [
             "zipbomb",
             "miner",
-            "bitcoinminer"
+            "(bitcoin|bit|crypto|btc|eth)?coinminer"
         ],
         "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner."
     },
@@ -267,7 +271,8 @@
     },
     "spyware": {
         "__alias__": [
-            "Monitor"
+            "Monitor",
+            "spy(?![a-z])"
         ],
         "__desc__": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner."
     },
@@ -286,7 +291,7 @@
     },
     "trojan": {
         "__alias__": [
-            "(?:(?:\\.|-|/|\\s)?(?:(?:ransom|pws|dwnldr|dropper|downloader|miner|proxy|dialer|psw|spy|banker|ddos|ddoser|dialer|sms)|trojan)){2}",
+            "trojanhorse",
             "proxy.?(program)"
         ],
         "__desc__": "Malware disguised as something inert or benign."
@@ -305,7 +310,8 @@
     "web_bug": "Code embedded in a web page or email that checks whether a user has accessed the content (e.g., a tiny, transparent GIF image).",
     "worm": {
         "__alias__": [
-            "(?:(?:\\.|-|/|\\s)?(?:(?:im|net|i|email|p2p|smtp)|worm)){2}",
+            "(?<=-)worm",
+            "(?:im|net|i|p2p|smtp)(?:\\.|-|/|\\s)?worm",
             "hllw"
         ],
         "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."
