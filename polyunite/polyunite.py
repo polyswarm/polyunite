@@ -5,7 +5,6 @@ from typing import Dict, Optional
 from polyunite.utils import GROUP_COLORS, MAEC_ATTRIBUTE, reset
 from polyunite.vocab import (
     ARCHIVES,
-    EXPLOITS,
     HEURISTICS,
     IDENT,
     LABELS,
@@ -79,100 +78,98 @@ class EnginePattern:
 
 
 class Alibaba(EnginePattern):
-    pattern = rf"^(?:{LABELS:x}:)?(?:({PLATFORM})\/)?(?:{IDENT})$"
+    pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?(?:({PLATFORM})\/)?(?:{IDENT})$"
 
 
 class ClamAV(EnginePattern):
     pattern = rf"""^
         (?:(?P<PREFIX>BC|Clamav))?
-        (?:(\.|^)(?:{PLATFORM}|{LABELS}))*
+        (?:(\.|^)(?:{PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?
+
         (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$"""
 
 
 class DrWeb(EnginePattern):
     pattern = rf"""^
-    ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
-              (?:(\.|\A|\b)(?i:({PLATFORM})))?
-              (?:(\.|\A|\b)(?i:{LABELS}))?
+    ((?i:{HEURISTICS})(?:\s+(?:of\s*)?)?)?
+              (?:(\.|\A|\b){PLATFORM})?
+              (?:(\.|\A|\b){LABELS})?
               (?:(\.|\b)( # MulDrop6.38732 can appear alone or in front of another `.`
                   (?P<FAMILY>[A-Za-z][-\w\.]+?)
                   (?:\.|\Z) # and either end or continue with `.`
                   (?P<VARIANT>[0-9]+)?
-                  (\.?(?P<SUFFIX>(origin|based)))?))?$"""
+                  (?:[.]?(?P<SUFFIX>(origin|based)))?))?$"""
 
 
 class Ikarus(EnginePattern):
     pattern = rf"""
         ^({OBFUSCATIONS}\.)?
               (?:{HEURISTICS}\:?)?
-              ((?:\A|\.|\b)({LABELS:x}|{EXPLOITS}|{PLATFORM}))*?
-              (\.{IDENT})?$"""
+              (?:(?:\A|\.|\b)({LABELS:x}|{PLATFORM}))*?
+              (?:[.]?{IDENT})?$"""
 
 
 class Jiangmin(EnginePattern):
     pattern = rf"""^(?:{HEURISTICS}:?)?
-              (?:(?:\b|\.|/|^)?{LABELS:x=[-/.]})?
-              ((?:\b|\.|/|^)?({OBFUSCATIONS}|{PLATFORM}))*?
-              (?:(?:\.|/|\A|\b){IDENT})?$"""
+              (?:(?:{LABELS:x}|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+?
+              {IDENT}?(?:[.](?P<GENERATION>[a-z]))?$"""
 
 
 class K7(EnginePattern):
-    pattern = rf"^{LABELS:x}? (\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
+    pattern = rf"^{LABELS:x}? (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
 
 
 class Lionic(EnginePattern):
-    pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?((\.|^){IDENT})?$"
+    pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?(?:(?:\.|^){IDENT})?$"
 
 
 class NanoAV(EnginePattern):
     pattern = rf"""^
-        ({LABELS})?
-              ((?:\.)(?P<NANO_TYPE>(Macro|Text|Url)))?
-              ((?:\.)(?:{PLATFORM}))*?
-              ((?:\.|\A|\b){IDENT})$"""
+        {LABELS}?
+              (?:[.]?(?P<NANO_TYPE>(Macro|Text|Url)))?
+              (?:(\b|[.]){PLATFORM})*?
+              (?:[.]?{IDENT})$"""
 
 
 class Qihoo360(EnginePattern):
     pattern = rf"""
-        ^({HEURISTICS}(/|((?<=VirusOrg)\.)))?
-              (
-                  ((\.|\b|\A)({MACROS}|{LANGS}|{OSES}|{ARCHIVES}))
-                  |(\.|\b|/|\A){LABELS:x}
-                  |((\.|\b)(QVM\d*(\.\d)?(\.[0-9A-F]+)?))
-              )*?
-              ((\.)(?i:{IDENT}))?$"""
+        ^(?:{HEURISTICS}(?:/|(?:(?<=VirusOrg)\.)))?
+              (?:
+                  (?:Application|{MACROS}|{LANGS}|{OSES}|{ARCHIVES}|{LABELS:x}|(QVM\d*(\.\d)?(\.[0-9A-F]+)?))
+              [./])*
+              {IDENT}?$"""
 
 
 class QuickHeal(EnginePattern):
     pattern = rf"""
         ^(?:{HEURISTICS}\.)?
               # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
-              ((?:\.|\A)?{LABELS:x}(\)$)?)?
-              ((?:\.|^)(?:{PLATFORM}))?
-              ((?:\.|\/|^)
-                  ((?P<FAMILY>[-\w]+))
-                  (\.(?P<VARIANT>\w+))?
-                  (\.(?P<SUFFIX>\w+))?)?$"""
+              (?:(?:\.|^)?{LABELS:x}(\)\Z)?)?
+              (?:(?:\.|^){PLATFORM})?
+              (?:(?:\.|\/|^)
+                  (?:(?P<FAMILY>[-\w]+))
+                  (?:\.(?P<VARIANT>\w+))?
+                  (?:\.(?P<SUFFIX>\w+))?)?$"""
 
 
 class Rising(EnginePattern):
     pattern = rf"""^
             {LABELS:x}?
-            (
-                ((?:^|\/|\.)(?:{PLATFORM})) |
-                ((?:\.|\/)(?P<FAMILY>[A-Z][\-\w]+))
+            (?:
+                (?:(?:^|\/|\.){PLATFORM}) |
+                (?:(?:\.|\/)(?P<FAMILY>[iA-Z][\-\w]+))
             )*
-            (?:(?P<VARIANTSEP>(\#|@|!|\.))(?P<VARIANT>.*))
-    $"""
+            (?:(?P<VARIANT>(?:[#@!.][a-zA-Z0-9]+)*?)%?)?$"""
+
+    @property
+    def name(self) -> str:
+        keys = tuple(map(self.values.get, ('FAMILY', 'VARIANT')))
+        return ''.join((keys if all(keys) else self.classification_name))
 
 
 class Virusdie(EnginePattern):
     pattern = rf"""^
         (?:{HEURISTICS})?
-        (
-            (?:(?:^|\.){LANGS})?
-            (?:(?:^|\.){LABELS})?
-        )*
-
-        (?:(?:^|\.){IDENT})
+        (?:(?:\A|\b|\.)(?:{LANGS}|{LABELS}))*
+        (?:(?:\A|\b|\.){IDENT})?
     $"""

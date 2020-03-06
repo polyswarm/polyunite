@@ -17,6 +17,7 @@
     "FreeBSD": "FreeBSD platform",
     "Multi": {
         "__alias__": [
+            "System",
             "Application",
             "Any",
             "Legacy",
