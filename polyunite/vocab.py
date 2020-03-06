@@ -37,7 +37,7 @@ class VocabRegex:
     def __format__(self, spec):
         opts = dict(map(lambda s: re.split(r'=|\Z', s, maxsplit=1), spec.split(':')))
         pat = group(
-            '(?:{sep}?(?:{pat}))+'.format(sep=opts['x'] or r'[-./]', pat=self.compile(1).pattern),
+            '(?:{sep}(?:{pat}))+'.format(sep=opts['x'] or r'[-./]?', pat=self.compile(1).pattern),
             name=self.name
         ) if 'x' in opts else self.compile().pattern
         return r'(?i:{})'.format(pat) if '-i' not in opts else pat
@@ -61,6 +61,6 @@ OBFUSCATIONS = VocabRegex.load_vocab('OBFUSCATIONS')
 
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS)
 
-IDENT = r"""(?P<NAME> (?P<FAMILY>CVE-[\d-]+|[A-Z0-9_a-z-]+)
-                ([.]?(?<=[.])(?P<VARIANT>[a-zA-Z0-9]*([.]\d+\Z)?))?
+IDENT = r"""(?P<NAME> (?P<FAMILY>(?:CVE-[\d-]+)|(?:[\w_-]+))
+                ([.]?(?<=[.])(?P<VARIANT>(?:[a-zA-Z0-9]*)([.]\d+\Z)?))?
                 (!(?P<SUFFIX>\w+))?)"""

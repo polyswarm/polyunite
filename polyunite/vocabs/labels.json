@@ -172,7 +172,7 @@
     },
     "polymorphic_virus": "A type of virus that encrypts its code differently with each infection (or with each generation of infections).",
     "premium_dialer_smser": {
-        "__alias__": ["dialer", "porn\\W?dialer", "((?<=trojan.)|(?<=[./-_\\s]))(?-i:SMS)(?!\\w)"],
+        "__alias__": ["dialer", "porn\\W?dialer", "((?<=trojan).?|(?<=[./-_\\s]))(?-i:SMS)(?!\\w)"],
       "__desc__": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers."
     },
     "prepender": {
@@ -186,7 +186,6 @@
             "ransom-?encoder",
             "ransomlock",
             "ransomcrypt",
-            "ransomware",
             "filecoder",
             "filecryptor"
         ],

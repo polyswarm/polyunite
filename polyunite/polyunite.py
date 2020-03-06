@@ -91,7 +91,7 @@ class ClamAV(EnginePattern):
 
 class DrWeb(EnginePattern):
     pattern = rf"""^
-    ((?i:{HEURISTICS})(?:\s+(?:of\s*)?)?)?
+    ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
               (?:(\.|\A|\b){PLATFORM})?
               (?:(\.|\A|\b){LABELS})?
               (?:(\.|\b)( # MulDrop6.38732 can appear alone or in front of another `.`

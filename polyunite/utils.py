@@ -34,7 +34,7 @@ def MAEC_ATTRIBUTE(src, every=False, container=set):
         return property(src)
 
     span = src.name
-    pattern = src.compile(1, 1)
+    pattern = src.compile(1)
     match = pattern.finditer
     wrapper = container if every else next
     return property(driver)
