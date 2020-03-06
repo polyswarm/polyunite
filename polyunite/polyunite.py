@@ -47,12 +47,12 @@ class EnginePattern:
     @property
     def heuristic(self) -> Optional[bool]:
         matches = self.first(('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT'))
-        return any(map(HEURISTICS.compile(1).search, matches))
+        return any(map(HEURISTICS.compile(1, 1).fullmatch, matches))
 
     @property
     def peripheral(self) -> bool:
         return not self.labels.isdisjoint({
-            'test', 'nonmalware', 'greyware', 'shellcode', 'security_assessment_tool'
+            'test', 'nonmalware', 'greyware', 'shellcode', 'security_assessment_tool', 'parental_control', 'web_bug'
         })
 
     @property
@@ -74,7 +74,7 @@ class EnginePattern:
     operating_system = MAEC_ATTRIBUTE(OSES)
     language = MAEC_ATTRIBUTE(LANGS)
     macro = MAEC_ATTRIBUTE(MACROS)
-    labels = MAEC_ATTRIBUTE(LABELS, every=True)
+    labels = MAEC_ATTRIBUTE(LABELS, reciever=set)
 
 
 class Alibaba(EnginePattern):
@@ -125,8 +125,8 @@ class Lionic(EnginePattern):
 
 class NanoAV(EnginePattern):
     pattern = rf"""^
-        {LABELS}?
-              (?:[.]?(?P<NANO_TYPE>(Macro|Text|Url)))?
+        {LABELS:x}?
+              (?:[.]?(?P<NANO_TYPE>(Text|Url)))?
               (?:(\b|[.]){PLATFORM})*?
               (?:[.]?{IDENT})$"""
 

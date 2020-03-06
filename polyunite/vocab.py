@@ -4,13 +4,11 @@ import json
 import re
 from typing import Any, Dict, Mapping, Union
 
-import pkg_resources
+from pkg_resources import resource_stream
 
-
-def group(*choices, fmt=None, name=None):
-    spec = fmt or name and fr'(?P<{name}>{{}})' or '(?:{})'
+def group(*choices, fmt='(?:{})', name=None):
+    spec = '(?P<%s>{})' % name if name else fmt
     return spec.format('|'.join(set(map(format, filter(None, choices)))))
-
 
 class VocabRegex:
     name: str
@@ -21,32 +19,39 @@ class VocabRegex:
         self.fields = fields
 
     @lru_cache()
-    def compile(self, min=0, max=4):
-        def driver(name, elt, depth=0):
-            group_name = min <= depth <= max and name.isidentifier() and name
-            name_pattern = None if name == self.name else name
+    def compile(self, start=0, end=1):
+        """Compile regex, name groups for fields nested at least ``start`` and at most ``end`` deep"""
+        def driver(name, entries, depth=0):
+            group_name = start <= depth <= end and name.isidentifier() and name
             return group(
-                name_pattern,
-                *elt.get('__alias__', ()),
-                *(driver(k, v, depth + 1) for k, v in elt.items() if not k.startswith('__')),
+                self.name != name and name,
+                *entries.get('__alias__', ()),
+                *(driver(k, v, depth + 1) for k, v in entries.items() if not k.startswith('__')),
                 name=group_name
-            ) if isinstance(elt, Mapping) else group(name_pattern, name=group_name)
+            ) if isinstance(entries, Mapping) else group(name, name=group_name)
 
         return re.compile(driver(self.name, self.fields), re.IGNORECASE)
 
     def __format__(self, spec):
-        opts = dict(map(lambda s: re.split(r'=|\Z', s, maxsplit=1), spec.split(':')))
-        pat = group(
-            '(?:{sep}(?:{pat}))+'.format(sep=opts['x'] or r'[-./]?', pat=self.compile(1).pattern),
-            name=self.name
-        ) if 'x' in opts else self.compile().pattern
-        return r'(?i:{})'.format(pat) if '-i' not in opts else pat
+        """controls how this class should be formatted (also provides __str_)
+
+        formatters:
+          x=str: controls if this regex should allow multiple submatches
+          {start,end}=int: controls the 'start' or 'end' compile parameters
+        """
+        fmt = '(?i:{})'
+        opts = dict(map(re.compile('=|$').split, spec.split(':')))
+        cargs = {k: int(opts[k]) for k in ('start', 'end') if k in opts}
+        if 'x' in opts:
+            cargs.update({'start': cargs.get('end', 1), 'end': cargs.get('end', 2)})
+            # controls how to separate different sub-sections, by default will use [-./] or \b
+            delim = opts["x"] or "[-./]?"
+            fmt = fr'(?P<{self.name}>(?:{delim}{fmt})+)'
+        return fmt.format(self.compile(**cargs).pattern)
 
     @classmethod
-    def load_vocab(cls, name, **kwargs):
-        return cls(
-            name, json.load(pkg_resources.resource_stream(__name__, f'vocabs/{name.lower()}.json')), **kwargs
-        )
+    def load_vocab(cls, name):
+        return cls(name, json.load(resource_stream(__name__, f'vocabs/{name.lower()}.json')))
 
 
 # Provides extra detail about the malware, including how it is used as part of a multicomponent

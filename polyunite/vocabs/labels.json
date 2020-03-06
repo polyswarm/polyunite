@@ -119,7 +119,10 @@
         "__desc__": "A type of program implanted on a system to monitor the keys pressed and thus record any sensitive data, such as passwords, entered by the user."
     },
     "kleptographic_worm": "A worm that encrypts information assets on compromised systems so they can only be decrypted by the worm's author, also known as information-stealing worm.",
-    "macro_virus": "A virus that uses a macro language, for example in Microsoft Office documents.",
+    "macro_virus": {
+        "__alias__": ["macro"],
+        "__desc__": "A virus that uses a macro language, for example in Microsoft Office documents."
+    },
     "malware_as_a_service": "Malware that is sold or produced as a service.",
     "mass_mailer": {
         "__alias__": [
