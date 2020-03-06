@@ -1,12 +1,3 @@
-from collections import UserDict
-import re
-from string import ascii_lowercase, ascii_uppercase, whitespace
-
-
-def trx(ss: str):
-    return (ss or '').translate(str.maketrans(ascii_uppercase, ascii_lowercase, whitespace))
-
-
 black = '\033[30m'
 red = '\033[31m'
 green = '\033[32m'
@@ -32,46 +23,18 @@ GROUP_COLORS = {
 }
 
 
-class EngineSchemes(UserDict):
-    """A fancy dictionary for holding each engine, with easy lookup"""
-    def __setitem__(self, k, v):
-        return super().__setitem__(trx(k), v)
-
-    def __getitem__(self, k):
-        return super().__getitem__(trx(k))
-
-    def __contains__(self, k):
-        return super().__contains__(trx(k))
-
-
-Schemes = EngineSchemes()
-
-
-def parse(name, classification: str):
-    return name in Schemes and Schemes[name](classification)
-
-
 def MAEC_ATTRIBUTE(src, every=False, container=set):
-    span = getattr(src, 'name', src)
+    def driver(self):
+        try:
+            return wrapper(filter(None, map(lambda m: m.lastgroup, match(self.values.get(span, r'')))))
+        except StopIteration:
+            return None
 
-    if callable(span):
-        fn = span
-    elif every:
+    if callable(src):
+        return property(src)
 
-        def fetch_all(self):
-            group = self.values.get(span, r'\Z\A')
-            return container(filter(None, (m.lastgroup for m in pattern.finditer(group))))
-
-        pattern = src.compile(1)
-        fn = fetch_all
-    else:
-
-        def driver(self):
-            match = self.values.get(span)
-            if match:
-                gen = (k for k, v in self.values.items() if v == match and k != span)
-                return next(gen, None)
-
-        fn = driver
-
-    return property(fn)
+    span = src.name
+    pattern = src.compile(1)
+    match = pattern.finditer
+    wrapper = container if every else next
+    return property(driver)

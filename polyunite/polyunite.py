@@ -2,7 +2,7 @@ from itertools import chain
 import re
 from typing import Dict, Optional
 
-from polyunite.utils import GROUP_COLORS, MAEC_ATTRIBUTE, Schemes, reset
+from polyunite.utils import GROUP_COLORS, MAEC_ATTRIBUTE, reset
 from polyunite.vocab import (
     ARCHIVES,
     EXPLOITS,
@@ -16,6 +16,8 @@ from polyunite.vocab import (
     PLATFORM,
 )
 
+engines = {}
+
 
 class EnginePattern:
     match: re.Match
@@ -26,7 +28,7 @@ class EnginePattern:
     def __init_subclass__(cls):
         if not isinstance(cls.pattern, re.Pattern):
             cls.pattern = re.compile(cls.pattern, re.VERBOSE)
-        Schemes[cls.__name__] = cls
+        engines[cls.__name__.lower()] = cls
 
     def __init__(self, classification: str):
         self.match = self.pattern.search(classification)
@@ -45,9 +47,8 @@ class EnginePattern:
 
     @property
     def heuristic(self) -> Optional[bool]:
-        return any(
-            map(HEURISTICS.compile(1).search, self.first(('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')))
-        )
+        matches = self.first(('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT'))
+        return any(map(HEURISTICS.compile(1).search, matches))
 
     @property
     def peripheral(self) -> bool:
@@ -58,14 +59,11 @@ class EnginePattern:
     @property
     def name(self) -> str:
         try:
-            return '.'.join(
-                next(
-                    zip(
-                        self.first(('FAMILY', 'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'LABELS')),
-                        self.first(('VARIANT', 'SUFFIX'))
-                    )
-                )
+            pairs = zip(
+                self.first(('FAMILY', 'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'LABELS')),
+                self.first(('VARIANT', 'SUFFIX'))
             )
+            return '.'.join(next(pairs))
         except StopIteration:
             return self.classification_name
 
@@ -77,7 +75,7 @@ class EnginePattern:
     operating_system = MAEC_ATTRIBUTE(OSES)
     language = MAEC_ATTRIBUTE(LANGS)
     macro = MAEC_ATTRIBUTE(MACROS)
-    labels = MAEC_ATTRIBUTE(LABELS, every=True, container=set)
+    labels = MAEC_ATTRIBUTE(LABELS, every=True)
 
 
 class Alibaba(EnginePattern):
@@ -174,6 +172,6 @@ class Virusdie(EnginePattern):
     pattern = rf"""^
         (?:{HEURISTICS})?
         (?:(?:^|\.){LABELS})?
-        (?:(?:^|\.){PLATFORM})?
+
         (?:(?:^|\.){IDENT})
     $"""
