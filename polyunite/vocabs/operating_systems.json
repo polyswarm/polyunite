@@ -1,8 +1,7 @@
 {
     "AndroidOS": {
         "__alias__": [
-            "Andr",
-            "Android"
+            "Andr(oid)?"
         ],
         "__desc__": "Android Phone OS"
     },
@@ -17,6 +16,7 @@
     "FreeBSD": "FreeBSD platform",
     "Multi": {
         "__alias__": [
+            "System",
             "Application",
             "Any",
             "Legacy",

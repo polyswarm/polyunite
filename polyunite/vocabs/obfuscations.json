@@ -1,12 +1,29 @@
 {
     "packing": {
         "__alias__": [
-            "packer",
+            "pack(er|ed)?",
             "obfuscator",
             "msilobfuscator",
             "encoder",
 
-            "[Pp]ack(ed)?",
+            "parite",
+            "kriz",
+            "magistr",
+            "polipos",
+            "md5sect",
+            "upx",
+            "fsg",
+            "swizzor",
+            "petite",
+            "pespin",
+            "wwpack",
+            "nspack",
+            "mew",
+            "upack",
+            "aspack",
+            "matchicon",
+            "imptbl",
+
             "malpack",
             "encpk",
             "malob",
