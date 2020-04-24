@@ -126,6 +126,10 @@ class K7(EnginePattern):
 class Lionic(EnginePattern):
     pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?(?:(?:\.|^){IDENT})?$"
 
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
+
 
 class NanoAV(EnginePattern):
     pattern = rf"""^
