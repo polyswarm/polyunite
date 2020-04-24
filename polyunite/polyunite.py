@@ -177,3 +177,14 @@ class Virusdie(EnginePattern):
         (?:(?:\A|\b|\.)(?:{LANGS}|{LABELS}))*
         (?:(?:\A|\b|\.){IDENT})?
     $"""
+
+
+class URLHaus(EnginePattern):
+    pattern = rf"""^
+        (({LABELS})(\.)?)?
+        (?P<FAMILY>[\s\w]+)
+    $"""
+
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''

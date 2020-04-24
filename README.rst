@@ -20,6 +20,7 @@ Supported:
 - QuickHeal
 - Rising
 - Virusdie
+- URLHaus
 
 
 Features
