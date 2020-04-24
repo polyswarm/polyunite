@@ -78,7 +78,9 @@ class EnginePattern:
 
 
 class Alibaba(EnginePattern):
-    pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?(?:({PLATFORM})\/)?(?:{IDENT})$"
+    pattern = rf"""^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?
+                  (?:({PLATFORM})\/)?
+                  (?:{IDENT})$"""
 
     @property
     def name(self) -> str:
@@ -115,11 +117,9 @@ class DrWeb(EnginePattern):
 
 
 class Ikarus(EnginePattern):
-    pattern = rf"""
-        ^({OBFUSCATIONS}\.)?
-              (?:{HEURISTICS}\:?)?
-              (?:(?:\A|\.|\b)({LABELS:x}|{PLATFORM}))*?
-              (?:[.]?{IDENT})?$"""
+    pattern = rf"""^ (not-a-virus:)? ({OBFUSCATIONS}\.)?
+                    (({LABELS}(-\w+)?)\.)? (({PLATFORM})\.)? (?P<FAMILY>.*)?
+                    $"""
 
     @property
     def name(self) -> str:
