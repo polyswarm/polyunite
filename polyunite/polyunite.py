@@ -110,6 +110,7 @@ class DrWeb(EnginePattern):
 
     @property
     def name(self) -> str:
+        # TODO: not finished
         return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
 
 
@@ -187,8 +188,7 @@ class Rising(EnginePattern):
 
     @property
     def name(self) -> str:
-        keys = tuple(map(self.values.get, ('FAMILY', 'VARIANT')))
-        return ''.join((keys if all(keys) else self.classification_name))
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
 
 
 class Virusdie(EnginePattern):
