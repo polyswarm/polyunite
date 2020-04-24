@@ -92,6 +92,10 @@ class ClamAV(EnginePattern):
 
         (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$"""
 
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
+
 
 class DrWeb(EnginePattern):
     pattern = rf"""^
@@ -111,6 +115,10 @@ class Ikarus(EnginePattern):
               (?:{HEURISTICS}\:?)?
               (?:(?:\A|\.|\b)({LABELS:x}|{PLATFORM}))*?
               (?:[.]?{IDENT})?$"""
+
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
 
 
 class Jiangmin(EnginePattern):
