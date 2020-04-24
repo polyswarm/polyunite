@@ -80,6 +80,10 @@ class EnginePattern:
 class Alibaba(EnginePattern):
     pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?(?:({PLATFORM})\/)?(?:{IDENT})$"
 
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
+
 
 class ClamAV(EnginePattern):
     pattern = rf"""^
@@ -121,6 +125,10 @@ class K7(EnginePattern):
 
 class Lionic(EnginePattern):
     pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?(?:(?:\.|^){IDENT})?$"
+
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
 
 
 class NanoAV(EnginePattern):
@@ -173,3 +181,14 @@ class Virusdie(EnginePattern):
         (?:(?:\A|\b|\.)(?:{LANGS}|{LABELS}))*
         (?:(?:\A|\b|\.){IDENT})?
     $"""
+
+
+class URLHaus(EnginePattern):
+    pattern = rf"""^
+        (({LABELS})(\.)?)?
+        (?P<FAMILY>[\s\w]+)
+    $"""
+
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
