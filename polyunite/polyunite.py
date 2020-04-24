@@ -108,6 +108,10 @@ class DrWeb(EnginePattern):
                   (?P<VARIANT>[0-9]+)?
                   (?:[.]?(?P<SUFFIX>(origin|based)))?))?$"""
 
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
+
 
 class Ikarus(EnginePattern):
     pattern = rf"""
