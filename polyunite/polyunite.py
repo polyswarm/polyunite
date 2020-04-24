@@ -118,6 +118,10 @@ class Jiangmin(EnginePattern):
               (?:(?:{LABELS:x}|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+?
               {IDENT}?(?:[.](?P<GENERATION>[a-z]))?$"""
 
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
+
 
 class K7(EnginePattern):
     pattern = rf"^{LABELS:x}? (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
