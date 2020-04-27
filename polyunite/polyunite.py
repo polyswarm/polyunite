@@ -185,6 +185,10 @@ class QuickHeal(EnginePattern):
                   (?:\.(?P<VARIANT>\w+))?
                   (?:\.(?P<SUFFIX>\w+))?)?$"""
 
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
+
 
 class Rising(EnginePattern):
     pattern = rf"""^
