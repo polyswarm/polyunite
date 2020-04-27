@@ -155,6 +155,10 @@ class NanoAV(EnginePattern):
               (?:(\b|[.]){PLATFORM})*?
               (?:[.]?{IDENT})$"""
 
+    @property
+    def name(self) -> str:
+        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
+
 
 class Qihoo360(EnginePattern):
     pattern = rf"""
