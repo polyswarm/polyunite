@@ -28,12 +28,11 @@ if len(sys.argv) == 1:
                 colorized = sch.colorize()
                 print(
                     ' | '.join((
-                        '{:<10}', '{:1}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}',
+                        '{:<10}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}',
                         '{}'
                     )).format(
                         engine,
                         sch.is_heuristic and 'H' or '',
-                        sch.is_paramalware and 'T' or '',
                         sch.operating_system or '',
                         sch.language or '',
                         sch.macro or '',
