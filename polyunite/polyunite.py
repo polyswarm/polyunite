@@ -139,6 +139,11 @@ class Jiangmin(EnginePattern):
 class K7(EnginePattern):
     pattern = rf"^{LABELS:x}? (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
 
+    @property
+    def name(self) -> str:
+        # K7 does not work with family names
+        return ''
+
 
 class Lionic(EnginePattern):
     pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?(?:(?:\.|^){IDENT})?$"
