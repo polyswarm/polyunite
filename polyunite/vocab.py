@@ -6,9 +6,11 @@ from typing import Any, Dict, Mapping, Union
 
 from pkg_resources import resource_stream
 
+
 def group(*choices, fmt='(?:{})', name=None):
     spec = '(?P<%s>{})' % name if name else fmt
     return spec.format('|'.join(set(map(format, filter(None, choices)))))
+
 
 class VocabRegex:
     name: 'str'
@@ -52,6 +54,7 @@ class VocabRegex:
     @classmethod
     def load_vocab(cls, name):
         return cls(name, json.load(resource_stream(__name__, f'vocabs/{name.lower()}.json')))
+
 
 # Provides extra detail about the malware, including how it is used as part of a multicomponent
 # threat. In the example above,

@@ -1,28 +1,36 @@
 import collections
 from functools import partial
 from itertools import chain
+import operator
 import re
 from typing import ClassVar, Dict, Optional
-import operator
 
-from polyunite.utils import GROUP_COLORS, reset
-from polyunite.registry import registry
 from polyunite.colors import GROUP_COLORS, RESET
-from polyunite.vocab import ARCHIVES, HEURISTICS, IDENT, LABELS, LANGS, MACROS, OBFUSCATIONS, OSES, PLATFORM
-from polyunite.errors import ClassificationDecodeError
+from polyunite.errors import PolyuniteDecodeError
+from polyunite.registry import registry
+from polyunite.utils import GROUP_COLORS, reset
+from polyunite.vocab import (
+    ARCHIVES,
+    HEURISTICS,
+    IDENT,
+    LABELS,
+    LANGS,
+    MACROS,
+    OBFUSCATIONS,
+    OSES,
+    PLATFORM,
+)
 
 
 def extract_vocabulary(vocab):
     find_iter = vocab.compile(1, 1).finditer
-    _last_group = operator.attrgetter('lastgroup')
     name = vocab.name
 
     def driver(self, recieve=lambda m: next(m, None)):
         field = self.get(name)
-        if isinstance(field, str):
-            return recieve(filter(None, (s.lastgroup for s in find_iter(field))))
-        else:
+        if not isinstance(field, str):
             return recieve(iter(()))
+        return recieve(filter(None, (s.lastgroup for s in find_iter(field))))
 
     return driver
 
@@ -50,12 +58,8 @@ class ClassificationDecoder(collections.UserDict):
 
     @property
     def is_heuristic(self) -> Optional[bool]:
-        match = HEURISTICS.compile(1, 1).fullmatch
-        for vocab in ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT'):
-            field = self.get(vocab)
-            if isinstance(field, str) and match(field):
-                return True
-        return False
+        fields = filter(None, map(self.get, ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')))
+        return any(map(HEURISTICS.compile(1, 1).fullmatch, fields))
 
     @classmethod
     def __init_subclass__(cls):
@@ -64,11 +68,14 @@ class ClassificationDecoder(collections.UserDict):
         registry.map_to_decoder(cls.__name__, cls)
 
     def __init__(self, classification: str):
-        match = self.regex.fullmatch(classification)
-        if not match:
-            raise ClassificationDecodeError
-        self.match = match
-        self.data = {k: v for k, v in match.groupdict().items() if v}
+        if not isinstance(classification, str):
+            raise PolyuniteDecodeError
+        self.match = self.regex.fullmatch(classification)
+        self.fields = {}
+        if self.match:
+            self.fields = {k: v for k, v in self.match.groupdict(None).items() if v}
+        if not self.fields:
+            raise PolyuniteDecodeError
 
     def colorize(self) -> str:
         """Colorize a classification string"""
@@ -77,6 +84,7 @@ class ClassificationDecoder(collections.UserDict):
         for name, match in filter(lambda kv: kv[0] in GROUP_COLORS, self.items()):
             ss = ''.join(chain(*zip(ss.rpartition(match), (GROUP_COLORS[name], RESET, ''))))
         return ss
+
 
 class Alibaba(ClassificationDecoder):
     pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?(?:({PLATFORM})\/)?(?:{IDENT})$"

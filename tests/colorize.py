@@ -27,10 +27,9 @@ if len(sys.argv) == 1:
             if sch:
                 colorized = sch.colorize()
                 print(
-                    ' | '.join((
-                        '{:<10}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}',
-                        '{}'
-                    )).format(
+                    ' | '.join(
+                        ('{:<10}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}', '{}')
+                    ).format(
                         engine,
                         sch.is_heuristic and 'H' or '',
                         sch.operating_system or '',
