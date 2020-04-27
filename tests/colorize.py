@@ -23,7 +23,7 @@ if len(sys.argv) == 1:
     errors = []
     for engine, family in seen():
         try:
-            sch = polyunite.parse(engine, family)
+            sch = polyunite.registry(engine, family)
             if sch:
                 colorized = sch.colorize()
                 print(
@@ -32,8 +32,8 @@ if len(sys.argv) == 1:
                         '{}'
                     )).format(
                         engine,
-                        sch.heuristic and 'H' or '',
-                        sch.peripheral and 'T' or '',
+                        sch.is_heuristic and 'H' or '',
+                        sch.is_paramalware and 'T' or '',
                         sch.operating_system or '',
                         sch.language or '',
                         sch.macro or '',
@@ -44,7 +44,9 @@ if len(sys.argv) == 1:
                 )
             else:
                 missing.add(engine)
-        except AttributeError as e:
+        except KeyError:
+            continue
+        except (ValueError) as e:
             errors.append((engine, family, e))
     print("{:-^150}".format("FAILURES"))
     for engine, family, err in errors:

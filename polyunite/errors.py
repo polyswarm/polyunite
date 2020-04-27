@@ -1,0 +1,2 @@
+class ClassificationDecodeError(ValueError):
+    pass

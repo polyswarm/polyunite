@@ -1,91 +1,82 @@
+import collections
+from functools import partial
 from itertools import chain
 import re
-from typing import Dict, Optional
+from typing import ClassVar, Dict, Optional
 
-from polyunite.utils import GROUP_COLORS, MAEC_ATTRIBUTE, reset
-from polyunite.vocab import (
-    ARCHIVES,
-    HEURISTICS,
-    IDENT,
-    LABELS,
-    LANGS,
-    MACROS,
-    OBFUSCATIONS,
-    OSES,
-    PLATFORM,
-)
-
-engines = {}
+from polyunite.utils import GROUP_COLORS, reset
+from polyunite.registry import registry
+from polyunite.colors import GROUP_COLORS, RESET
+from polyunite.vocab import ARCHIVES, HEURISTICS, IDENT, LABELS, LANGS, MACROS, OBFUSCATIONS, OSES, PLATFORM
 
 
-class EnginePattern:
-    match: re.Match
-    values: Dict[str, str]
-    pattern: re.Pattern
+class ClassificationDecoder(collections.UserDict):
+    pattern: 'ClassVar[str]'
+    regex: 'ClassVar[re.Pattern]'
+
+    operating_system = property(OSES.find_with)
+    language = property(LANGS.find_with)
+    macro = property(MACROS.find_with)
+    labels = property(partial(LABELS.find_with, reciever=set))
+
+    @property
+    def classification_name(self):
+        return self.match.string
+
+    @property
+    def av_vendor(self):
+        return self.__class__.__name__
 
     @classmethod
     def __init_subclass__(cls):
         if not isinstance(cls.pattern, re.Pattern):
-            cls.pattern = re.compile(cls.pattern, re.VERBOSE)
-        engines[cls.__name__.lower()] = cls
+            cls.regex = re.compile(cls.pattern, re.VERBOSE)
+        registry.map_to_decoder(cls.__name__, cls)
 
     def __init__(self, classification: str):
-        self.match = self.pattern.fullmatch(classification)
-        self.values = {k: v for k, v in self.match.groupdict().items() if v}
+        match = self.regex.fullmatch(classification)
+        if not match:
+            raise ValueError
+        self.match = match
+        self.data = {k: v for k, v in match.groupdict().items() if v}
 
     def colorize(self) -> str:
         """Colorize a classification string"""
         ss = self.classification_name
         # interleave the color, match & reset between the part before & after the match (from rpartition)
-        for name, match in filter(lambda kv: kv[0] in GROUP_COLORS, self.values.items()):
-            ss = ''.join(chain(*zip(ss.rpartition(match), (GROUP_COLORS[name], reset, ''))))
+        for name, match in filter(lambda kv: kv[0] in GROUP_COLORS, self.items()):
+            ss = ''.join(chain(*zip(ss.rpartition(match), (GROUP_COLORS[name], RESET, ''))))
         return ss
 
-    def first(self, keys):
-        return filter(None, map(self.values.get, keys))
+    @property
+    def is_heuristic(self) -> Optional[bool]:
+        match = HEURISTICS.compile(1, 1).fullmatch
+        for field in ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT'):
+            if field in self and match(self[field]):
+                return True
 
     @property
-    def heuristic(self) -> Optional[bool]:
-        matches = self.first(('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT'))
-        return any(map(HEURISTICS.compile(1, 1).fullmatch, matches))
-
-    @property
-    def peripheral(self) -> bool:
+    def is_paramalware(self) -> bool:
         return not self.labels.isdisjoint({
-            'test', 'nonmalware', 'greyware', 'shellcode', 'security_assessment_tool', 'parental_control', 'web_bug'
+            'test',
+            'nonmalware',
+            'greyware',
+            'shellcode',
+            'security_assessment_tool',
+            'parental_control',
+            'web_bug',
         })
 
     @property
     def name(self) -> str:
-        try:
-            pairs = zip(
-                self.first(('FAMILY', 'LANGS', 'MACROS', 'OPERATING_SYSTEMS', 'LABELS')),
-                self.first(('VARIANT', 'SUFFIX'))
-            )
-            return '.'.join(next(pairs))
-        except StopIteration:
-            return self.classification_name
-
-    @MAEC_ATTRIBUTE
-    def classification_name(self) -> Optional[str]:
-        return self.match and self.match.string
-
-    av_vendor = MAEC_ATTRIBUTE(lambda self: self.__class__.__name__)
-    operating_system = MAEC_ATTRIBUTE(OSES)
-    language = MAEC_ATTRIBUTE(LANGS)
-    macro = MAEC_ATTRIBUTE(MACROS)
-    labels = MAEC_ATTRIBUTE(LABELS, reciever=set)
+        return self.get('FAMILY') or self.classification_name
 
 
-class Alibaba(EnginePattern):
+class Alibaba(ClassificationDecoder):
     pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?(?:({PLATFORM})\/)?(?:{IDENT})$"
 
-    @property
-    def name(self) -> str:
-        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
 
-
-class ClamAV(EnginePattern):
+class ClamAV(ClassificationDecoder):
     pattern = rf"""^
         (?:(?P<PREFIX>BC|Clamav))?
         (?:(\.|^)(?:{PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?
@@ -93,7 +84,7 @@ class ClamAV(EnginePattern):
         (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$"""
 
 
-class DrWeb(EnginePattern):
+class DrWeb(ClassificationDecoder):
     pattern = rf"""^
     ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
               (?:(\.|\A|\b){PLATFORM})?
@@ -105,7 +96,7 @@ class DrWeb(EnginePattern):
                   (?:[.]?(?P<SUFFIX>(origin|based)))?))?$"""
 
 
-class Ikarus(EnginePattern):
+class Ikarus(ClassificationDecoder):
     pattern = rf"""
         ^({OBFUSCATIONS}\.)?
               (?:{HEURISTICS}\:?)?
@@ -113,25 +104,21 @@ class Ikarus(EnginePattern):
               (?:[.]?{IDENT})?$"""
 
 
-class Jiangmin(EnginePattern):
+class Jiangmin(ClassificationDecoder):
     pattern = rf"""^(?:{HEURISTICS}:?)?
               (?:(?:{LABELS:x}|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+?
               {IDENT}?(?:[.](?P<GENERATION>[a-z]))?$"""
 
 
-class K7(EnginePattern):
+class K7(ClassificationDecoder):
     pattern = rf"^{LABELS:x}? (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
 
 
-class Lionic(EnginePattern):
+class Lionic(ClassificationDecoder):
     pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?(?:(?:\.|^){IDENT})?$"
 
-    @property
-    def name(self) -> str:
-        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''
 
-
-class NanoAV(EnginePattern):
+class NanoAV(ClassificationDecoder):
     pattern = rf"""^
         {LABELS:x}?
               (?:[.]?(?P<NANO_TYPE>(Text|Url)))?
@@ -139,7 +126,7 @@ class NanoAV(EnginePattern):
               (?:[.]?{IDENT})$"""
 
 
-class Qihoo360(EnginePattern):
+class Qihoo360(ClassificationDecoder):
     pattern = rf"""
         ^(?:{HEURISTICS}(?:/|(?:(?<=VirusOrg)\.)))?
               (?:
@@ -148,7 +135,7 @@ class Qihoo360(EnginePattern):
               {IDENT}?$"""
 
 
-class QuickHeal(EnginePattern):
+class QuickHeal(ClassificationDecoder):
     pattern = rf"""
         ^(?:{HEURISTICS}\.)?
               # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
@@ -160,7 +147,7 @@ class QuickHeal(EnginePattern):
                   (?:\.(?P<SUFFIX>\w+))?)?$"""
 
 
-class Rising(EnginePattern):
+class Rising(ClassificationDecoder):
     pattern = rf"""^
             {LABELS:x}?
             (?:
@@ -171,11 +158,11 @@ class Rising(EnginePattern):
 
     @property
     def name(self) -> str:
-        keys = tuple(map(self.values.get, ('FAMILY', 'VARIANT')))
+        keys = tuple(map(self.get, ('FAMILY', 'VARIANT')))
         return ''.join((keys if all(keys) else self.classification_name))
 
 
-class Virusdie(EnginePattern):
+class Virusdie(ClassificationDecoder):
     pattern = rf"""^
         (?:{HEURISTICS})?
         (?:(?:\A|\b|\.)(?:{LANGS}|{LABELS}))*
@@ -183,12 +170,8 @@ class Virusdie(EnginePattern):
     $"""
 
 
-class URLHaus(EnginePattern):
+class URLHaus(ClassificationDecoder):
     pattern = rf"""^
         (({LABELS})(\.)?)?
         (?P<FAMILY>[\s\w]+)
     $"""
-
-    @property
-    def name(self) -> str:
-        return self.values.get('FAMILY') if self.values.get('FAMILY') else ''

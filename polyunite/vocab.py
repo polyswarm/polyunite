@@ -11,14 +11,14 @@ def group(*choices, fmt='(?:{})', name=None):
     return spec.format('|'.join(set(map(format, filter(None, choices)))))
 
 class VocabRegex:
-    name: str
-    fields: Dict[str, Union[Dict, str]]
+    name: 'str'
+    fields: 'Dict[str, Union[Dict, str]]'
 
     def __init__(self, name, fields):
         self.name = name
         self.fields = fields
 
-    @lru_cache()
+    @lru_cache
     def compile(self, start=0, end=1):
         """Compile regex, name groups for fields nested at least ``start`` and at most ``end`` deep"""
         def driver(name, entries, depth=0):
@@ -52,7 +52,6 @@ class VocabRegex:
     @classmethod
     def load_vocab(cls, name):
         return cls(name, json.load(resource_stream(__name__, f'vocabs/{name.lower()}.json')))
-
 
 # Provides extra detail about the malware, including how it is used as part of a multicomponent
 # threat. In the example above,
