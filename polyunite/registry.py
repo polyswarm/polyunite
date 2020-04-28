@@ -11,11 +11,12 @@ class EngineRegistry:
     registry: 'ClassVar[Dict[str, type]]' = {}
 
     @classmethod
-    def parse(cls, engine: 'str', classification: 'str') -> 'ClassificationParser':
+    def parse_with(cls, engine: 'str', classification: 'str') -> 'ClassificationParser':
         """Parse `classification` with a specialized parsing class identified by `engine`
 
         :raises polyunite.errors.ParseError: An error occurred decoding the message
         :raises polyunite.errors.EngineKeyError: No engine found with this name
+        :raises polyunite.errors.EngineNormalizeError: Couldn't normalize engine name
         """
         return cls.map_to_parser(engine)(classification)
 
@@ -45,6 +46,3 @@ class EngineRegistry:
             return name.translate(cls._translate_table)
         except AttributeError:
             raise EngineNormalizeError
-
-
-parse = EngineRegistry.parse

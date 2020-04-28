@@ -46,7 +46,7 @@ if len(sys.argv) == 1:
     for engine, family, err in errors:
         print("{:<15}: {:85} : {}".format(engine, family, err))
     print("{:-^150}".format("INFO"))
-    print('compile.cache_info', polyunite.VocabRegex.compile.cache_info())
+    print('compile.cache_info', polyunite.vocab.VocabRegex.compile.cache_info())
     print('Missing:', missing)
 
 elif len(sys.argv) == 2 and sys.argv[1] == '-r':

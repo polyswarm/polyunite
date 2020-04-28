@@ -1,11 +1,10 @@
 import collections
 from itertools import chain
-import operator
 import re
-from typing import ClassVar, Dict, Optional
+from typing import ClassVar, Dict
 
-from polyunite.colors import GROUP_COLORS, RESET
 from polyunite.errors import MatchError
+from polyunite.utils import colors, extract_vocabulary
 from polyunite.vocab import (
     ARCHIVES,
     HEURISTICS,
@@ -19,21 +18,6 @@ from polyunite.vocab import (
 )
 
 from .registry import EngineRegistry
-
-
-def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
-    """Build a function which extracts a vocabulary match"""
-    name = vocab.name
-    find_iter = vocab.compile(1, 1).finditer
-    last_group = operator.attrgetter('lastgroup')
-
-    def driver(self):
-        try:
-            return recieve(filter(None, map(last_group, find_iter(self[name]))))
-        except KeyError:
-            return recieve(iter(()))
-
-    return driver
 
 
 class ClassificationParser(collections.UserDict):
@@ -67,22 +51,36 @@ class ClassificationParser(collections.UserDict):
         return self.get('FAMILY', self.source)
 
     @property
-    def av_vendor(self):
+    def av_vendor(self) -> str:
         """Engine / AV vendor's name"""
         return self.__class__.__name__
 
     @property
-    def is_heuristic(self) -> Optional[bool]:
+    def is_heuristic(self) -> bool:
         """Check if we've parsed this classification as a heuristic-detection"""
-        match = HEURISTICS.compile(1, 1).fullmatch
-        return any(map(match, filter(None, map(self.get, ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')))))
+        fields = map(self.get, ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT'))
+        return any(map(HEURISTICS.compile(1, 1).fullmatch, filter(None, fields)))
 
-    def colorize(self) -> str:
+    def colorize(
+        self,
+        style={
+            'NAME': colors.UNDERLINE,
+            'LABELS': colors.YELLOW_FG,
+            'ARCHIVES': colors.BLACK_FG,
+            'HEURISTICS': colors.MAGENTA_FG,
+            'MACROS': colors.GREEN_FG,
+            'LANGS': colors.BLUE_FG,
+            'OPERATING_SYSTEMS': colors.CYAN_FG,
+            'FAMILY': colors.GREEN_FG,
+            'VARIANT': colors.WHITE_FG,
+            'OBFUSCATION': colors.BLACK_FG,
+        }
+    ) -> str:
         """Colorize a classification string"""
         ss = self.source
-        # interleave the color, match & reset between the part before & after the match (from rpartition)
-        for name, match in filter(lambda kv: kv[0] in GROUP_COLORS, self.items()):
-            ss = ''.join(chain(*zip(ss.rpartition(match), (GROUP_COLORS[name], RESET, ''))))
+        # interleave the colors, match & reset between the part before & after the match (from rpartition)
+        for name, match in filter(lambda kv: kv[0] in style, self.items()):
+            ss = ''.join(chain(*zip(ss.rpartition(match), (style[name], colors.RESET, ''))))
         return ss
 
 

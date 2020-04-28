@@ -1,45 +1,7 @@
-from . import errors
-from .parsers import (
-    K7,
-    Alibaba,
-    ClamAV,
-    DrWeb,
-    Ikarus,
-    Jiangmin,
-    Lionic,
-    NanoAV,
-    Qihoo360,
-    QuickHeal,
-    Rising,
-    URLHaus,
-    Virusdie,
-)
-from .registry import parse
-from .vocab import (ARCHIVES, HEURISTICS, LABELS, LANGS, MACROS, OBFUSCATIONS, OSES, PLATFORM, VocabRegex)
+from . import errors, parsers, vocab
+from .registry import EngineRegistry
 
-__all__ = [
-    'errors',
-    'parse',
-    'Alibaba',
-    'ClamAV',
-    'DrWeb',
-    'Ikarus',
-    'Jiangmin',
-    'K7',
-    'Lionic',
-    'NanoAV',
-    'Qihoo360',
-    'QuickHeal',
-    'Rising',
-    'Virusdie',
-    'URLHaus',
-    'VocabRegex',
-    'ARCHIVES',
-    'HEURISTICS',
-    'LABELS',
-    'LANGS',
-    'MACROS',
-    'OBFUSCATIONS',
-    'OSES',
-    'PLATFORM',
-]
+# NOTE: legacy interface name
+parse = EngineRegistry.parse_with
+
+__all__ = ['parsers', 'vocab', 'errors', 'registry', 'parse']

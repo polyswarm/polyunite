@@ -6,7 +6,6 @@ MAGENTA_FG = '\033[35m'
 RED_FG = '\033[31m'
 WHITE_FG = '\033[37m'
 YELLOW_FG = '\033[33m'
-
 RESET = '\033[0m'
 UNDERLINE = '\033[4m'
 
