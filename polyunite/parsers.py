@@ -4,20 +4,23 @@ import re
 from typing import ClassVar, Dict
 
 from polyunite.errors import MatchError
-from polyunite.utils import colors, extract_vocabulary
-from polyunite.vocab import (
-    ARCHIVES,
-    HEURISTICS,
-    IDENT,
-    LABELS,
-    LANGS,
-    MACROS,
-    OBFUSCATIONS,
-    OSES,
-    PLATFORM,
-)
+from polyunite.utils import colors, extract_vocabulary, group
+from polyunite.vocab import VocabRegex
 
 from .registry import EngineRegistry
+
+# regular expressions which match 'vocabularies' of classification components
+LABELS = VocabRegex.from_resource('LABELS')
+LANGS = VocabRegex.from_resource('LANGS')
+ARCHIVES = VocabRegex.from_resource('ARCHIVES')
+MACROS = VocabRegex.from_resource('MACROS')
+OSES = VocabRegex.from_resource('OPERATING_SYSTEMS')
+HEURISTICS = VocabRegex.from_resource('HEURISTICS')
+OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
+PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS)
+IDENT = r"""(?P<NAME> (?P<FAMILY>(?:CVE-[\d-]+)|(?:[\w_-]+))
+                ([.]?(?<=[.])(?P<VARIANT>(?:[a-zA-Z0-9]*)([.]\d+\Z)?))?
+                (!(?P<SUFFIX>\w+))?)"""
 
 
 class ClassificationParser(collections.UserDict):

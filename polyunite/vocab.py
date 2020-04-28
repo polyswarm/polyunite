@@ -5,10 +5,7 @@ from typing import Dict, Mapping, Union
 
 from pkg_resources import resource_stream
 
-
-def group(*choices, fmt='(?:{})', name=None):
-    spec = '(?P<%s>{})' % name if name else fmt
-    return spec.format('|'.join(set(map(format, filter(None, choices)))))
+from polyunite.utils import group
 
 
 class VocabRegex:
@@ -51,22 +48,5 @@ class VocabRegex:
         return fmt.format(self.compile(**cargs).pattern)
 
     @classmethod
-    def load_vocab(cls, name):
+    def from_resource(cls, name: 'str'):
         return cls(name, json.load(resource_stream(__name__, f'vocabs/{name.lower()}.json')))
-
-
-# Provides extra detail about the malware, including how it is used as part of a multicomponent
-# threat. In the example above,
-LABELS = VocabRegex.load_vocab('LABELS')
-LANGS = VocabRegex.load_vocab('LANGS')
-ARCHIVES = VocabRegex.load_vocab('ARCHIVES')
-MACROS = VocabRegex.load_vocab('MACROS')
-OSES = VocabRegex.load_vocab('OPERATING_SYSTEMS')
-HEURISTICS = VocabRegex.load_vocab('HEURISTICS')
-OBFUSCATIONS = VocabRegex.load_vocab('OBFUSCATIONS')
-
-PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS)
-
-IDENT = r"""(?P<NAME> (?P<FAMILY>(?:CVE-[\d-]+)|(?:[\w_-]+))
-                ([.]?(?<=[.])(?P<VARIANT>(?:[a-zA-Z0-9]*)([.]\d+\Z)?))?
-                (!(?P<SUFFIX>\w+))?)"""

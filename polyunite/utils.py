@@ -1,4 +1,5 @@
 import operator
+from typing import Optional
 
 
 class colors:
@@ -12,6 +13,12 @@ class colors:
     YELLOW_FG = '\033[33m'
     RESET = '\033[0m'
     UNDERLINE = '\033[4m'
+
+
+def group(*choices, fmt='(?:{})', name: 'Optional[str]' = None):
+    """Group a regular expression"""
+    spec = '(?P<%s>{})' % name if name else fmt
+    return spec.format('|'.join(set(map(format, filter(None, choices)))))
 
 
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
