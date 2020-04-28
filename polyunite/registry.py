@@ -1,43 +1,51 @@
-from typing import ClassVar, Dict, Optional
+import string
+from typing import TYPE_CHECKING, ClassVar, Dict, Type
 
-from polyunite.errors import (
-    PolyuniteDecodeError,
-    PolyuniteEngineLookupError,
-    PolyuniteEngineMapError,
-)
+from polyunite.errors import EngineKeyError, EngineNormalizeError
+
+if TYPE_CHECKING:
+    from polyunite.decoders import ClassificationDecoder
 
 
 class EngineRegistry:
-    registry: ClassVar[Mapping] = {}
+    registry: 'ClassVar[Dict[str, type]]' = {}
 
-    def map_to_decoder(self, engine: str, cls):
-        """Register cls as the specialized class for handling "engine" engines. """
-        if engine and isinstance(engine, str):
-            self.registry[engine.lower()] = cls
-        else:
-            raise PolyuniteEngineMapError
-
-    def __getitem__(self, engine: str):
-        try:
-            return self.registry[engine.lower()]
-        except KeyError:
-            raise PolyuniteEngineLookupError
-
-    def __call__(self, engine: str, classification: str):
+    @classmethod
+    def decode(cls, engine: 'str', classification: 'str') -> 'ClassificationDecoder':
         """Create an engineparts instance for engine 'engine' from 'classification'.
 
         Creates an instance by creating a specialized class for parsing and representing the
         specified engine's classification by combining the factory base_class with a specialized
         class from the registry
         """
-        return self[engine](classification)
+        return cls.map_to_decoder(engine)(classification)
 
-    def is_heuristic(self, engine: str, classification: str):
+    @classmethod
+    def create_decoder(cls, decoder: 'Type[ClassificationDecoder]', name: 'str'):
+        """Register cls as the specialized class for handling "engine" engines. """
+        cls.registry[cls._normalize(name)] = decoder
+
+    @classmethod
+    def map_to_decoder(cls, engine: 'str'):
+        """Lookup the engine-specialized decoder"""
         try:
-            decoding = self(engine, classification).is_heuristic
-            return decoding.is_heuristic
-        except (PolyuniteDecodeError, PolyuniteEngineLookupError):
-            return None
+            return cls.registry[cls._normalize(engine)]
+        except KeyError:
+            raise EngineKeyError
+
+    _translate_table = str.maketrans(
+        string.ascii_uppercase,
+        string.ascii_lowercase,
+        string.whitespace + string.punctuation,
+    )
+
+    @classmethod
+    def _normalize(cls, name: 'str'):
+        """Return a 'normalized' version of this string"""
+        try:
+            return name.translate(cls._translate_table)
+        except AttributeError:
+            raise EngineNormalizeError
 
 
-registry = EngineRegistry()
+decode = EngineRegistry.decode

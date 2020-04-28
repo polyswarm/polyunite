@@ -1,2 +1,45 @@
-from .registry import registry
-__all__ = ['registry']
+from . import errors
+from .decoders import (
+    K7,
+    Alibaba,
+    ClamAV,
+    DrWeb,
+    Ikarus,
+    Jiangmin,
+    Lionic,
+    NanoAV,
+    Qihoo360,
+    QuickHeal,
+    Rising,
+    URLHaus,
+    Virusdie,
+)
+from .registry import decode
+from .vocab import (ARCHIVES, HEURISTICS, LABELS, LANGS, MACROS, OBFUSCATIONS, OSES, PLATFORM, VocabRegex)
+
+__all__ = [
+    'errors',
+    'decode',
+    'Alibaba',
+    'ClamAV',
+    'DrWeb',
+    'Ikarus',
+    'Jiangmin',
+    'K7',
+    'Lionic',
+    'NanoAV',
+    'Qihoo360',
+    'QuickHeal',
+    'Rising',
+    'Virusdie',
+    'URLHaus',
+    'VocabRegex',
+    'ARCHIVES',
+    'HEURISTICS',
+    'LABELS',
+    'LANGS',
+    'MACROS',
+    'OBFUSCATIONS',
+    'OSES',
+    'PLATFORM',
+]

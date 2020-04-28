@@ -23,34 +23,30 @@ if len(sys.argv) == 1:
     errors = []
     for engine, family in seen():
         try:
-            sch = polyunite.registry(engine, family)
-            if sch:
-                colorized = sch.colorize()
-                print(
-                    ' | '.join(
-                        ('{:<10}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}', '{}')
-                    ).format(
-                        engine,
-                        sch.is_heuristic and 'H' or '',
-                        sch.operating_system or '',
-                        sch.language or '',
-                        sch.macro or '',
-                        ', '.join(sch.labels),
-                        sch.name,
-                        colorized,
-                    )
+            sch = polyunite.decode(engine, family)
+            print(
+                ' | '.join(
+                    ('{:<10}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}', '{}')
+                ).format(
+                    engine,
+                    sch.is_heuristic and 'H' or '',
+                    sch.operating_system or '',
+                    sch.language or '',
+                    sch.macro or '',
+                    ', '.join(sch.labels),
+                    sch.name,
+                    sch.colorize(),
                 )
-            else:
-                missing.add(engine)
-        except KeyError:
-            continue
-        except (ValueError) as e:
+            )
+        except polyunite.errors.MatchError as e:
             errors.append((engine, family, e))
+        except polyunite.errors.EngineKeyError:
+            missing.add(engine)
     print("{:-^150}".format("FAILURES"))
     for engine, family, err in errors:
         print("{:<15}: {:85} : {}".format(engine, family, err))
     print("{:-^150}".format("INFO"))
-    print('compile.cache_info', polyunite.vocab.VocabRegex.compile.cache_info())
+    print('compile.cache_info', polyunite.VocabRegex.compile.cache_info())
     print('Missing:', missing)
 
 elif len(sys.argv) == 2 and sys.argv[1] == '-r':

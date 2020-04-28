@@ -1,8 +1,7 @@
 from functools import lru_cache
-from itertools import chain
 import json
 import re
-from typing import Any, Dict, Mapping, Union
+from typing import Dict, Mapping, Union
 
 from pkg_resources import resource_stream
 
@@ -20,17 +19,17 @@ class VocabRegex:
         self.name = name
         self.fields = fields
 
-    @lru_cache
-    def compile(self, start=0, end=1):
+    @lru_cache(typed=True)
+    def compile(self, start: 'int' = 0, end: 'int' = 1):
         """Compile regex, name groups for fields nested at least ``start`` and at most ``end`` deep"""
         def driver(name, entries, depth=0):
             group_name = start <= depth <= end and name.isidentifier() and name
-            return group(
-                self.name != name and name,
-                *entries.get('__alias__', ()),
-                *(driver(k, v, depth + 1) for k, v in entries.items() if not k.startswith('__')),
-                name=group_name
-            ) if isinstance(entries, Mapping) else group(name, name=group_name)
+            if isinstance(entries, Mapping):
+                aliases = entries.get('__alias__', ())
+                children = (driver(k, v, depth + 1) for k, v in entries.items() if not k.startswith('__'))
+                return group(self.name != name and name, *aliases, *children, name=group_name)
+            else:
+                return group(name, name=group_name)
 
         return re.compile(driver(self.name, self.fields), re.IGNORECASE)
 
@@ -42,7 +41,7 @@ class VocabRegex:
           {start,end}=int: controls the 'start' or 'end' compile parameters
         """
         fmt = '(?i:{})'
-        opts = dict(map(re.compile('=|$').split, spec.split(':')))
+        opts: Dict[str, str] = {k: v for k, v in map(re.compile('=|$').split, spec.split(':'))}
         cargs = {k: int(opts[k]) for k in ('start', 'end') if k in opts}
         if 'x' in opts:
             cargs.update({'start': cargs.get('end', 1), 'end': cargs.get('end', 2)})

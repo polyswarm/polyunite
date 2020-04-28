@@ -1,14 +1,10 @@
 import collections
-from functools import partial
 from itertools import chain
-import operator
 import re
-from typing import ClassVar, Dict, Optional
+from typing import ClassVar, Optional
 
 from polyunite.colors import GROUP_COLORS, RESET
-from polyunite.errors import PolyuniteDecodeError
-from polyunite.registry import registry
-from polyunite.utils import GROUP_COLORS, reset
+from polyunite.errors import MatchError
 from polyunite.vocab import (
     ARCHIVES,
     HEURISTICS,
@@ -21,16 +17,20 @@ from polyunite.vocab import (
     PLATFORM,
 )
 
+from .registry import EngineRegistry
 
-def extract_vocabulary(vocab):
+
+def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
+    """Build a function which extracts a vocabulary match"""
     find_iter = vocab.compile(1, 1).finditer
     name = vocab.name
 
-    def driver(self, recieve=lambda m: next(m, None)):
+    def driver(self):
         field = self.get(name)
-        if not isinstance(field, str):
+        if isinstance(field, str):
+            return recieve(filter(None, (s.lastgroup for s in find_iter(field))))
+        else:
             return recieve(iter(()))
-        return recieve(filter(None, (s.lastgroup for s in find_iter(field))))
 
     return driver
 
@@ -39,6 +39,21 @@ class ClassificationDecoder(collections.UserDict):
     pattern: 'ClassVar[str]'
     regex: 'ClassVar[re.Pattern]'
 
+    @classmethod
+    def __init_subclass__(cls):
+        if not isinstance(cls.pattern, re.Pattern):
+            cls.regex = re.compile(cls.pattern, re.VERBOSE)
+        EngineRegistry.create_decoder(cls, cls.__name__)
+
+    def __init__(self, classification: str):
+        self.data = None
+        if isinstance(classification, str):
+            self.match = self.regex.fullmatch(classification)
+            if self.match:
+                self.data = {k: v for k, v in self.match.groupdict().items() if v}
+        if not self.data:
+            raise MatchError
+
     operating_system = property(extract_vocabulary(OSES))
     language = property(extract_vocabulary(LANGS))
     macro = property(extract_vocabulary(MACROS))
@@ -46,36 +61,24 @@ class ClassificationDecoder(collections.UserDict):
 
     @property
     def name(self) -> str:
+        """'name' of the virus"""
         return self.get('FAMILY') or self.source
 
     @property
     def source(self):
+        """Classification string used in decoding"""
         return self.match.string
 
     @property
     def av_vendor(self):
+        """Engine / AV vendor's name"""
         return self.__class__.__name__
 
     @property
     def is_heuristic(self) -> Optional[bool]:
-        fields = filter(None, map(self.get, ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')))
-        return any(map(HEURISTICS.compile(1, 1).fullmatch, fields))
-
-    @classmethod
-    def __init_subclass__(cls):
-        if not isinstance(cls.pattern, re.Pattern):
-            cls.regex = re.compile(cls.pattern, re.VERBOSE)
-        registry.map_to_decoder(cls.__name__, cls)
-
-    def __init__(self, classification: str):
-        if not isinstance(classification, str):
-            raise PolyuniteDecodeError
-        self.match = self.regex.fullmatch(classification)
-        self.fields = {}
-        if self.match:
-            self.fields = {k: v for k, v in self.match.groupdict(None).items() if v}
-        if not self.fields:
-            raise PolyuniteDecodeError
+        """Check if we've decoded this classification as a heuristic-detection"""
+        match = HEURISTICS.compile(1, 1).fullmatch
+        return any(map(match, filter(None, map(self.get, ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')))))
 
     def colorize(self) -> str:
         """Colorize a classification string"""
