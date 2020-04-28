@@ -43,6 +43,7 @@
             "dldr",
             "dloadr",
             "dloade",
+            "malware_download",
             "download",
             "(?<=\\W)DL",
             "dload",
