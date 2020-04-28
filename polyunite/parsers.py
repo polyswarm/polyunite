@@ -69,9 +69,9 @@ class ClassificationParser(collections.UserDict):
         style={
             'NAME': colors.UNDERLINE,
             'LABELS': colors.YELLOW_FG,
-            'ARCHIVES': colors.BLACK_FG,
+            'ARCHIVES': colors.RED_FG,
             'HEURISTICS': colors.MAGENTA_FG,
-            'MACROS': colors.GREEN_FG,
+            'MACROS': colors.UNDERLINE + colors.RED_FG,
             'LANGS': colors.BLUE_FG,
             'OPERATING_SYSTEMS': colors.CYAN_FG,
             'FAMILY': colors.GREEN_FG,

@@ -3,7 +3,7 @@ from typing import Optional
 
 
 class colors:
-    BLACK_FG = '0\033[30m'
+    BLACK_FG = '\033[30m'
     BLUE_FG = '\033[34m'
     CYAN_FG = '\033[36m'
     GREEN_FG = '\033[32m'
