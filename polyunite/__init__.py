@@ -1,5 +1,5 @@
 from . import errors
-from .decoders import (
+from .parsers import (
     K7,
     Alibaba,
     ClamAV,
@@ -14,12 +14,12 @@ from .decoders import (
     URLHaus,
     Virusdie,
 )
-from .registry import decode
+from .registry import parse
 from .vocab import (ARCHIVES, HEURISTICS, LABELS, LANGS, MACROS, OBFUSCATIONS, OSES, PLATFORM, VocabRegex)
 
 __all__ = [
     'errors',
-    'decode',
+    'parse',
     'Alibaba',
     'ClamAV',
     'DrWeb',

@@ -4,30 +4,29 @@ from typing import TYPE_CHECKING, ClassVar, Dict, Type
 from polyunite.errors import EngineKeyError, EngineNormalizeError
 
 if TYPE_CHECKING:
-    from polyunite.decoders import ClassificationDecoder
+    from polyunite.parsers import ClassificationParser
 
 
 class EngineRegistry:
     registry: 'ClassVar[Dict[str, type]]' = {}
 
     @classmethod
-    def decode(cls, engine: 'str', classification: 'str') -> 'ClassificationDecoder':
-        """Create an engineparts instance for engine 'engine' from 'classification'.
+    def parse(cls, engine: 'str', classification: 'str') -> 'ClassificationParser':
+        """Parse `classification` with a specialized parsing class identified by `engine`
 
-        Creates an instance by creating a specialized class for parsing and representing the
-        specified engine's classification by combining the factory base_class with a specialized
-        class from the registry
+        :raises polyunite.errors.ParseError: An error occurred decoding the message
+        :raises polyunite.errors.EngineKeyError: No engine found with this name
         """
-        return cls.map_to_decoder(engine)(classification)
+        return cls.map_to_parser(engine)(classification)
 
     @classmethod
-    def create_decoder(cls, decoder: 'Type[ClassificationDecoder]', name: 'str'):
-        """Register cls as the specialized class for handling "engine" engines. """
-        cls.registry[cls._normalize(name)] = decoder
+    def create_parser(cls, parser: 'Type[ClassificationParser]', name: 'str'):
+        """Register `cls` as the specialized class for handling parse requests """
+        cls.registry[cls._normalize(name)] = parser
 
     @classmethod
-    def map_to_decoder(cls, engine: 'str'):
-        """Lookup the engine-specialized decoder"""
+    def map_to_parser(cls, engine: 'str'):
+        """Lookup the engine-specialized parser"""
         try:
             return cls.registry[cls._normalize(engine)]
         except KeyError:
@@ -48,4 +47,4 @@ class EngineRegistry:
             raise EngineNormalizeError
 
 
-decode = EngineRegistry.decode
+parse = EngineRegistry.parse

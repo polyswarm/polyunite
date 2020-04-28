@@ -36,7 +36,7 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     return driver
 
 
-class ClassificationDecoder(collections.UserDict):
+class ClassificationParser(collections.UserDict):
     pattern: 'ClassVar[str]'
     regex: 'ClassVar[re.Pattern]'
     data: 'Dict[str, str]'
@@ -45,7 +45,7 @@ class ClassificationDecoder(collections.UserDict):
     @classmethod
     def __init_subclass__(cls):
         cls.regex = re.compile(cls.pattern, re.VERBOSE)
-        EngineRegistry.create_decoder(cls, cls.__name__)
+        EngineRegistry.create_parser(cls, cls.__name__)
 
     def __init__(self, classification: str):
         super().__init__()
@@ -73,7 +73,7 @@ class ClassificationDecoder(collections.UserDict):
 
     @property
     def is_heuristic(self) -> Optional[bool]:
-        """Check if we've decoded this classification as a heuristic-detection"""
+        """Check if we've parsed this classification as a heuristic-detection"""
         match = HEURISTICS.compile(1, 1).fullmatch
         return any(map(match, filter(None, map(self.get, ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT')))))
 
@@ -86,11 +86,11 @@ class ClassificationDecoder(collections.UserDict):
         return ss
 
 
-class Alibaba(ClassificationDecoder):
+class Alibaba(ClassificationParser):
     pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?(?:({PLATFORM})\/)?(?:{IDENT})$"
 
 
-class ClamAV(ClassificationDecoder):
+class ClamAV(ClassificationParser):
     pattern = rf"""^
         (?:(?P<PREFIX>BC|Clamav))?
         (?:(\.|^)(?:{PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?
@@ -98,7 +98,7 @@ class ClamAV(ClassificationDecoder):
         (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$"""
 
 
-class DrWeb(ClassificationDecoder):
+class DrWeb(ClassificationParser):
     pattern = rf"""^
     ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
               (?:(\.|\A|\b){PLATFORM})?
@@ -110,7 +110,7 @@ class DrWeb(ClassificationDecoder):
                   (?:[.]?(?P<SUFFIX>(origin|based)))?))?$"""
 
 
-class Ikarus(ClassificationDecoder):
+class Ikarus(ClassificationParser):
     pattern = rf"""
         ^({OBFUSCATIONS}\.)?
               (?:{HEURISTICS}\:?)?
@@ -118,21 +118,21 @@ class Ikarus(ClassificationDecoder):
               (?:[.]?{IDENT})?$"""
 
 
-class Jiangmin(ClassificationDecoder):
+class Jiangmin(ClassificationParser):
     pattern = rf"""^(?:{HEURISTICS}:?)?
               (?:(?:{LABELS:x}|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+?
               {IDENT}?(?:[.](?P<GENERATION>[a-z]))?$"""
 
 
-class K7(ClassificationDecoder):
+class K7(ClassificationParser):
     pattern = rf"^{LABELS:x}? (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
 
 
-class Lionic(ClassificationDecoder):
+class Lionic(ClassificationParser):
     pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?(?:(?:\.|^){IDENT})?$"
 
 
-class NanoAV(ClassificationDecoder):
+class NanoAV(ClassificationParser):
     pattern = rf"""^
         {LABELS:x}?
               (?:[.]?(?P<NANO_TYPE>(Text|Url)))?
@@ -140,7 +140,7 @@ class NanoAV(ClassificationDecoder):
               (?:[.]?{IDENT})$"""
 
 
-class Qihoo360(ClassificationDecoder):
+class Qihoo360(ClassificationParser):
     pattern = rf"""
         ^(?:{HEURISTICS}(?:/|(?:(?<=VirusOrg)\.)))?
               (?:
@@ -149,7 +149,7 @@ class Qihoo360(ClassificationDecoder):
               {IDENT}?$"""
 
 
-class QuickHeal(ClassificationDecoder):
+class QuickHeal(ClassificationParser):
     pattern = rf"""
         ^(?:{HEURISTICS}\.)?
               # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
@@ -161,7 +161,7 @@ class QuickHeal(ClassificationDecoder):
                   (?:\.(?P<SUFFIX>\w+))?)?$"""
 
 
-class Rising(ClassificationDecoder):
+class Rising(ClassificationParser):
     pattern = rf"""^
             {LABELS:x}?
             (?:
@@ -178,7 +178,7 @@ class Rising(ClassificationDecoder):
             return self.source
 
 
-class Virusdie(ClassificationDecoder):
+class Virusdie(ClassificationParser):
     pattern = rf"""^
         (?:{HEURISTICS})?
         (?:(?:\A|\b|\.)(?:{LANGS}|{LABELS}))*
@@ -186,7 +186,7 @@ class Virusdie(ClassificationDecoder):
     $"""
 
 
-class URLHaus(ClassificationDecoder):
+class URLHaus(ClassificationParser):
     pattern = rf"""^
         (({LABELS})(\.)?)?
         (?P<FAMILY>[\s\w]+)

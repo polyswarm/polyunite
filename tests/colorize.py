@@ -23,7 +23,7 @@ if len(sys.argv) == 1:
     errors = []
     for engine, family in seen():
         try:
-            sch = polyunite.decode(engine, family)
+            sch = polyunite.parse(engine, family)
             print(
                 ' | '.join(
                     ('{:<10}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}', '{}')
