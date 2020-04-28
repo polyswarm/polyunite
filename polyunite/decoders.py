@@ -1,7 +1,8 @@
 import collections
 from itertools import chain
+import operator
 import re
-from typing import ClassVar, Optional
+from typing import ClassVar, Dict, Optional
 
 from polyunite.colors import GROUP_COLORS, RESET
 from polyunite.errors import MatchError
@@ -22,14 +23,14 @@ from .registry import EngineRegistry
 
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     """Build a function which extracts a vocabulary match"""
-    find_iter = vocab.compile(1, 1).finditer
     name = vocab.name
+    find_iter = vocab.compile(1, 1).finditer
+    last_group = operator.attrgetter('lastgroup')
 
     def driver(self):
-        field = self.get(name)
-        if isinstance(field, str):
-            return recieve(filter(None, (s.lastgroup for s in find_iter(field))))
-        else:
+        try:
+            return recieve(filter(None, map(last_group, find_iter(self[name]))))
+        except KeyError:
             return recieve(iter(()))
 
     return driver
@@ -38,19 +39,20 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
 class ClassificationDecoder(collections.UserDict):
     pattern: 'ClassVar[str]'
     regex: 'ClassVar[re.Pattern]'
+    data: 'Dict[str, str]'
+    source: 'str'
 
     @classmethod
     def __init_subclass__(cls):
-        if not isinstance(cls.pattern, re.Pattern):
-            cls.regex = re.compile(cls.pattern, re.VERBOSE)
+        cls.regex = re.compile(cls.pattern, re.VERBOSE)
         EngineRegistry.create_decoder(cls, cls.__name__)
 
     def __init__(self, classification: str):
-        self.data = None
-        if isinstance(classification, str):
-            self.match = self.regex.fullmatch(classification)
-            if self.match:
-                self.data = {k: v for k, v in self.match.groupdict().items() if v}
+        super().__init__()
+        self.source = classification
+        match = self.regex.fullmatch(classification)
+        if match:
+            self.data = {k: v for k, v in match.groupdict().items() if v}
         if not self.data:
             raise MatchError
 
@@ -62,12 +64,7 @@ class ClassificationDecoder(collections.UserDict):
     @property
     def name(self) -> str:
         """'name' of the virus"""
-        return self.get('FAMILY') or self.source
-
-    @property
-    def source(self):
-        """Classification string used in decoding"""
-        return self.match.string
+        return self.get('FAMILY', self.source)
 
     @property
     def av_vendor(self):
@@ -175,8 +172,10 @@ class Rising(ClassificationDecoder):
 
     @property
     def name(self) -> str:
-        keys = tuple(map(self.get, ('FAMILY', 'VARIANT')))
-        return ''.join((keys if all(keys) else self.source))
+        try:
+            return ''.join((self['FAMILY'], self['VARIANT']))
+        except KeyError:
+            return self.source
 
 
 class Virusdie(ClassificationDecoder):
