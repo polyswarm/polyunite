@@ -189,6 +189,6 @@ class Virusdie(ClassificationParser):
 
 class URLHaus(ClassificationParser):
     pattern = rf"""^
-        (({LABELS})(\.)?)?
-        (?P<FAMILY>[\s\w]+)
+        (({LABELS})(\.|$))?
+        (?P<FAMILY>[\s\w]+)?
     $"""
