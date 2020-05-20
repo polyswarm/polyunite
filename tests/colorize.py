@@ -24,28 +24,24 @@ if len(sys.argv) == 1:
     for engine, family in seen():
         try:
             sch = polyunite.parse(engine, family)
-            if sch:
-                colorized = sch.colorize()
-                print(
-                    ' | '.join((
-                        '{:<10}', '{:1}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}',
-                        '{}'
-                    )).format(
-                        engine,
-                        sch.heuristic and 'H' or '',
-                        sch.peripheral and 'T' or '',
-                        sch.operating_system or '',
-                        sch.language or '',
-                        sch.macro or '',
-                        ', '.join(sch.labels),
-                        sch.name,
-                        colorized,
-                    )
+            print(
+                ' | '.join(
+                    ('{:<10}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}', '{}')
+                ).format(
+                    engine,
+                    sch.is_heuristic and 'H' or '',
+                    sch.operating_system or '',
+                    sch.language or '',
+                    sch.macro or '',
+                    ', '.join(sch.labels),
+                    sch.name,
+                    sch.colorize(),
                 )
-            else:
-                missing.add(engine)
-        except AttributeError as e:
+            )
+        except polyunite.errors.MatchError as e:
             errors.append((engine, family, e))
+        except polyunite.errors.EngineKeyError:
+            missing.add(engine)
     print("{:-^150}".format("FAILURES"))
     for engine, family, err in errors:
         print("{:<15}: {:85} : {}".format(engine, family, err))

@@ -1,34 +1,32 @@
 from functools import lru_cache
-from itertools import chain
 import json
 import re
-from typing import Any, Dict, Mapping, Union
+from typing import Dict, Mapping, Union
 
 from pkg_resources import resource_stream
 
-def group(*choices, fmt='(?:{})', name=None):
-    spec = '(?P<%s>{})' % name if name else fmt
-    return spec.format('|'.join(set(map(format, filter(None, choices)))))
+from polyunite.utils import group
+
 
 class VocabRegex:
-    name: str
-    fields: Dict[str, Union[Dict, str]]
+    name: 'str'
+    fields: 'Dict[str, Union[Dict, str]]'
 
     def __init__(self, name, fields):
         self.name = name
         self.fields = fields
 
-    @lru_cache()
-    def compile(self, start=0, end=1):
+    @lru_cache(typed=True)
+    def compile(self, start: 'int' = 0, end: 'int' = 1):
         """Compile regex, name groups for fields nested at least ``start`` and at most ``end`` deep"""
         def driver(name, entries, depth=0):
             group_name = start <= depth <= end and name.isidentifier() and name
-            return group(
-                self.name != name and name,
-                *entries.get('__alias__', ()),
-                *(driver(k, v, depth + 1) for k, v in entries.items() if not k.startswith('__')),
-                name=group_name
-            ) if isinstance(entries, Mapping) else group(name, name=group_name)
+            if isinstance(entries, Mapping):
+                aliases = entries.get('__alias__', ())
+                children = (driver(k, v, depth + 1) for k, v in entries.items() if not k.startswith('__'))
+                return group(self.name != name and name, *aliases, *children, name=group_name)
+            else:
+                return group(name, name=group_name)
 
         return re.compile(driver(self.name, self.fields), re.IGNORECASE)
 
@@ -40,7 +38,7 @@ class VocabRegex:
           {start,end}=int: controls the 'start' or 'end' compile parameters
         """
         fmt = '(?i:{})'
-        opts = dict(map(re.compile('=|$').split, spec.split(':')))
+        opts: Dict[str, str] = {k: v for k, v in map(re.compile('=|$').split, spec.split(':'))}
         cargs = {k: int(opts[k]) for k in ('start', 'end') if k in opts}
         if 'x' in opts:
             cargs.update({'start': cargs.get('end', 1), 'end': cargs.get('end', 2)})
@@ -50,22 +48,5 @@ class VocabRegex:
         return fmt.format(self.compile(**cargs).pattern)
 
     @classmethod
-    def load_vocab(cls, name):
+    def from_resource(cls, name: 'str'):
         return cls(name, json.load(resource_stream(__name__, f'vocabs/{name.lower()}.json')))
-
-
-# Provides extra detail about the malware, including how it is used as part of a multicomponent
-# threat. In the example above,
-LABELS = VocabRegex.load_vocab('LABELS')
-LANGS = VocabRegex.load_vocab('LANGS')
-ARCHIVES = VocabRegex.load_vocab('ARCHIVES')
-MACROS = VocabRegex.load_vocab('MACROS')
-OSES = VocabRegex.load_vocab('OPERATING_SYSTEMS')
-HEURISTICS = VocabRegex.load_vocab('HEURISTICS')
-OBFUSCATIONS = VocabRegex.load_vocab('OBFUSCATIONS')
-
-PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS)
-
-IDENT = r"""(?P<NAME> (?P<FAMILY>(?:CVE-[\d-]+)|(?:[\w_-]+))
-                ([.]?(?<=[.])(?P<VARIANT>(?:[a-zA-Z0-9]*)([.]\d+\Z)?))?
-                (!(?P<SUFFIX>\w+))?)"""
