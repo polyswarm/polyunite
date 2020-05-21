@@ -112,11 +112,9 @@ class DrWeb(ClassificationParser):
 
 
 class Ikarus(ClassificationParser):
-    pattern = rf"""
-        ^({OBFUSCATIONS}\.)?
-              (?:{HEURISTICS}\:?)?
-              (?:(?:\A|\.|\b)({LABELS:x}|{PLATFORM}))*?
-              (?:[.]?{IDENT})?$"""
+    pattern = rf"""^(not-a-virus:)? ({OBFUSCATIONS}\.)?
+                    (({LABELS}(-\w+)?)\.)? (({PLATFORM})\.)? (?P<FAMILY>.*)?
+                    $"""
 
 
 class Jiangmin(ClassificationParser):
