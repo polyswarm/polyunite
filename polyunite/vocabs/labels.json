@@ -184,9 +184,13 @@
         "__desc__": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system."
     },
     "polymorphic_virus": "A type of virus that encrypts its code differently with each infection (or with each generation of infections).",
+    "sms": {
+        "__alias__": ["((?<=trojan).?|(?<=[./-_\\s]))(?-i:SMS)(?!\\w)"],
+        "__desc__": "Malware that uses SMS for malicious purpose"
+    },
     "premium_dialer_smser": {
-        "__alias__": ["dialer", "porn\\W?dialer", "((?<=trojan).?|(?<=[./-_\\s]))(?-i:SMS)(?!\\w)"],
-      "__desc__": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers."
+        "__alias__": ["dialer", "porn\\W?dialer"],
+        "__desc__": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers."
     },
     "prepender": {
         "__alias__": ["hllp"],
