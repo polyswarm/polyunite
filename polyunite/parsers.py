@@ -128,6 +128,11 @@ class Jiangmin(ClassificationParser):
 class K7(ClassificationParser):
     pattern = rf"^{LABELS:x}? (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
 
+    @property
+    def name(self) -> str:
+        # K7 does not work with family names
+        return ''
+
 
 class Lionic(ClassificationParser):
     pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?(?:(?:\.|^){IDENT})?$"
