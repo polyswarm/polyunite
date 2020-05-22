@@ -177,7 +177,7 @@ class Rising(ClassificationParser):
     @property
     def name(self) -> str:
         try:
-            return ''.join((self['FAMILY'], self['VARIANT']))
+            return self['FAMILY']
         except KeyError:
             return self.source
 
