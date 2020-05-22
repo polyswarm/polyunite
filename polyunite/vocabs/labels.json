@@ -171,13 +171,18 @@
         ],
         "__desc__": "A program that monitors or limits machine usage. Such programs can run undetected and can transmit monitoring information to another machine."
     },
+    "banker": {
+        "__alias__": [
+            "banker"
+        ],
+        "__desc__": "A type of trojan designed to perform banking fraud."
+    },
     "password_stealer": {
         "__alias__": [
             "pws",
             "psw",
             "stealer",
             "(password-)?stealer",
-            "banker",
             "pwsteal(er)?",
             "infosteal(er)?"
         ],
