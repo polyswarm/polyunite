@@ -64,6 +64,12 @@
         ],
         "__desc__": "Encryption of the malware instance code."
     },
+    "unpacked": {
+        "__alias__": [
+            "unpacked"
+        ],
+        "__desc__": "Upacked binary or code from the original malware"
+    },
     "dead-code-insertion": "Dead code inserted in the malware instance.",
     "entry-point-obfuscation": "Obfuscation of the malware instance entry point.",
     "import-address-table-obfuscation": "Obfuscation of the malware instance import address table.",
