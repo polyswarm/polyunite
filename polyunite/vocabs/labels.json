@@ -44,7 +44,7 @@
             "dloadr",
             "dloade",
             "malware_download",
-            "download",
+            "download(ware|guide)",
             "(?<=\\W)DL",
             "dload",
             "downware",
@@ -54,7 +54,6 @@
             "dropped",
             "docdl",
             "macrodown",
-            "downloadware",
             "dloadware"
         ],
         "__desc__": "Malware programmed to download and execute other files, usually more complex malware."
