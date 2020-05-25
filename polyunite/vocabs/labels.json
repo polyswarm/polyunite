@@ -173,7 +173,7 @@
     },
     "banker": {
         "__alias__": [
-            "banker"
+            "banker(\\d)?"
         ],
         "__desc__": "A type of trojan designed to perform banking fraud."
     },
