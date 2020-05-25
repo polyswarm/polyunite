@@ -51,6 +51,19 @@ class ClassificationParser(collections.UserDict):
     @property
     def name(self) -> str:
         """'name' of the virus"""
+        # for those really hard to parse lables
+        pattern = rf"""^({LABELS:x})?
+                        ({LANGS:x})?
+                        ({ARCHIVES:x})?
+                        ({MACROS:x})?
+                        ({OSES:x})?
+                        ({OBFUSCATIONS:x})?
+                        ({HEURISTICS:x})?
+                       $"""
+        regex = re.compile(pattern, re.VERBOSE)
+        match = regex.fullmatch(self.get('FAMILY', ''))
+        if match:
+            return ''
         return self.get('FAMILY', self.source)
 
     @property
@@ -88,7 +101,9 @@ class ClassificationParser(collections.UserDict):
 
 
 class Alibaba(ClassificationParser):
-    pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?(?:({PLATFORM})\/)?(?:{IDENT})$"
+    pattern = rf"""^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?
+                    (?:({PLATFORM})\/)?
+                    (?:{IDENT})$"""
 
 
 class ClamAV(ClassificationParser):
@@ -124,7 +139,8 @@ class Jiangmin(ClassificationParser):
 
 
 class K7(ClassificationParser):
-    pattern = rf"^{LABELS:x}? (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
+    pattern = rf"""^{LABELS:x}?
+                    (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"""
 
     @property
     def name(self) -> str:
@@ -133,7 +149,9 @@ class K7(ClassificationParser):
 
 
 class Lionic(ClassificationParser):
-    pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?(?:(?:\.|^){IDENT})?$"
+    pattern = rf"""^{LABELS}?
+                    (?:(^|\.)(?:{PLATFORM}))?
+                    (?:(?:\.|^){IDENT})?$"""
 
 
 class NanoAV(ClassificationParser):
