@@ -270,7 +270,7 @@
         ],
         "__desc__": "A program that can be used to gather information for unauthorized access to computer systems."
     },
-    "shellcode": {
+    "exploit": {
         "__tag__": [
             "paramalware"
         ],
