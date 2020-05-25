@@ -192,13 +192,6 @@ class Rising(ClassificationParser):
             )*
             (?:(?P<VARIANT>(?:[#@!.][a-zA-Z0-9]+)*?)%?)?$"""
 
-    @property
-    def name(self) -> str:
-        try:
-            return self['FAMILY']
-        except KeyError:
-            return self.source
-
 
 class Virusdie(ClassificationParser):
     pattern = rf"""^
