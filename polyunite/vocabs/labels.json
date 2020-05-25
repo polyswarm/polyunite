@@ -190,7 +190,7 @@
     },
     "injector": {
         "__alias__": [
-            "inject(or)?"
+            "(vb|cee|aut|autoit|crypt(o)?|delf)?inject(\\d|or)?"
         ],
         "__desc__": "A type of trojan that injects itself into other processes or files."
     },
