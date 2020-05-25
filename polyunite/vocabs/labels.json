@@ -224,11 +224,18 @@
     },
     "resource_exploiter": {
         "__alias__": [
-            "zipbomb",
+            "zipbomb"
+        ],
+        "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles)."
+    },
+    "cryptominer": {
+        "__alias__": [
             "miner",
+            "btcmine",
+            "coinminer",
             "(bitcoin|bit|crypto|btc|eth)?coinminer"
         ],
-        "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner."
+        "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner, to use them for cryptocurrency mining without user permission."
     },
     "rogue_security_software": {
         "__alias__": [
