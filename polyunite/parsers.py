@@ -72,20 +72,6 @@ class Classification(collections.UserDict):
     @property
     def name(self) -> str:
         """'name' of the virus"""
-        # for those really hard to parse lables
-        return self.source
-        pattern = rf"""^({LABELS})?
-                        ({LANGS})?
-                        ({ARCHIVES})?
-                        ({MACROS})?
-                        ({OSES})?
-                        ({OBFUSCATIONS})?
-                        ({HEURISTICS})?
-                       $"""
-        regex = re.compile(pattern, re.VERBOSE)
-        match = regex.fullmatch(self.get('FAMILY', ''))
-        if match:
-            return ''
         return self.get('FAMILY', self.source)
 
     @property
@@ -222,7 +208,7 @@ class Virusdie(Classification):
     pattern = rf"""^
         (?:{HEURISTICS})?
         (?:(?:\A|\b|\.)(?:{LANGS}|{LABELS}))*
-        (?:(?:\A|\b|\.){IDENT})?
+            (?:(?:\A|\b|\.){IDENT})?
     $"""
 
 
