@@ -72,6 +72,20 @@ class Classification(collections.UserDict):
     @property
     def name(self) -> str:
         """'name' of the virus"""
+        # for those really hard to parse lables
+        return self.source
+        pattern = rf"""^({LABELS})?
+                        ({LANGS})?
+                        ({ARCHIVES})?
+                        ({MACROS})?
+                        ({OSES})?
+                        ({OBFUSCATIONS})?
+                        ({HEURISTICS})?
+                       $"""
+        regex = re.compile(pattern, re.VERBOSE)
+        match = regex.fullmatch(self.get('FAMILY', ''))
+        if match:
+            return ''
         return self.get('FAMILY', self.source)
 
     @property
@@ -111,7 +125,9 @@ class Classification(collections.UserDict):
 
 
 class Alibaba(Classification):
-    pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS}*):)?(?:({PLATFORM})[./])*(?i:{IDENT})$"
+    pattern = rf"""^(?:(?:{OBFUSCATIONS}|{LABELS}*):)*
+                    (?:({PLATFORM})\/)?
+                    (?i:{IDENT})$"""
 
 
 class ClamAV(Classification):
@@ -148,11 +164,19 @@ class Jiangmin(Classification):
 
 
 class K7(Classification):
-    pattern = rf"^([-]?{LABELS})+ (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
+    pattern = rf"""^{LABELS}*
+                    (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"""
+
+    @property
+    def name(self) -> str:
+        # K7 does not work with family names
+        return ''
 
 
 class Lionic(Classification):
-    pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))*(?:(?:\.|^){IDENT})?$"
+    pattern = rf"""^{LABELS}?
+                    (?:(^|\.)(?:{PLATFORM}))?
+                    (?:(?:\.|^){IDENT})?$"""
 
 
 class NanoAV(Classification):

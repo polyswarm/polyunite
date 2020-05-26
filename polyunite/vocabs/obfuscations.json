@@ -63,5 +63,11 @@
             "cryptic"
         ],
         "__desc__": "Encryption of the malware instance code."
+    },
+    "unpacked": {
+        "__alias__": [
+            "unpacked"
+        ],
+        "__desc__": "Upacked binary or code from the original malware"
     }
 }

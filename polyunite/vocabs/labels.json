@@ -44,7 +44,7 @@
             "dloadr",
             "dloade",
             "malware_download",
-            "download",
+            "download(ware|guide)?",
             "(?<=\\W)DL",
             "dload",
             "downware",
@@ -54,7 +54,6 @@
             "dropped",
             "docdl",
             "macrodown",
-            "downloadware",
             "dloadware"
         ],
         "__desc__": "Malware programmed to download and execute other files, usually more complex malware."
@@ -171,22 +170,43 @@
         ],
         "__desc__": "A program that monitors or limits machine usage. Such programs can run undetected and can transmit monitoring information to another machine."
     },
+    "banker": {
+        "__alias__": [
+            "banker(\\d)?"
+        ],
+        "__desc__": "A type of trojan designed to perform banking fraud."
+    },
     "password_stealer": {
         "__alias__": [
             "pws",
             "psw",
             "stealer",
             "(password-)?stealer",
-            "banker",
             "pwsteal(er)?",
             "infosteal(er)?"
         ],
         "__desc__": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system."
     },
+    "injector": {
+        "__alias__": [
+            "(vb|cee|aut|autoit|crypt(o)?|delf)?inject(\\d|or)?"
+        ],
+        "__desc__": "A type of trojan that injects itself into other processes or files."
+    },
+    "infector": {
+        "__alias__": [
+            "infect(or)?"
+        ],
+        "__desc__": "A type of trojan that spreads by attaching its code to other files."
+    },
     "polymorphic_virus": "A type of virus that encrypts its code differently with each infection (or with each generation of infections).",
+    "sms": {
+        "__alias__": ["((?<=trojan).?|(?<=[./-_\\s]))(?-i:SMS)(?!\\w)"],
+        "__desc__": "Malware that uses SMS for malicious purpose"
+    },
     "premium_dialer_smser": {
-        "__alias__": ["dialer", "porn\\W?dialer", "((?<=trojan).?|(?<=[./-_\\s]))(?-i:SMS)(?!\\w)"],
-      "__desc__": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers."
+        "__alias__": ["dialer", "porn\\W?dialer"],
+        "__desc__": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers."
     },
     "prepender": {
         "__alias__": ["hllp"],
@@ -215,11 +235,18 @@
     },
     "resource_exploiter": {
         "__alias__": [
-            "zipbomb",
+            "zipbomb"
+        ],
+        "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles)."
+    },
+    "cryptominer": {
+        "__alias__": [
             "miner",
+            "btcmine",
+            "coinminer",
             "(bitcoin|bit|crypto|btc|eth)?coinminer"
         ],
-        "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner."
+        "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner, to use them for cryptocurrency mining without user permission."
     },
     "rogue_security_software": {
         "__alias__": [
@@ -249,7 +276,7 @@
         ],
         "__desc__": "A program that can be used to gather information for unauthorized access to computer systems."
     },
-    "shellcode": {
+    "exploit": {
         "__tag__": [
             "paramalware"
         ],
@@ -304,5 +331,11 @@
             "hllw"
         ],
         "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."
+    },
+    "cve": {
+        "__alias__": [
+            "CVE-\\d{4}-\\d{4,7}"
+        ],
+        "__desc__": "The Common Vulnerabilities and Exposures system provides a reference-method for publicly known information-security vulnerabilities and exposures."
     }
 }

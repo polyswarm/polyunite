@@ -10,7 +10,8 @@
             "(?i:MS(Excel|Word|Powerpoint|Outlook)((20)?\\d\\d)?)",
             "(?i:Office((20)?\\d\\d)?)",
             "Doc",
-            "OLE"
+            "OLE",
+            "SAgent"
         ],
         "A97M": "Access 97, 2000, XP, 2003, 2007, and 2010 macros",
         "AM": "Runs as a VBA macro in the Microsoft Access application (version 97 or later)",
