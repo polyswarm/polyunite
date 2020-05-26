@@ -40,7 +40,7 @@ if len(sys.argv) == 1:
             )
         except polyunite.errors.MatchError as e:
             errors.append((engine, family, e))
-        except polyunite.errors.EngineKeyError:
+        except polyunite.errors.RegistryKeyError:
             missing.add(engine)
     print("{:-^150}".format("FAILURES"))
     for engine, family, err in errors:

@@ -24,13 +24,16 @@ def group(*choices, fmt='(?:{})', name: 'Optional[str]' = None):
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     """Build a function which extracts a vocabulary match"""
     name = vocab.name
-    find_iter = vocab.compile(1, 1).finditer
-    last_group = operator.attrgetter('lastgroup')
 
     def driver(self):
         try:
-            return recieve(filter(None, map(last_group, find_iter(self[name]))))
-        except KeyError:
+            return (
+                recieve((
+                    k for c in self.match.captures(name) for k, v in self.match.groupdict(None).items()
+                    if v == c and k != name
+                ))
+            )
+        except IndexError:
             return recieve(iter(()))
 
     return driver

@@ -1,14 +1,8 @@
 class EngineNormalizeError(TypeError):
-    """This value couldn't be normalized as an engine's name, check it's type"""
+    """A value of this type could not be normalized into a registry name"""
 
+class MatchError(ValueError):
+    """An exception was raised by an while decoding a malware name"""
 
-class ParseError(ValueError):
-    """A generic error occurred decoding an engine's classification"""
-
-
-class EngineKeyError(ParseError):
-    """No parser has been created for this engine"""
-
-
-class MatchError(ParseError):
-    """Invalid classification string"""
+class RegistryKeyError(KeyError):
+    """No name decoder was found with this name"""

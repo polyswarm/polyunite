@@ -1,13 +1,14 @@
 import collections
-from itertools import chain
-import re
+from itertools import chain, tee
+from contextlib import suppress
+import regex as re
 from typing import ClassVar, Dict
 
 from polyunite.errors import MatchError
 from polyunite.utils import colors, extract_vocabulary, group
 from polyunite.vocab import VocabRegex
 
-from .registry import EngineRegistry
+from .registry import registry
 
 # regular expressions which match 'vocabularies' of classification components
 LABELS = VocabRegex.from_resource('LABELS')
@@ -18,12 +19,12 @@ OSES = VocabRegex.from_resource('OPERATING_SYSTEMS')
 HEURISTICS = VocabRegex.from_resource('HEURISTICS')
 OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS)
-IDENT = r"""(?P<NAME> (?P<FAMILY>(?:CVE-[\d-]+)|(?:[\w_-]+))
-                ([.]?(?<=[.])(?P<VARIANT>(?:[a-zA-Z0-9]*)([.]\d+\Z)?))?
-                (!(?P<SUFFIX>\w+))?)"""
+IDENT = r"""(?P<NAME>(?P<FAMILY>(?P<CVE>(?:CVE-[\d-]+))|BO|(?:[\w_-]{3,}))?
+                ([.](?P<VARIANT>(?:[a-zA-Z0-9]*)([.]\d+\Z)?))?
+                ((?P<SUFFIX>(!\w+|[.][a-z]+)))?)"""
 
 
-class ClassificationParser(collections.UserDict):
+class Classification(collections.UserDict):
     pattern: 'ClassVar[str]'
     regex: 'ClassVar[re.Pattern]'
     data: 'Dict[str, str]'
@@ -32,16 +33,29 @@ class ClassificationParser(collections.UserDict):
     @classmethod
     def __init_subclass__(cls):
         cls.regex = re.compile(cls.pattern, re.VERBOSE)
-        EngineRegistry.create_parser(cls, cls.__name__)
+        registry.register(cls, cls.__name__)
 
-    def __init__(self, classification: str):
+    @classmethod
+    def from_string(cls, name: 'str') -> 'Classification':
+        """Build a `Classification` from the raw malware name provided by this engine"""
+        return cls(name)
+
+    @classmethod
+    def guess_heuristic(cls, name: 'str') -> 'bool':
+        try:
+            return cls.from_string(name).is_heuristic
+        except MatchError:
+            return False
+
+    def __init__(self, name: str):
+        self.source = name
         super().__init__()
-        self.source = classification
-        match = self.regex.fullmatch(classification)
-        if match:
-            self.data = {k: v for k, v in match.groupdict().items() if v}
-        if not self.data:
-            raise MatchError
+        try:
+            self.match = self.regex.fullmatch(name)
+            self.data = {k: v for k, v in self.match.groupdict().items() if v}
+        except (AttributeError, TypeError):
+            raise MatchError(name)
+
 
     operating_system = property(extract_vocabulary(OSES))
     language = property(extract_vocabulary(LANGS))
@@ -61,7 +75,7 @@ class ClassificationParser(collections.UserDict):
     @property
     def is_heuristic(self) -> bool:
         """Check if we've parsed this classification as a heuristic-detection"""
-        fields = map(self.get, ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT'))
+        fields = map(self.get, ('HEURISTICS', LABELS.name, 'VARIANT', 'FAMILY'))
         return any(map(HEURISTICS.compile(1, 1).fullmatch, filter(None, fields)))
 
     def colorize(
@@ -76,22 +90,24 @@ class ClassificationParser(collections.UserDict):
             'OPERATING_SYSTEMS': colors.CYAN_FG,
             'FAMILY': colors.GREEN_FG,
             'VARIANT': colors.WHITE_FG,
-            'OBFUSCATION': colors.BLACK_FG,
+            'OBFUSCATIONS': colors.WHITE_FG + colors.UNDERLINE,
         }
     ) -> str:
         """Colorize a classification string"""
-        ss = self.source
-        # interleave the colors, match & reset between the part before & after the match (from rpartition)
-        for name, match in filter(lambda kv: kv[0] in style, self.items()):
-            ss = ''.join(chain(*zip(ss.rpartition(match), (style[name], colors.RESET, ''))))
-        return ss
+        markers = list(self.source)
+        for name, style in style.items():
+            with suppress(IndexError):
+                for start, end in self.match.spans(name):
+                    markers[start] = style + self.source[start]
+                    markers[end] = colors.RESET + self.source[end]
+        return ''.join(markers) + colors.RESET
 
 
-class Alibaba(ClassificationParser):
-    pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?(?:({PLATFORM})\/)?(?:{IDENT})$"
+class Alibaba(Classification):
+    pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS}*):)?(?:({PLATFORM})[./])*(?:{IDENT})$"
 
 
-class ClamAV(ClassificationParser):
+class ClamAV(Classification):
     pattern = rf"""^
         (?:(?P<PREFIX>BC|Clamav))?
         (?:(\.|^)(?:{PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?
@@ -99,7 +115,7 @@ class ClamAV(ClassificationParser):
         (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$"""
 
 
-class DrWeb(ClassificationParser):
+class DrWeb(Classification):
     pattern = rf"""^
     ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
               (?:(\.|\A|\b){PLATFORM})?
@@ -111,50 +127,48 @@ class DrWeb(ClassificationParser):
                   (?:[.]?(?P<SUFFIX>(origin|based)))?))?$"""
 
 
-class Ikarus(ClassificationParser):
-    pattern = rf"""
-        ^({OBFUSCATIONS}\.)?
-              (?:{HEURISTICS}\:?)?
-              (?:(?:\A|\.|\b)({LABELS:x}|{PLATFORM}))*?
-              (?:[.]?{IDENT})?$"""
-
-
-class Jiangmin(ClassificationParser):
-    pattern = rf"""^(?:{HEURISTICS}:?)?
-              (?:(?:{LABELS:x}|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+?
-              {IDENT}?(?:[.](?P<GENERATION>[a-z]))?$"""
-
-
-class K7(ClassificationParser):
-    pattern = rf"^{LABELS:x}? (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
-
-
-class Lionic(ClassificationParser):
-    pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?(?:(?:\.|^){IDENT})?$"
-
-
-class NanoAV(ClassificationParser):
+class Ikarus(Classification):
     pattern = rf"""^
-        {LABELS:x}?
-              (?:[.]?(?P<NANO_TYPE>(Text|Url)))?
-              (?:(\b|[.]){PLATFORM})*?
-              (?:[.]?{IDENT})$"""
+              (?:{HEURISTICS}\:?)?
+              (?:(?:\A|[.]|\b)(-?{LABELS}|{OBFUSCATIONS}|{PLATFORM}))*
+              (?:(?:\A|[.]|\b){IDENT})?$"""
 
 
-class Qihoo360(ClassificationParser):
-    pattern = rf"""
-        ^(?:{HEURISTICS}(?:/|(?:(?<=VirusOrg)\.)))?
-              (?:
-                  (?:Application|{MACROS}|{LANGS}|{OSES}|{ARCHIVES}|{LABELS:x}|(QVM\d*(\.\d)?(\.[0-9A-F]+)?))
-              [./])*
+class Jiangmin(Classification):
+    pattern = rf"""^(?:{HEURISTICS}:?)?
+              (?:(?:({LABELS}+)|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+
               {IDENT}?$"""
 
 
-class QuickHeal(ClassificationParser):
+class K7(Classification):
+    pattern = rf"^([-]?{LABELS})+ (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
+
+
+class Lionic(Classification):
+    pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))*(?:(?:\.|^){IDENT})?$"
+
+
+class NanoAV(Classification):
+    pattern = rf"""^
+        ({LABELS}+)?
+              (?:[.]?(?P<NANO_TYPE>(Text|Url)))?
+              (?:(^|[.]){PLATFORM})*
+              (?:([.]|^){IDENT})$"""
+
+
+class Qihoo360(Classification):
+    pattern = rf"""
+        ^(?:{HEURISTICS}(?:/|(?:(?<=VirusOrg)\.)))?
+              (?:(?:Application|({PLATFORM})|{LABELS}|(QVM\d*(\.\d)?(\.[0-9A-F]+)?))([.]|\/|\Z))*
+              {IDENT}?$"""
+
+
+class QuickHeal(Classification):
     pattern = rf"""
         ^(?:{HEURISTICS}\.)?
+              (?:(?:{LABELS})+)?
               # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
-              (?:(?:\.|^)?{LABELS:x}(\)\Z)?)?
+              (?:(\)$))?
               (?:(?:\.|^){PLATFORM})?
               (?:(?:\.|\/|^)
                   (?:(?P<FAMILY>[-\w]+))
@@ -162,24 +176,17 @@ class QuickHeal(ClassificationParser):
                   (?:\.(?P<SUFFIX>\w+))?)?$"""
 
 
-class Rising(ClassificationParser):
+class Rising(Classification):
     pattern = rf"""^
-            {LABELS:x}?
+            ([.]?{LABELS})*
             (?:
                 (?:(?:^|\/|\.){PLATFORM}) |
-                (?:(?:\.|\/)(?P<FAMILY>[iA-Z][\-\w]+))
+                (?:(?:\.|\/)(?P<FAMILY>(?P<CVE>CVE-\d{4}-\d+)|[iA-Z][\-\w]+?))
             )*
             (?:(?P<VARIANT>(?:[#@!.][a-zA-Z0-9]+)*?)%?)?$"""
 
-    @property
-    def name(self) -> str:
-        try:
-            return ''.join((self['FAMILY'], self['VARIANT']))
-        except KeyError:
-            return self.source
 
-
-class Virusdie(ClassificationParser):
+class Virusdie(Classification):
     pattern = rf"""^
         (?:{HEURISTICS})?
         (?:(?:\A|\b|\.)(?:{LANGS}|{LABELS}))*
@@ -187,7 +194,7 @@ class Virusdie(ClassificationParser):
     $"""
 
 
-class URLHaus(ClassificationParser):
+class URLHaus(Classification):
     pattern = rf"""^
         (({LABELS})(\.|$))?
         (?P<FAMILY>[\s\w]+)?
