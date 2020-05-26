@@ -1,37 +1,61 @@
 from functools import lru_cache
 import json
-import regex as re
-from typing import Dict, Mapping, Union
+from typing import List, Mapping, Optional
 
 from pkg_resources import resource_stream
+import regex as re
 
-from polyunite.utils import group
+
+def group(*choices, fmt='(?:{})', name: 'Optional[str]' = None):
+    """Group a regular expression"""
+    spec = '(?P<%s>{})' % name if name else fmt
+    return spec.format('|'.join(set(map(format, filter(None, choices)))))
+
 
 class VocabRegex:
     name: 'str'
-    fields: 'Dict[str, Union[Dict, str]]'
+    depth: 'int'
+    children: 'List[VocabRegex]'
+    aliases: 'List[str]'
 
-    def __init__(self, name, fields):
+    def __init__(self, name, fields, *, depth=0):
+        values = [(f, fields[f]) for f in fields if not f.startswith('__')]
         self.name = name
-        self.fields = fields
+        self.depth = depth
+        self.aliases = list(fields.get('__alias__', ()))
+        self.aliases.extend(name for name, val in values if isinstance(val, str))
+        self.children = [
+            VocabRegex(name, val, depth=depth + 1) for name, val in values if isinstance(val, Mapping)
+        ]
+        if depth > 0:
+            self.aliases.append(name)
 
     @lru_cache(typed=True)
-    def compile(self, start: 'int' = 0, end: 'int' = 1):
+    def compile(self, start: 'int' = 0, end: 'int' = 1) -> 're.Pattern':
         """Compile regex, name groups for fields nested at least ``start`` and at most ``end`` deep"""
-        def driver(name, entries, depth=0):
-            group_name = start <= depth <= end and name.isidentifier() and name
-            if isinstance(entries, Mapping):
-                aliases = entries.get('__alias__', ())
-                children = (driver(k, v, depth + 1) for k, v in entries.items() if not k.startswith('__'))
-                return group(self.name != name and name, *aliases, *children, name=group_name)
-            else:
-                return group(name, name=group_name)
+        return re.compile(self.pattern(start, end), re.IGNORECASE)
 
-        return re.compile(driver(self.name, self.fields), re.IGNORECASE)
+    def pattern(self, start: 'int' = 0, end: 'int' = 1) -> 'str':
+        """Convert this grouped regular expression pattern"""
+        use_group_name = start <= self.depth <= end and self.name.isidentifier()
+        return group(
+            *(c.pattern() for c in self.children),
+            *self.aliases,
+            name=self.name if use_group_name else None,
+        )
+
+    @property
+    def sublabels(self):
+        return list(v.name for v in self.iter() if v.depth > self.depth)
+
+    def iter(self):
+        yield self
+        for c in self.children:
+            yield from c.iter()
 
     def __format__(self, spec):
         """controls how this class should be formatted (also provides __str_)"""
-        return '(?i:{})'.format(self.compile().pattern)
+        return '(?i:{})'.format(self.pattern())
 
     @classmethod
     def from_resource(cls, name: 'str'):

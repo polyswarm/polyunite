@@ -1,12 +1,12 @@
 import collections
-from itertools import chain, tee
 from contextlib import suppress
-import regex as re
 from typing import ClassVar, Dict
 
+import regex as re
+
 from polyunite.errors import MatchError
-from polyunite.utils import colors, extract_vocabulary, group
-from polyunite.vocab import VocabRegex
+from polyunite.utils import colors
+from polyunite.vocab import VocabRegex, group
 
 from .registry import registry
 
@@ -18,17 +18,35 @@ MACROS = VocabRegex.from_resource('MACROS')
 OSES = VocabRegex.from_resource('OPERATING_SYSTEMS')
 HEURISTICS = VocabRegex.from_resource('HEURISTICS')
 OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
+SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS)
-IDENT = r"""(?P<NAME>(?P<FAMILY>(?P<CVE>(?:CVE-[\d-]+))|BO|(?:[\w_-]{3,}))?
+IDENT = r"""(?P<NAME>(?P<FAMILY>(?P<CVE>(?:CVE-[\d-]+))|BO|(?:[0-9]?[A-Z][\w_-]{2,}))?
                 ([.](?P<VARIANT>(?:[a-zA-Z0-9]*)([.]\d+\Z)?))?
-                ((?P<SUFFIX>(!\w+|[.][a-z]+)))?)"""
+                ((?P<SUFFIX>(!\w+|[.]origin|[.][a-z]+)))?)"""
+
+
+def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
+    sublabels = vocab.sublabels
+    return lambda self: recieve(label for label in sublabels if label in self)
 
 
 class Classification(collections.UserDict):
     pattern: 'ClassVar[str]'
     regex: 'ClassVar[re.Pattern]'
     data: 'Dict[str, str]'
-    source: 'str'
+
+    def __init__(self, name: str):
+        super().__init__()
+        try:
+            self.match = self.regex.fullmatch(name)
+            self.data = {k: v for k, v in self.match.groupdict().items() if v}
+        except (AttributeError, TypeError):
+            raise MatchError(name)
+
+    operating_system = property(extract_vocabulary(OSES))
+    language = property(extract_vocabulary(LANGS))
+    macro = property(extract_vocabulary(MACROS))
+    labels = property(extract_vocabulary(LABELS, recieve=set))
 
     @classmethod
     def __init_subclass__(cls):
@@ -47,20 +65,9 @@ class Classification(collections.UserDict):
         except MatchError:
             return False
 
-    def __init__(self, name: str):
-        self.source = name
-        super().__init__()
-        try:
-            self.match = self.regex.fullmatch(name)
-            self.data = {k: v for k, v in self.match.groupdict().items() if v}
-        except (AttributeError, TypeError):
-            raise MatchError(name)
-
-
-    operating_system = property(extract_vocabulary(OSES))
-    language = property(extract_vocabulary(LANGS))
-    macro = property(extract_vocabulary(MACROS))
-    labels = property(extract_vocabulary(LABELS, recieve=set))
+    @property
+    def source(self):
+        return self.match.string
 
     @property
     def name(self) -> str:
@@ -75,7 +82,7 @@ class Classification(collections.UserDict):
     @property
     def is_heuristic(self) -> bool:
         """Check if we've parsed this classification as a heuristic-detection"""
-        fields = map(self.get, ('HEURISTICS', LABELS.name, 'VARIANT', 'FAMILY'))
+        fields = map(self.get, (HEURISTICS.name, LABELS.name, 'VARIANT', 'FAMILY'))
         return any(map(HEURISTICS.compile(1, 1).fullmatch, filter(None, fields)))
 
     def colorize(
@@ -104,7 +111,7 @@ class Classification(collections.UserDict):
 
 
 class Alibaba(Classification):
-    pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS}*):)?(?:({PLATFORM})[./])*(?:{IDENT})$"
+    pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS}*):)?(?:({PLATFORM})[./])*(?i:{IDENT})$"
 
 
 class ClamAV(Classification):
@@ -150,7 +157,8 @@ class Lionic(Classification):
 
 class NanoAV(Classification):
     pattern = rf"""^
-        ({LABELS}+)?
+        (?:Marker[.])?
+        (?:{LABELS}+)?
               (?:[.]?(?P<NANO_TYPE>(Text|Url)))?
               (?:(^|[.]){PLATFORM})*
               (?:([.]|^){IDENT})$"""
@@ -160,7 +168,7 @@ class Qihoo360(Classification):
     pattern = rf"""
         ^(?:{HEURISTICS}(?:/|(?:(?<=VirusOrg)\.)))?
               (?:(?:Application|({PLATFORM})|{LABELS}|(QVM\d*(\.\d)?(\.[0-9A-F]+)?))([.]|\/|\Z))*
-              {IDENT}?$"""
+              (?i:{IDENT})?$"""
 
 
 class QuickHeal(Classification):

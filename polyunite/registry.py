@@ -1,15 +1,15 @@
-import string
-from typing import TYPE_CHECKING, ClassVar, Dict, Type
-
 from collections import UserDict
-from polyunite.errors import RegistryKeyError, EngineNormalizeError, MatchError
+import string
+from typing import TYPE_CHECKING, Optional, Type
+
+from polyunite.errors import EngineNormalizeError, MatchError, RegistryKeyError
 
 if TYPE_CHECKING:
     from polyunite.parsers import Classification
 
 
 class EngineRegistry(UserDict):
-    def __contains__(self, engine: 'str'):
+    def __contains__(self, engine):
         return super().__contains__(self._normalize(engine))
 
     def __getitem__(self, engine):
@@ -33,8 +33,9 @@ class EngineRegistry(UserDict):
 
     def is_heuristic(self, engine: 'str', name: 'str') -> 'Optional[bool]':
         try:
-            if engine and name:
-                return self.decode(engine, name).is_heuristic
+            if not engine or not name:
+                return None
+            return self.decode(engine, name).is_heuristic
         except (EngineNormalizeError, RegistryKeyError, MatchError):
             return None
 
@@ -50,5 +51,6 @@ class EngineRegistry(UserDict):
             return name.translate(self._translate_table)
         except AttributeError:
             raise EngineNormalizeError(type(name))
+
 
 registry = EngineRegistry()
