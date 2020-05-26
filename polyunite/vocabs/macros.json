@@ -11,6 +11,9 @@
             "(?i:Office((20)?\\d\\d)?)",
             "Doc",
             "OLE",
+            "macro",
+            "macro.word",
+            "macro.excel",
             "SAgent"
         ],
         "A97M": "Access 97, 2000, XP, 2003, 2007, and 2010 macros",

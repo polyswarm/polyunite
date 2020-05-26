@@ -104,6 +104,7 @@
             "misleading",
             "settings-modifier",
             "hoax",
+            "badjoke",
             "swbndlr",
             "sftwrbndlr"
         ],
@@ -129,7 +130,9 @@
     "malware_as_a_service": "Malware that is sold or produced as a service.",
     "mass_mailer": {
         "__alias__": [
+            "mail",
             "email",
+            "hllm",
             "spammer",
             "smtp",
             "spam",
@@ -148,7 +151,7 @@
         ],
         "__alias__": [
             "not-?a-?virus",
-            ".*eicar.*",
+            ".*\b(?i:eicar)\b.*",
             "test",
             "testfile",
             "test.file",
@@ -217,6 +220,7 @@
             "ansom",
             "ransom",
             "ransom-?encoder",
+            "virlock",
             "ransomlock",
             "ransomcrypt",
             "filecoder",
@@ -332,9 +336,9 @@
         ],
         "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."
     },
-    "cve": {
+    "CVE": {
         "__alias__": [
-            "CVE-\\d{4}-\\d{4,7}"
+            "CVE-\\d{4}-\\d+"
         ],
         "__desc__": "The Common Vulnerabilities and Exposures system provides a reference-method for publicly known information-security vulnerabilities and exposures."
     }
