@@ -40,9 +40,6 @@ def IDENT(extra_families=[], extra_variants=[]):
         )
     )
 
-print('IDID')
-print(IDENT())
-
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     sublabels = vocab.sublabels
     return property(lambda self: recieve(label for label in sublabels if label in self))
