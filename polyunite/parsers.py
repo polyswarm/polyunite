@@ -27,8 +27,6 @@ def IDENT(extra_families=[], extra_variants=[]):
         family=group(
             r'(?:[i0-9]?[A-Z](?:[[:alpha:]]+){i<=1:\d}\d*?)',
             r'(?P<CVE>CVE-?\d{4}-?\d+){i<=1:[a-z0-9A-Z]}',
-            r'BO',
-            r'[A-Z]{2}',
             *extra_families,
             name='FAMILY',
         ),
