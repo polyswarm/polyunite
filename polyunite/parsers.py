@@ -23,6 +23,7 @@ PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS)
 
 
 def IDENT(extra_families=[], extra_variants=[]):
+    """Build a family & variant subpattern"""
     return r'(?P<NAME>{family}?{variant}{{,3}})'.format(
         family=group(
             r'(?:[i0-9]?[A-Z](?:[[:alpha:]]+){i<=1:\d}\d*?)',
@@ -38,7 +39,9 @@ def IDENT(extra_families=[], extra_variants=[]):
         )
     )
 
+
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
+    """Call `recieve` with a generator of all `vocab`'s matching label names"""
     sublabels = vocab.sublabels
     return property(lambda self: recieve(label for label in sublabels if label in self))
 
@@ -47,6 +50,7 @@ class Classification(collections.UserDict):
     pattern: 'ClassVar[str]'
     regex: 'ClassVar[re.Pattern]'
     data: 'Dict[str, str]'
+    match: 're.Match'
 
     def __init__(self, name: str):
         super().__init__()
@@ -126,18 +130,18 @@ class Classification(collections.UserDict):
         self,
         style={
             'NAME': colors.UNDERLINE,
-            'LABELS': colors.YELLOW_FG,
-            'ARCHIVES': colors.RED_FG,
-            'HEURISTICS': colors.MAGENTA_FG,
-            'MACROS': colors.UNDERLINE + colors.RED_FG,
-            'LANGS': colors.BLUE_FG,
-            'OPERATING_SYSTEMS': colors.CYAN_FG,
             'FAMILY': colors.GREEN_FG,
             'VARIANT': colors.WHITE_FG,
-            'OBFUSCATIONS': colors.WHITE_FG + colors.UNDERLINE,
+            LABELS.name: colors.YELLOW_FG,
+            ARCHIVES.name: colors.RED_FG,
+            HEURISTICS.name: colors.MAGENTA_FG,
+            MACROS.name: colors.UNDERLINE + colors.RED_FG,
+            LANGS.name: colors.BLUE_FG,
+            OSES.name: colors.CYAN_FG,
+            OBFUSCATIONS.name: colors.WHITE_FG + colors.UNDERLINE,
         }
     ) -> str:
-        """Colorize a classification string"""
+        """Colorize a classification string's parts which matched the labels in `STYLE`"""
         markers = list(self.source)
         for name, style in style.items():
             with suppress(IndexError):

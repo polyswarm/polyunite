@@ -9,5 +9,6 @@ class MatchError(ValueError):
 class RegistryKeyError(KeyError):
     """No name decoder was found with this name"""
 
+
 # For backwards compatibility
 EngineKeyError = RegistryKeyError
