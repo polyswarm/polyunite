@@ -176,7 +176,7 @@
         ],
         "__desc__": "A type of trojan designed to perform banking fraud."
     },
-    "password_stealer": {
+    "stealer": {
         "__alias__": [
             "pws",
             "psw",
