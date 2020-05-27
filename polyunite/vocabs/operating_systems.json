@@ -1,7 +1,8 @@
 {
-    "AndroidOS": {
+    "Android": {
         "__alias__": [
-            "Andr(oid)?"
+            "Andr(oid)?",
+            "AndroidOS"
         ],
         "__desc__": "Android Phone OS"
     },

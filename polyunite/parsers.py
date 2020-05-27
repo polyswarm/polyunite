@@ -1,13 +1,14 @@
 import collections
-from itertools import chain
-import re
+from contextlib import suppress
 from typing import ClassVar, Dict
 
-from polyunite.errors import MatchError
-from polyunite.utils import colors, extract_vocabulary, group
-from polyunite.vocab import VocabRegex
+import regex as re
 
-from .registry import EngineRegistry
+from polyunite.errors import MatchError
+from polyunite.utils import colors
+from polyunite.vocab import VocabRegex, group
+
+from .registry import registry
 
 # regular expressions which match 'vocabularies' of classification components
 LABELS = VocabRegex.from_resource('LABELS')
@@ -17,41 +18,98 @@ MACROS = VocabRegex.from_resource('MACROS')
 OSES = VocabRegex.from_resource('OPERATING_SYSTEMS')
 HEURISTICS = VocabRegex.from_resource('HEURISTICS')
 OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
-PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS)
-IDENT = r"""(?P<NAME> (?P<FAMILY>(?:CVE-[\d-]+)|(?:[\w_-]+))
-                ([.]?(?<=[.])(?P<VARIANT>(?:[a-zA-Z0-9]*)([.]\d+\Z)?))?
-                (!(?P<SUFFIX>\w+))?)"""
+SUFFIXES = VocabRegex.from_resource('SUFFIXES')
+PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS)
 
 
-class ClassificationParser(collections.UserDict):
+def IDENT(extra_families=[], extra_variants=[]):
+    """Build a family & variant subpattern"""
+    return r'(?P<NAME>{family}?{variant}{{,3}})'.format(
+        family=group(
+            r'(?:[i0-9]?[A-Z](?:[[:alpha:]]+){i<=1:\d}\d*?)',
+            r'(?P<CVE>CVE-?\d{4}-?\d+){i<=1:[a-z0-9A-Z]}',
+            *extra_families,
+            name='FAMILY',
+        ),
+        variant=group(
+            r'[.!#@-]?(?<=[.!#@-])(?-i:[A-Z]+|[a-z]+|[a-f0-9]+|[A-F0-9]+)',
+            r'(?i:[.#@!-]?(?<=[.!#@-])\L<suffixes>)',
+            *extra_variants,
+            name='VARIANT'
+        )
+    )
+
+
+def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
+    """Call `recieve` with a generator of all `vocab`'s matching label names"""
+    sublabels = vocab.sublabels
+    return property(lambda self: recieve(label for label in sublabels if label in self))
+
+
+class Classification(collections.UserDict):
     pattern: 'ClassVar[str]'
     regex: 'ClassVar[re.Pattern]'
     data: 'Dict[str, str]'
-    source: 'str'
+    match: 're.Match'
+
+    def __init__(self, name: str):
+        super().__init__()
+        try:
+            self.match = self.regex.fullmatch(name)
+            self.data = {k: v for k, v in self.match.capturesdict().items() if v}
+        except (AttributeError, TypeError):
+            raise MatchError(name)
+
+    operating_system = extract_vocabulary(OSES)
+    language = extract_vocabulary(LANGS)
+    macro = extract_vocabulary(MACROS)
+    labels = extract_vocabulary(LABELS, recieve=set)
 
     @classmethod
     def __init_subclass__(cls):
-        cls.regex = re.compile(cls.pattern, re.VERBOSE)
-        EngineRegistry.create_parser(cls, cls.__name__)
+        cls.regex = re.compile(
+            cls.pattern,
+            re.VERBOSE,
+            suffixes=[
+                "bit", "cl", "dam", "dha", "dll", "dr", "gen", "kit", "ldr", "m", "mm", "origin", "pak",
+                "pfn", "plock", "plugin", "remnants", "rfn", "rootkit", "worm"
+            ],
+            ignore_unused=True
+        )
+        registry.register(cls, cls.__name__)
 
-    def __init__(self, classification: str):
-        super().__init__()
-        self.source = classification
-        match = self.regex.fullmatch(classification)
-        if match:
-            self.data = {k: v for k, v in match.groupdict().items() if v}
-        if not self.data:
-            raise MatchError
+    @classmethod
+    def from_string(cls, name: 'str') -> 'Classification':
+        """Build a `Classification` from the raw malware name provided by this engine"""
+        return cls(name)
 
-    operating_system = property(extract_vocabulary(OSES))
-    language = property(extract_vocabulary(LANGS))
-    macro = property(extract_vocabulary(MACROS))
-    labels = property(extract_vocabulary(LABELS, recieve=set))
+    @classmethod
+    def guess_heuristic(cls, name: 'str') -> 'bool':
+        try:
+            return cls.from_string(name).is_heuristic
+        except MatchError:
+            return False
+
+    @property
+    def source(self):
+        return self.match.string
+
+    def first(self, group, default=None):
+        """Retrieve the first capture in `group`"""
+        return next(iter(self.get(group, ())), default)
+
+    def last(self, group, default=None):
+        """Retrieve the last capture in `group`"""
+        return next(iter(reversed(self.get(group, ()))), default)
+
+    def lastgroups(self, *groups):
+        """Iterator of the last capture in `groups`"""
+        return (self[f][-1] for f in groups if f in self)
 
     @property
     def name(self) -> str:
         """'name' of the virus"""
-        return self.get('FAMILY', self.source)
+        return next(self.lastgroups('CVE', 'FAMILY'), self.source)
 
     @property
     def av_vendor(self) -> str:
@@ -61,100 +119,121 @@ class ClassificationParser(collections.UserDict):
     @property
     def is_heuristic(self) -> bool:
         """Check if we've parsed this classification as a heuristic-detection"""
-        fields = map(self.get, ('HEURISTICS', 'FAMILY', 'LABELS', 'VARIANT'))
-        return any(map(HEURISTICS.compile(1, 1).fullmatch, filter(None, fields)))
+        return any(
+            map(
+                HEURISTICS.compile(1, 1).fullmatch,
+                self.lastgroups(HEURISTICS.name, LABELS.name, 'VARIANT', 'FAMILY')
+            )
+        )
 
     def colorize(
         self,
         style={
             'NAME': colors.UNDERLINE,
-            'LABELS': colors.YELLOW_FG,
-            'ARCHIVES': colors.RED_FG,
-            'HEURISTICS': colors.MAGENTA_FG,
-            'MACROS': colors.UNDERLINE + colors.RED_FG,
-            'LANGS': colors.BLUE_FG,
-            'OPERATING_SYSTEMS': colors.CYAN_FG,
             'FAMILY': colors.GREEN_FG,
             'VARIANT': colors.WHITE_FG,
-            'OBFUSCATION': colors.BLACK_FG,
+            LABELS.name: colors.YELLOW_FG,
+            ARCHIVES.name: colors.RED_FG,
+            HEURISTICS.name: colors.MAGENTA_FG,
+            MACROS.name: colors.UNDERLINE + colors.RED_FG,
+            LANGS.name: colors.BLUE_FG,
+            OSES.name: colors.CYAN_FG,
+            OBFUSCATIONS.name: colors.WHITE_FG + colors.UNDERLINE,
         }
     ) -> str:
-        """Colorize a classification string"""
-        ss = self.source
-        # interleave the colors, match & reset between the part before & after the match (from rpartition)
-        for name, match in filter(lambda kv: kv[0] in style, self.items()):
-            ss = ''.join(chain(*zip(ss.rpartition(match), (style[name], colors.RESET, ''))))
-        return ss
+        """Colorize a classification string's parts which matched the labels in `STYLE`"""
+        markers = list(self.source)
+        for name, style in style.items():
+            with suppress(IndexError):
+                for start, end in self.match.spans(name):
+                    markers[start] = style + self.source[start]
+                    markers[end] = colors.RESET + self.source[end]
+        return ''.join(markers) + colors.RESET
 
 
-class Alibaba(ClassificationParser):
-    pattern = rf"^(?:(?:{OBFUSCATIONS}|{LABELS:x}):)?(?:({PLATFORM})\/)?(?:{IDENT})$"
+class Alibaba(Classification):
+    pattern = rf"""^
+        (?:(?:{OBFUSCATIONS}|{LABELS}*)[:])*
+        (?:{PLATFORM}[/])*
+        { IDENT([r"[a-z]+", r"[A-Z]{2}"], [r"[.]ali[0-9a-f]+"]) }?
+    ?$"""
 
 
-class ClamAV(ClassificationParser):
+class ClamAV(Classification):
     pattern = rf"""^
         (?:(?P<PREFIX>BC|Clamav))?
         (?:(\.|^)(?:{PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?
-
         (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$"""
 
 
-class DrWeb(ClassificationParser):
+class DrWeb(Classification):
     pattern = rf"""^
-    ((?i:{HEURISTICS})(\s+(of\s*)?)?)?
-              (?:(\.|\A|\b){PLATFORM})?
-              (?:(\.|\A|\b){LABELS})?
-              (?:(\.|\b)( # MulDrop6.38732 can appear alone or in front of another `.`
-                  (?P<FAMILY>[A-Za-z][-\w\.]+?)
-                  (?:\.|\Z) # and either end or continue with `.`
-                  (?P<VARIANT>[0-9]+)?
-                  (?:[.]?(?P<SUFFIX>(origin|based)))?))?$"""
+    (?:{HEURISTICS}(?:\s+(?:of\s*)?)?)?
+              (?:(\.|\A|\b)(?:{LABELS}|{PLATFORM}))*
+              (?:(\.|\b) # MulDrop6.38732 can appear alone or in front of another `.`
+                  {IDENT()})?$"""
 
 
-class Ikarus(ClassificationParser):
-    pattern = rf"""
-        ^({OBFUSCATIONS}\.)?
+class Ikarus(Classification):
+    pattern = rf"""^
               (?:{HEURISTICS}\:?)?
-              (?:(?:\A|\.|\b)({LABELS:x}|{PLATFORM}))*?
-              (?:[.]?{IDENT})?$"""
+              (?:(?:\A|[.]|\b)(-?{LABELS}|{OBFUSCATIONS}|{PLATFORM}|Patched))*
+              (?:(?:\A|[.]|\b)
+                    (?P<NAME>
+                        (?P<FAMILY>BO|(?:[i0-9]?[A-Z][\w_-]{{2,}}))?
+                        (?P<VARIANT>
+                            [.](?:[0-9]+|[a-z]+|[A-Z]+|[A-F0-9]+) |
+                            (?i:[.#@!]\L<suffixes>)
+                         ){{,2}}
+                    )
+                    (?:[.](?:{OSES}|{LANGS}|{MACROS}|{HEURISTICS}))?
+                )?
+
+    $"""
 
 
-class Jiangmin(ClassificationParser):
+class Jiangmin(Classification):
     pattern = rf"""^(?:{HEURISTICS}:?)?
-              (?:(?:{LABELS:x}|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+?
-              {IDENT}?(?:[.](?P<GENERATION>[a-z]))?$"""
+              (?:(?:({LABELS}{{,2}})|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+
+              {IDENT(["cnPeace"], [r"[a-z]+[0-9]"])}?$"""
 
 
-class K7(ClassificationParser):
-    pattern = rf"^{LABELS:x}? (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"
+class K7(Classification):
+    pattern = rf"""^(?:[-]?{LABELS})*
+                    (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?$"""
+
+    @property
+    def name(self) -> str:
+        # K7 does not work with family names
+        return ''
 
 
-class Lionic(ClassificationParser):
-    pattern = rf"^{LABELS}?(?:(^|\.)(?:{PLATFORM}))?(?:(?:\.|^){IDENT})?$"
+class Lionic(Classification):
+    pattern = rf"""^{LABELS}?
+                    (?:(^|\.)(?:{PLATFORM}))?
+                    (?:(?:\.|^){IDENT()})?$"""
 
 
-class NanoAV(ClassificationParser):
+class NanoAV(Classification):
     pattern = rf"""^
-        {LABELS:x}?
-              (?:[.]?(?P<NANO_TYPE>(Text|Url)))?
-              (?:(\b|[.]){PLATFORM})*?
-              (?:[.]?{IDENT})$"""
+        (?:Marker[.])?
+        (?:(?:\A|\.|\-)(?:{PLATFORM}|Text|{LABELS}))*
+        (([.]|\A){IDENT()})$"""
 
 
-class Qihoo360(ClassificationParser):
+class Qihoo360(Classification):
     pattern = rf"""
         ^(?:{HEURISTICS}(?:/|(?:(?<=VirusOrg)\.)))?
-              (?:
-                  (?:Application|{MACROS}|{LANGS}|{OSES}|{ARCHIVES}|{LABELS:x}|(QVM\d*(\.\d)?(\.[0-9A-F]+)?))
-              [./])*
-              {IDENT}?$"""
+              (?:(?:Application|({PLATFORM})|{LABELS}|(QVM\d*(\.\d)?(\.[0-9A-F]+)?))([.]|\/|\Z))*
+              (?<![A-Z](?i)){IDENT()}?$"""
 
 
-class QuickHeal(ClassificationParser):
+class QuickHeal(Classification):
     pattern = rf"""
         ^(?:{HEURISTICS}\.)?
+              (?:(?:{LABELS})+)?
               # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
-              (?:(?:\.|^)?{LABELS:x}(\)\Z)?)?
+              (?:(\)$))?
               (?:(?:\.|^){PLATFORM})?
               (?:(?:\.|\/|^)
                   (?:(?P<FAMILY>[-\w]+))
@@ -162,32 +241,46 @@ class QuickHeal(ClassificationParser):
                   (?:\.(?P<SUFFIX>\w+))?)?$"""
 
 
-class Rising(ClassificationParser):
+class Rising(Classification):
     pattern = rf"""^
-            {LABELS:x}?
-            (?:
-                (?:(?:^|\/|\.){PLATFORM}) |
-                (?:(?:\.|\/)(?P<FAMILY>[iA-Z][\-\w]+))
-            )*
-            (?:(?P<VARIANT>(?:[#@!.][a-zA-Z0-9]+)*?)%?)?$"""
+    (?(DEFINE)
+        (?P<FAMILY>[iA-Z][\-\w]+?)
+        (?P<PLATFORM>{PLATFORM}))
+
+    (?:[.]?{LABELS})*
+    (?:(?:\A|[.])(?&PLATFORM))*
+    (?:
+        [.](?&FAMILY) |
+        [.](?&PLATFORM)/(?&FAMILY) |
+        (?:[.](?&FAMILY))?/(?&PLATFORM)
+    )?
+    (?P<VARIANT>
+        (?:
+            [!]ET\#\d\d\% |
+            [@][A-Z]+ |
+            [!#.][a-z0-9]+ |
+            [.][A-Z]+ |
+            [.]\L<suffixes>
+        ){{,2}}
+        (?:(?:[!][0-9]+)?[.][A-F0-9]+)?
+    )?
+    $"""
 
     @property
     def name(self) -> str:
-        try:
-            return ''.join((self['FAMILY'], self['VARIANT']))
-        except KeyError:
-            return self.source
+        """'name' of the virus"""
+        return next(self.lastgroups('CVE', 'FAMILY', HEURISTICS.name), self.source)
 
 
-class Virusdie(ClassificationParser):
+class Virusdie(Classification):
     pattern = rf"""^
         (?:{HEURISTICS})?
-        (?:(?:\A|\b|\.)(?:{LANGS}|{LABELS}))*
-        (?:(?:\A|\b|\.){IDENT})?
+        (?:(?:\A|\b|\.)(?:{PLATFORM}|{LABELS}))*
+            (?i:(?:\A|\b|\.){IDENT()})?
     $"""
 
 
-class URLHaus(ClassificationParser):
+class URLHaus(Classification):
     pattern = rf"""^
         (({LABELS})(\.|$))?
         (?P<FAMILY>[\s\w]+)?

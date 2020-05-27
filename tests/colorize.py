@@ -21,9 +21,9 @@ def seen():
 if len(sys.argv) == 1:
     missing = set()
     errors = []
-    for engine, family in seen():
+    for engine, label in seen():
         try:
-            sch = polyunite.parse(engine, family)
+            sch = polyunite.parse(engine, label)
             print(
                 ' | '.join(
                     ('{:<10}', '{:1}', '{:<10.10}', '{:<9.9}', '{:<10.10}', '{:30}', '{:>15.15}', '{}')
@@ -39,12 +39,12 @@ if len(sys.argv) == 1:
                 )
             )
         except polyunite.errors.MatchError as e:
-            errors.append((engine, family, e))
-        except polyunite.errors.EngineKeyError:
+            errors.append((engine, label, e))
+        except polyunite.errors.RegistryKeyError:
             missing.add(engine)
     print("{:-^150}".format("FAILURES"))
-    for engine, family, err in errors:
-        print("{:<15}: {:85} : {}".format(engine, family, err))
+    for engine, label, err in errors:
+        print("{:<15}: {:85} : {}".format(engine, label, err))
     print("{:-^150}".format("INFO"))
     print('compile.cache_info', polyunite.vocab.VocabRegex.compile.cache_info())
     print('Missing:', missing)

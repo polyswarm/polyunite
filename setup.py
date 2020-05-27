@@ -10,7 +10,7 @@ with open('README.rst') as readme_file:
 
 requirements = [ ]
 
-setup_requirements = ['pytest-runner', ]
+setup_requirements = ['pytest-runner', 'regex']
 
 test_requirements = ['pytest', ]
 

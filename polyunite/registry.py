@@ -1,37 +1,43 @@
+from collections import UserDict
 import string
-from typing import TYPE_CHECKING, ClassVar, Dict, Type
+from typing import TYPE_CHECKING, Optional, Type
 
-from polyunite.errors import EngineKeyError, EngineNormalizeError
+from polyunite.errors import EngineNormalizeError, MatchError, RegistryKeyError
 
 if TYPE_CHECKING:
-    from polyunite.parsers import ClassificationParser
+    from polyunite.parsers import Classification
 
 
-class EngineRegistry:
-    registry: 'ClassVar[Dict[str, type]]' = {}
+class EngineRegistry(UserDict):
+    def __contains__(self, engine):
+        return super().__contains__(self._normalize(engine))
 
-    @classmethod
-    def parse_with(cls, engine: 'str', classification: 'str') -> 'ClassificationParser':
-        """Parse `classification` with a specialized parsing class identified by `engine`
-
-        :raises polyunite.errors.ParseError: An error occurred decoding the message
-        :raises polyunite.errors.EngineKeyError: No engine found with this name
-        :raises polyunite.errors.EngineNormalizeError: Couldn't normalize engine name
-        """
-        return cls.map_to_parser(engine)(classification)
-
-    @classmethod
-    def create_parser(cls, parser: 'Type[ClassificationParser]', name: 'str'):
-        """Register `cls` as the specialized class for handling parse requests """
-        cls.registry[cls._normalize(name)] = parser
-
-    @classmethod
-    def map_to_parser(cls, engine: 'str'):
+    def __getitem__(self, engine):
         """Lookup the engine-specialized parser"""
         try:
-            return cls.registry[cls._normalize(engine)]
+            return super().__getitem__(self._normalize(engine))
         except KeyError:
-            raise EngineKeyError
+            raise RegistryKeyError(engine)
+
+    def decode(self, engine: 'str', name: 'str') -> 'Classification':
+        """Parse `name` with a specialized parsing class identified by `engine`
+
+        :raises polyunite.errors.RegistryKeyError: No engine found with this name
+        :raises polyunite.errors.EngineNormalizeError: Couldn't normalize engine name
+        """
+        return self[engine].from_string(name)
+
+    def register(self, parser: 'Type[Classification]', name: 'str'):
+        """Register `self` as the specialized class for handling parse requests """
+        self[self._normalize(name)] = parser
+
+    def is_heuristic(self, engine: 'str', name: 'str') -> 'Optional[bool]':
+        try:
+            if not engine or not name:
+                return None
+            return self.decode(engine, name).is_heuristic
+        except (EngineNormalizeError, RegistryKeyError, MatchError):
+            return None
 
     _translate_table = str.maketrans(
         string.ascii_uppercase,
@@ -39,10 +45,12 @@ class EngineRegistry:
         string.whitespace + string.punctuation,
     )
 
-    @classmethod
-    def _normalize(cls, name: 'str'):
+    def _normalize(self, name: 'str'):
         """Return a 'normalized' version of this string"""
         try:
-            return name.translate(cls._translate_table)
+            return name.translate(self._translate_table)
         except AttributeError:
-            raise EngineNormalizeError
+            raise EngineNormalizeError(type(name))
+
+
+registry = EngineRegistry()
