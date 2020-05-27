@@ -20,24 +20,28 @@ HEURISTICS = VocabRegex.from_resource('HEURISTICS')
 OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS)
-def IDENT_OF(family=[r'[A-Z][A-Z]'], variant=[r'(?:\Z)']):
-    return r"""
-    (?P<NAME>
-        (?P<FAMILY>
-            BO |
-            (?:[i0-9]?[A-Z][\w_-]{{2,}}) |
-            {family}
-        )?
-        (?P<VARIANT>
-            [!]ET\#\d\d\% |
-            [.!#@](?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+) |
-            (?i:[.#@!]\L<suffixes>) |
-            {variant}
-        ){{,3}}?
-    )
-    """.format(family='|'.join(family), variant='|'.join(variant))
 
-IDENT = IDENT_OF()
+
+def IDENT(extra_families=[], extra_variants=[]):
+    return r'(?P<NAME>{family}?{variant}{{,3}})'.format(
+        family=group(
+            r'(?:[i0-9]?[A-Z](?:[[:alpha:]]+){i<=1:\d}\d*?)',
+            r'(?P<CVE>CVE-?\d{4}-?\d+){i<=1:[a-z0-9A-Z]}',
+            r'BO',
+            r'[A-Z]{2}',
+            *extra_families,
+            name='FAMILY',
+        ),
+        variant=group(
+            r'[.!#@-]?(?<=[.!#@-])(?-i:[A-Z]+|[a-z]+|[a-f0-9]+|[A-F0-9]+)',
+            r'(?i:[.#@!-]?(?<=[.!#@-])\L<suffixes>)',
+            *extra_variants,
+            name='VARIANT'
+        )
+    )
+
+print('IDID')
+print(IDENT())
 
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     sublabels = vocab.sublabels
@@ -152,14 +156,14 @@ class Alibaba(Classification):
     pattern = rf"""^
         (?:(?:{OBFUSCATIONS}|{LABELS}*)[:])*
         (?:{PLATFORM}[/])*
-        { IDENT_OF(family=[r"[a-z]+", r"[A-Z]{2}"], variant=[r"[.]ali[0-9a-f]+"]) }?
+        { IDENT([r"[a-z]+", r"[A-Z]{2}"], [r"[.]ali[0-9a-f]+"]) }?
     ?$"""
+
 
 class ClamAV(Classification):
     pattern = rf"""^
         (?:(?P<PREFIX>BC|Clamav))?
         (?:(\.|^)(?:{PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?
-
         (?:(\.|^)(?P<FAMILY>\w+)(?:(\:\w|\/\w+))*(?:-(?P<VARIANT>[\-0-9]+)))?$"""
 
 
@@ -168,7 +172,7 @@ class DrWeb(Classification):
     (?:{HEURISTICS}(?:\s+(?:of\s*)?)?)?
               (?:(\.|\A|\b)(?:{LABELS}|{PLATFORM}))*
               (?:(\.|\b) # MulDrop6.38732 can appear alone or in front of another `.`
-                  {IDENT})?$"""
+                  {IDENT()})?$"""
 
 
 class Ikarus(Classification):
@@ -192,7 +196,7 @@ class Ikarus(Classification):
 class Jiangmin(Classification):
     pattern = rf"""^(?:{HEURISTICS}:?)?
               (?:(?:({LABELS}{{,2}})|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+
-              {IDENT_OF(family=["cnPeace"], variant=[r"[a-z]+[0-9]"])}?$"""
+              {IDENT(["cnPeace"], [r"[a-z]+[0-9]"])}?$"""
 
 
 class K7(Classification):
@@ -208,23 +212,21 @@ class K7(Classification):
 class Lionic(Classification):
     pattern = rf"""^{LABELS}?
                     (?:(^|\.)(?:{PLATFORM}))?
-                    (?:(?:\.|^){IDENT})?$"""
+                    (?:(?:\.|^){IDENT()})?$"""
 
 
 class NanoAV(Classification):
     pattern = rf"""^
         (?:Marker[.])?
-        (?:{LABELS}+)?
-              (?:[.]?(?P<NANO_TYPE>(Text|Url)))?
-              (?:(^|[.]){PLATFORM})*
-              (?:([.]|^){IDENT})$"""
+        (?:(?:\A|\.|\-)(?:{PLATFORM}|Text|{LABELS}))*
+        (([.]|\A){IDENT()})$"""
 
 
 class Qihoo360(Classification):
     pattern = rf"""
         ^(?:{HEURISTICS}(?:/|(?:(?<=VirusOrg)\.)))?
               (?:(?:Application|({PLATFORM})|{LABELS}|(QVM\d*(\.\d)?(\.[0-9A-F]+)?))([.]|\/|\Z))*
-              (?i:{IDENT})?$"""
+              (?<![A-Z](?i)){IDENT()}?$"""
 
 
 class QuickHeal(Classification):
@@ -275,7 +277,7 @@ class Virusdie(Classification):
     pattern = rf"""^
         (?:{HEURISTICS})?
         (?:(?:\A|\b|\.)(?:{PLATFORM}|{LABELS}))*
-            (?:(?:\A|\b|\.){IDENT_OF(family=[r'[[:alpha:]]+'])})?
+            (?i:(?:\A|\b|\.){IDENT()})?
     $"""
 
 

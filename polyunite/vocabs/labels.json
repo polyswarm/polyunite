@@ -151,7 +151,7 @@
         ],
         "__alias__": [
             "not-?a-?virus",
-            ".*\b(?i:eicar)\b.*",
+            ".*(?i:eicar).*",
             "test",
             "testfile",
             "test.file",
