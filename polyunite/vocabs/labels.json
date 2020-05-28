@@ -83,9 +83,7 @@
         "__alias__": [
             "fraud-?tool",
             "keygen",
-            "Sorter\\.AVE",
             "Harm",
-            "VirusOrg",
             "pua",
             "puf",
             "pup",
@@ -192,7 +190,8 @@
     },
     "injector": {
         "__alias__": [
-            "(vb|cee|aut|autoit|crypt(o)?|delf)?inject(\\d|or)?"
+            "(vb|cee|aut|autoit|crypt(o)?|delf)?inject(\\d|or)?",
+            "resident"
         ],
         "__desc__": "A type of trojan that injects itself into other processes or files."
     },
@@ -306,13 +305,14 @@
     "trojan": {
         "__alias__": [
             "trojanhorse",
-            "proxy.?(program)"
+            "proxy\\W?(program)"
         ],
         "__desc__": "Malware disguised as something inert or benign."
     },
     "virus": {
         "__alias__": [
             "irus",
+            "VirusOrg",
             "spoofer",
             "constructor",
             "malware",
@@ -338,7 +338,7 @@
     },
     "CVE": {
         "__alias__": [
-            "CVE-\\d{4}-\\d+"
+            "CVE-?\\d{4}-?\\d+"
         ],
         "__desc__": "The Common Vulnerabilities and Exposures system provides a reference-method for publicly known information-security vulnerabilities and exposures."
     }
