@@ -8,12 +8,6 @@ from setuptools import setup, find_packages
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-requirements = [ ]
-
-setup_requirements = ['pytest-runner', 'regex']
-
-test_requirements = ['pytest', ]
-
 setup(
     author="Zephyr Pellerin",
     author_email='zp@polyswarm.io',
@@ -32,16 +26,15 @@ setup(
         'console_scripts': [ 'main=polyunite.polyunite:main' ]
     },
     description="polyunite parses a variety of antimalware vendor's classification strings",
-    install_requires=requirements,
     long_description=readme,
     include_package_data=True,
     keywords='polyunite',
     name='polyunite',
     packages=find_packages(include=['polyunite']),
-    package_data={'polyunite': ['vocabs/*']},
-    setup_requires=setup_requirements,
+    setup_requires=['pytest-runner'],
+    install_requires=['regex'],
     test_suite='tests',
-    tests_require=test_requirements,
+    tests_require=['pytest'],
     url='https://github.com/zv/polyunite',
     version='0.1.0',
     zip_safe=False,

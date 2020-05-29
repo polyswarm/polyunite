@@ -44,8 +44,10 @@
             "dloadr",
             "dloade",
             "malware_download",
-            "download(ware|guide)?",
-            "(?<=\\W)DL",
+            "download",
+            "\\bDL\\b",
+            "downloadguide",
+            "downloadware",
             "dload",
             "downware",
             "downagent",
@@ -81,30 +83,32 @@
             "paramalware"
         ],
         "__alias__": [
-            "fraud-?tool",
-            "keygen",
+            "Bundler",
             "Harm",
+            "application",
+            "badjoke",
+            "crack",
+            "cracktool",
+            "cheat",
+            "fraud-?tool",
+            "hoax",
+            "joke",
+            "keygen",
+            "misleading",
+            "nettool",
+            "program",
             "pua",
             "puf",
             "pup",
-            "joke",
-            "program",
-            "application",
-            "software-bundler",
-            "Bundler",
-            "tool",
-            "toolbar",
-            "nettool",
             "risktool",
             "riskware",
-            "virtool",
-            "unwanted.?(program|file)",
-            "misleading",
             "settings-modifier",
-            "hoax",
-            "badjoke",
+            "sftwrbndlr",
+            "software-bundler",
             "swbndlr",
-            "sftwrbndlr"
+            "tool",
+            "toolbar",
+            "unwanted.?(?:program|file)"
         ],
         "__desc__": "Software that, while not definitely malicious, has a suspicious or potentially unwanted aspect."
     },
@@ -149,16 +153,11 @@
         ],
         "__alias__": [
             "not-?a-?virus",
-            ".*(?i:eicar).*",
+            "(?i:eicar(?:.?test(?:.?file)?)?)",
             "test",
             "testfile",
             "test.file",
-            "testvirus",
-            "tool",
-            "keygen",
-            "crack",
-            "cracktool",
-            "joke"
+            "testvirus"
         ],
         "__desc__": "Not a virus"
     },
@@ -180,6 +179,7 @@
     "stealer": {
         "__alias__": [
             "pws",
+            "pswtool",
             "psw",
             "stealer",
             "(password-)?stealer",
@@ -268,8 +268,7 @@
             "virtool",
             "pswtool",
             "tool",
-            "risk-?tool",
-            "hack(?:tool)?",
+            "hack-?tool",
             "hktl",
             "securitytool",
             "security-?tool",
@@ -294,7 +293,7 @@
     "spyware": {
         "__alias__": [
             "Monitor",
-            "spy(?![a-z])"
+            "spy\\b"
         ],
         "__desc__": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner."
     },
@@ -304,8 +303,7 @@
     },
     "trojan": {
         "__alias__": [
-            "trojanhorse",
-            "proxy\\W?(program)"
+            "trojanhorse"
         ],
         "__desc__": "Malware disguised as something inert or benign."
     },
@@ -329,7 +327,7 @@
     },
     "worm": {
         "__alias__": [
-            "(?:im|net|I|p2p|smtp)(\\.|-|/)?worm",
+            "(?:im|net|I|p2p|smtp)[-./]?worm",
             "(i-)?worm[./-](?:im|net|i|p2p|smtp)",
             "(?<=-)worm",
             "hllw"

@@ -11,7 +11,6 @@
         "siggen": "malware that is detected using a generic signature",
         "kit": "virus constructor",
         "ldr": "loader component of a malware",
-        "mm": "mass mailer worm",
         "origin": "unpacked variant",
         "pak": "compressed malware",
         "pfn": "an internal category used to refer to some threats",

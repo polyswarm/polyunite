@@ -4,8 +4,16 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+coverage = "*"
+flake8 = "*"
+isort = "*"
+mypy = "*"
+pytest = "*"
+pytest-runner = "*"
+yapf = "*"
 
 [packages]
+polyunite = {editable = true, path = "."}
 regex = "*"
 
 [requires]

@@ -22,8 +22,10 @@ def group(*choices, fmt='(?:{})', name: 'Optional[str]' = None):
     return spec.format('|'.join(set(map(format, filter(None, choices)))))
 
 class format_template(str):
+    """A template string parameterized by it's format specification directly"""
     __format__ = str.format
 
-# consume `{0}` if matches, but ensures but ensures this match is preceeded by `{0}`, this is
-# useful for regular expressions where the earlier match may have already consumed {0}.
+# consume `{0}` if matches *AND* ensures this match is preceeded by `{0}`.
+# This may seem redundant but is useful in regular expressions where the
+# prior match may have already consumed by another regular expression.
 antecedent = format_template(r'{0}?(?<={0})')

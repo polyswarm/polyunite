@@ -45,7 +45,7 @@ class VocabRegex:
 
     @property
     def sublabels(self) -> 'Iterator[str]':
-        yield from (v.name for v in self.iter() if v.depth > self.depth)
+        return (v.name for v in self.iter() if v.depth > self.depth and v.name)
 
     @property
     def entries(self) -> 'Iterator[str]':
@@ -71,11 +71,11 @@ OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS)
 
-
 def IDENT(extra_families=[], extra_variants=[]):
     """Build a family & variant subpattern"""
-    return r'(?P<NAME>{family}?{variant}{{,2}})'.format(
+    return r'(?P<NAME>\b{family}?\b{variant}{{,2}})'.format(
         family=group(
+            r'(?P<nonmalware>(?i:eicar(?:[^a-z]test(?:[^a-z]file)?)?([.]com)?))',
             r'(?P<CVE>CVE-?\d{4}-?\d+){i<=1:[A-Za-z]}',
             r'[A-Za-z]{2,3}(?!$)',
             r'i?(?:[A-Z][A-Za-z]{2,}){i<=3:\d}',
@@ -85,6 +85,7 @@ def IDENT(extra_families=[], extra_variants=[]):
         variant=group(
             rf'{antecedent:[.!@#]}(?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+)',
             rf'(?i:{antecedent:[.!@#-]}\L<suffixes>)',
+            rf'([!]@mm|@m)',
             rf'{antecedent:[.]}[A-Z0-9]+',
             *extra_variants,
             name='VARIANT'

@@ -28,7 +28,7 @@ Features
 
 To view a sample of how each ``polyunite`` breaks down each classification string, run::
 
-  python tests/colorize.py
+  python tests/utils.py -c
 
 The output is color-coded by malware family feature (e.g `label`, `family name`, `variant id`, etc.)
 

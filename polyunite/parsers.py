@@ -38,7 +38,7 @@ class Classification(collections.UserDict):
         super().__init__()
         try:
             self.match = self.regex.fullmatch(name)
-            self.source = self.match.string
+            self.source = name
             self.data = {k: v for k, v in self.match.capturesdict().items() if v}
         except (AttributeError, TypeError):
             raise MatchError(name)
@@ -78,7 +78,7 @@ class Classification(collections.UserDict):
             # Return the longest leftmost word if we haven't matched anything
             ss = self.source
             if 'VARIANT' in self:
-                ss = ss[0:min(self.match.starts('VARIANT'))]
+                ss = ss[:self.match.start('VARIANT')]
             return re.sub(r"^.*?(\w+)\W*$", r"\g<1>", ss)
 
     @property
@@ -119,30 +119,30 @@ class Classification(collections.UserDict):
 
 class Alibaba(Classification):
     pattern = rf"""^
-    (?:(?:{OBFUSCATIONS}|{LABELS}*)[:])*
-    (?:{PLATFORM}[/])*
+    (({OBFUSCATIONS}|{LABELS}*)[:])*
+    ({PLATFORM}[/])*
     {IDENT([r'[a-z]+', r'[A-Z]{2}'], [r"[.]ali[0-9a-f]+"])}?
     $"""
 
 
 class ClamAV(Classification):
     pattern = rf"""^
-    (?:(?P<PREFIX>BC|Clamav))?
-    (?:(\.|^)(?:{PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?
-    (?:
+    ((?P<PREFIX>BC|Clamav))?
+    ((\.|^)({PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?
+    (
         (\.|^)
         (?P<FAMILY>\w+)
-        (?:(\:\w|\/\w+))*
-        (?:-(?P<VARIANT>[\-0-9]+))
+        ((\:\w|\/\w+))*
+        (-(?P<VARIANT>[\-0-9]+))
     )?
     $"""
 
 
 class DrWeb(Classification):
     pattern = rf"""^
-    (?:{HEURISTICS}(?:\s+(?:of\s*)?)?)?
-    (?:(\A|\b|[.])(?:{LABELS}|{PLATFORM}))*
-    (?:(\b|[.]) # MulDrop6.38732 can appear alone or in front of another `.`
+    ({HEURISTICS}(\s+(of\s*)?)?)?
+    ((\A|\b|[.])({LABELS}|{PLATFORM}))*
+    ((\b|[.]) # MulDrop6.38732 can appear alone or in front of another `.`
         {IDENT()}
     )?
     $"""
@@ -150,33 +150,33 @@ class DrWeb(Classification):
 
 class Ikarus(Classification):
     pattern = rf"""^
-    (?:{HEURISTICS}\:?)?
-    (?:(?:\A|[.]|\b)(-?{LABELS}|{OBFUSCATIONS}|{PLATFORM}|Patched))*
-    (?:(?:\A|[.]|\b)
+    ({HEURISTICS}\:?)?
+    ((\A|[.]|\b)(-?{LABELS}|{OBFUSCATIONS}|{PLATFORM}|Patched))*
+    ((\A|[.]|\b)
         (?P<NAME>
-            (?P<FAMILY>BO|(?:[i0-9]?[A-Z][\w_-]{{2,}}))?
+            (?P<FAMILY>BO|([i0-9]?[A-Z][\w_-]{{2,}}))?
             (?P<VARIANT>
-                [.](?:[0-9]+|[a-z]+|[A-Z]+|[A-F0-9]+) |
+                [.]([0-9]+|[a-z]+|[A-Z]+|[A-F0-9]+) |
                 (?i:[.#@!]\L<suffixes>)
              ){{,2}}
         )
-        (?:[.](?:{OSES}|{LANGS}|{MACROS}|{HEURISTICS}))?
+        ([.]({OSES}|{LANGS}|{MACROS}|{HEURISTICS}))?
     )?
     $"""
 
 
 class Jiangmin(Classification):
     pattern = rf"""^
-    (?:{HEURISTICS}:?)?
-    (?:(?:({LABELS}{{,2}})|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+
+    ({HEURISTICS}:?)?
+    ((({LABELS}{{,2}})|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+
     {IDENT(["cnPeace", r"[A-Z][a-z]+-[0-9]"], [r"[a-z]+[0-9]"])}?
     $"""
 
 
 class K7(Classification):
     pattern = rf"""^
-    (?:[-]?{LABELS})*
-    (?:\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?
+    ([-]?{LABELS})*
+    (\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?
     $"""
 
     @property
@@ -188,30 +188,30 @@ class K7(Classification):
 class Lionic(Classification):
     pattern = rf"""^
     {LABELS}?
-    (?:(?:\A|[.]){PLATFORM})?
-    (?:(?:\A|[.]){IDENT()})?
+    ((\A|[.]){PLATFORM})*
+    ((\A|[.]){IDENT()})?
     $"""
 
 
 class NanoAV(Classification):
     pattern = rf"""^
-    (?:Marker[.])?
-    (?:(?:\A|[.-])(?:{PLATFORM}|Text|{LABELS}|{OBFUSCATIONS}))*
-    (?:(?:\A|[.]){IDENT([r"[a-z]+[A-Z][A-Za-z]+", r"[A-Z][a-z]+-[a-z]+"])})
+    (Marker[.])?
+    ((\b|[.-])({PLATFORM}|Text|{LABELS}|{OBFUSCATIONS}))*
+    ((\b|[.]){IDENT([r"[a-z]+[A-Z][A-Za-z]+", r"[A-Z][a-z]+-[a-z]+"])})
     $"""
 
 
 class Qihoo360(Classification):
     pattern = rf"""^
-    (?:{HEURISTICS}[/.])?
-    (?:
+    ({HEURISTICS}[/.])?
+    (
         (?|
             Application |
             {PLATFORM} |
             {LABELS} |
-            (?:QVM\d+(?:[.]\d+)?(?:[.]\p{{Hex_Digit}}+)?) # QVM40.1.BB16 or QVM9
+            (QVM\d+([.]\d+)?([.]\p{{Hex_Digit}}+)?) # QVM40.1.BB16 or QVM9
         )
-        (?:[./]||\Z)
+        ([./]||\Z)
     )*
     (?<![A-Z](?i))
     {IDENT([r'[A-Z]+-[A-Z]+'])}?
@@ -220,11 +220,11 @@ class Qihoo360(Classification):
 
 class QuickHeal(Classification):
     pattern = rf"""^
-    (?:{HEURISTICS}\.)?
-        (?:(?:[.]|\/|\A){PLATFORM}|{LABELS}+)*
+    ({HEURISTICS}\.)?
+        (([.]|\/|\A){PLATFORM}|{LABELS}+)*
         # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
-        (?:(\)$))?
-        (?:
+        ((\)$))?
+        (
             ([./]|\A)
             {IDENT([r'VirXXX-[A-Z]'], [r'[.][[:xdigit:]]+'])}
         )?
@@ -234,33 +234,33 @@ class QuickHeal(Classification):
 class Rising(Classification):
     pattern = rf"""^
     (?(DEFINE)
-        (?P<FAMILY>[iA-Z][\-\w]+?)
+        (?P<FAMILY>[iA-Z][-\w]+?)
         (?P<PLATFORM>{PLATFORM}))
     # -----------------------------
-    (?:[.]?{LABELS})*
-    (?:(?:\A|[.])(?&PLATFORM))*
+    ([.]?{LABELS})*
+    ((\A|[.])(?&PLATFORM))*
     (?|
         [.](?&FAMILY) |
         [.](?&PLATFORM)/(?&FAMILY) |
-        (?:[.](?&FAMILY))?/(?&PLATFORM)
+        ([.](?&FAMILY))?/(?&PLATFORM)
     )?
     (?P<VARIANT>
         (?|
-           {antecedent:[!]}   ET\#\d\d\% |
-           {antecedent:[@]}   [A-Z]+ |
-           {antecedent:[!#.]} [a-z0-9]+ |
-           {antecedent:[.]}   [A-Z]+ |
-           {antecedent:[.]}   \L<suffixes>
+           [!]   ET\#\d\d\% |
+           [@]   [A-Z]+ |
+           [!#.] [a-z0-9]+ |
+           [.]   [A-Z]+ |
+           (?i:\L<suffixes>)
         ){{,2}}
-        (?:{antecedent:(?:[!][0-9]+)}?[.][A-F0-9]+)?
+        ({antecedent:([!][0-9]+)}?[.][A-F0-9]+)?
     )?
     $"""
 
 
 class Virusdie(Classification):
     pattern = rf"""^
-    (?:{HEURISTICS})?
-    (?:(\A|[.])(?:{PLATFORM}|{LABELS}))*
+    ({HEURISTICS})?
+    ((\A|[.])({PLATFORM}|{LABELS}))*
     (?i:(\A|[.]){IDENT()})?
     $"""
 

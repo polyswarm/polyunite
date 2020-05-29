@@ -66,6 +66,11 @@ docs: ## generate documentation, including API docs
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
+regenerate-report-fixtures: ## regenerate fixtures
+	-rm tests/fixtures/report_results.zip
+	./tests/utils.py --build-fixtures | zip tests/fixtures/report_results -
+	printf "@ -\n@=report_results.json\n" | zipnote -w tests/fixtures/report_results.zip
+
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
