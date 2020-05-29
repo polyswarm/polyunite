@@ -179,7 +179,7 @@
         ],
         "__desc__": "A type of trojan designed to perform banking fraud."
     },
-    "password_stealer": {
+    "stealer": {
         "__alias__": [
             "pws",
             "psw",
@@ -261,7 +261,7 @@
     "rootkit": "A method of hiding files or processes from normal methods of monitoring; often used by malware to conceal its presence and activities.",
     "scareware": "A program that reports false or significantly misleading information on the presence of security risks, threats, or system issues on the target computer.",
     "screen_capture": "A type of malware used to capture images from the target systems screen, used for exfiltration and command and control.",
-    "security_assessment_tool": {
+    "hacktool": {
         "__tag__": [
             "paramalware"
         ],
