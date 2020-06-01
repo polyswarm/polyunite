@@ -175,21 +175,9 @@ class DrWeb(Classification):
 
 
 class Ikarus(Classification):
-    pattern = rf"""^
-              (?:{HEURISTICS}\:?)?
-              (?:(?:\A|[.]|\b)(-?{LABELS}|{OBFUSCATIONS}|{PLATFORM}|Patched))*
-              (?:(?:\A|[.]|\b)
-                    (?P<NAME>
-                        (?P<FAMILY>BO|(?:[i0-9]?[A-Z][\w_-]{{2,}}))?
-                        (?P<VARIANT>
-                            [.](?:[0-9]+|[a-z]+|[A-Z]+|[A-F0-9]+) |
-                            (?i:[.#@!]\L<suffixes>)
-                         ){{,2}}
-                    )
-                    (?:[.](?:{OSES}|{LANGS}|{MACROS}|{HEURISTICS}))?
-                )?
-
-    $"""
+    pattern = rf"""^(not-a-virus:)? ({OBFUSCATIONS}\.)?
+                    (({LABELS}(-\w+)?)\.)? (({PLATFORM})\.)? (?P<FAMILY>.*)?
+                    $"""
 
 
 class Jiangmin(Classification):
