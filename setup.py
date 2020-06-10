@@ -8,9 +8,9 @@ from setuptools import setup, find_packages
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-requirements = [ ]
+requirements = [ 'regex' ]
 
-setup_requirements = ['pytest-runner', 'regex']
+setup_requirements = ['pytest-runner']
 
 test_requirements = ['pytest', ]
 
