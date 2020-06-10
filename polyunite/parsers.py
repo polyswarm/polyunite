@@ -109,7 +109,21 @@ class Classification(collections.UserDict):
     @property
     def name(self) -> str:
         """'name' of the virus"""
-        return next(self.lastgroups('CVE', 'FAMILY'), self.source)
+        name = next(self.lastgroups('CVE', 'FAMILY'), '')
+        # for those really hard to parse lables
+        pattern = rf"""^({LABELS:x})?
+                        ({LANGS:x})?
+                        ({ARCHIVES:x})?
+                        ({MACROS:x})?
+                        ({OSES:x})?
+                        ({OBFUSCATIONS:x})?
+                        ({HEURISTICS:x})?
+                       $"""
+        regex = re.compile(pattern, re.VERBOSE)
+        match = regex.fullmatch(name)
+        if match:
+            return ''
+        return name
 
     @property
     def av_vendor(self) -> str:
