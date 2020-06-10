@@ -268,11 +268,6 @@ class Rising(Classification):
     )?
     $"""
 
-    @property
-    def name(self) -> str:
-        """'name' of the virus"""
-        return next(self.lastgroups('CVE', 'FAMILY', HEURISTICS.name), self.source)
-
 
 class Virusdie(Classification):
     pattern = rf"""^
