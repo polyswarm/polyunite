@@ -20,7 +20,8 @@
     "cavity_filler": "A type of file-infecting virus that seeks unused space within the files it infects, inserting its code into these gaps to avoid changing the size of the file and thus not alerting integrity-checking software to its presence.",
     "clicker": {
         "__alias__": [
-            "cliqker"
+            "cliqker",
+            "click"
         ],
         "__desc__": "A trojan that makes a system visit a specific web page, often very frequently and usually with the aim of increasing the traffic recorded by the site and thus increasing revenue from advertising. Clickers may also be used to carry out DDoS attacks."
     },
