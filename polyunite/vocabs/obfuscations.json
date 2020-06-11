@@ -49,7 +49,9 @@
             "pecompact",
             "upack",
             "themida",
-            "vmprotect"
+            "vmprotect",
+
+            "Hqwar"
         ],
         "__desc__": "Packing of the malware instance code, not including encryption."
     },
