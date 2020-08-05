@@ -1,25 +1,80 @@
 image: $REPO_URL/stage
 
+services:
+  - docker:dind
+
 stages:
+  - build
   - test
   - release
 
 variables:
   DOCKER_HOST: tcp://localhost:2375/
+  BASE_IMAGE_NAME: polyunite
 
-test:
+default:
+  before_script:
+    - pip install -q --upgrade pip
+    - pip install -q $END_TO_END_LIB@$CI_COMMIT_REF_NAME || pip install -q $END_TO_END_LIB
+    - e2e init
+
+###############################################################
+# Build Stage (jobs inside a stage run in parallel)
+###############################################################
+dev-pypi:
+  tags:
+    - kube
+  image: python:3.6
+  stage: build
+  before_script:
+    - pip3 install -q --upgrade pip setuptools twine wheel bump2version
+  script:
+    - SHORT_SHA=$(git rev-parse --short HEAD) bumpversion --no-commit --no-tag local
+    - python setup.py -q bdist_wheel
+    - twine upload --skip-existing --disable-progress-bar --non-interactive dist/*
+
+###############################################################
+# Test Stage
+###############################################################
+test-py37:
+  image: python:3.7
   stage: test
   tags:
     - kube
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  before_script:
+    - pip3 install tox
   script:
-    - python3 setup.py pytest
+    - tox -e py37
+  except:
+    - images
 
-release:
-  stage: release
+test-py38:
+  image: python:3.8.3
+  stage: test
   tags:
     - kube
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  before_script:
+    - pip3 install tox
   script:
-    - python3 setup.py sdist bdist_wheel
-    - twine upload --skip-existing ./dist/*
-  only:
-    - master
+    - tox -e py38
+  except:
+    - images
+
+###############################################################
+# Release Stage
+###############################################################
+release-pypi:
+  tags:
+    - kube
+  stage: release
+  script:
+    # release to internal pypi but do not tag yet
+    - e2e release --skip-tag --remote https://github.com/polyswarm/$CI_PROJECT_NAME.git
+    # release to public pypi and tag
+    - e2e release
+      -u $PUBLIC_TWINE_USERNAME
+      -p $PUBLIC_TWINE_PASSWORD
+      -r $PUBLIC_TWINE_REPOSITORY_URL
+      --remote https://github.com/polyswarm/$CI_PROJECT_NAME.git
