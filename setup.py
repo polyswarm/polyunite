@@ -22,6 +22,7 @@ setup(
         'regex~=2020.5.14',
     ],
     long_description='file: README.rst',
+    long_description_content_type='rst',
     include_package_data=True,
     keywords='polyunite',
     name='polyunite',
