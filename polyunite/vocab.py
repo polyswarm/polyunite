@@ -3,9 +3,9 @@ import json
 from typing import Iterator, List, Mapping, Optional
 
 from pkg_resources import resource_stream
-import regex as re
+from polyunite.utils import antecedent, group
 
-from polyunite.utils import group, antecedent
+import regex as re
 
 
 class VocabRegex:
@@ -70,6 +70,7 @@ HEURISTICS = VocabRegex.from_resource('HEURISTICS')
 OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS)
+
 
 def IDENT(extra_families=[], extra_variants=[]):
     """Build a family & variant subpattern"""

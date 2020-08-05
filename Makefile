@@ -1,6 +1,12 @@
 .PHONY: clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
 
+TESTS_DIR := tests
+FIXTURES_DIR := $(TESTS_DIR)/fixtures
+SCRIPTS_DIR := scripts
+
+RESULTS_FIXTURE_ARCHIVE := $(FIXTURES_DIR)/report_results.zip
+
 BROWSER := xdg-open
 
 define PRINT_HELP_PYSCRIPT
@@ -47,32 +53,25 @@ format:  ## format code in Polyswarm style
 	isort --recursive polyunite tests
 
 test: ## run tests
-	py.test
+	python3 setup.py test
 
-coverage: ## check code coverage
-	coverage run --source polyunite -m pytest
-	coverage report -m
-	coverage html
-	$(BROWSER) htmlcov/index.html
+.PHONY: patterns-report
+report:  ## Show colorized results report
+	- $(SCRIPTS_DIR)/colorize
 
-backup-frames: ## backup frame cache entries
-	tar -a -cvf frame_cache.tar.gz .cache/frames/*
+.PHONY: patterns-report
+patterns-report:  ## Show all engine's full regex patterns
+	- $(SCRIPTS_DIR)/vocabs
 
-docs: ## generate documentation, including API docs
-	rm -f docs/polyunite.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ polyunite
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
+.PHONY: result-fixtures
+result-fixtures: $(RESULTS_FIXTURE_ARCHIVE) ## save the current engine's results to the test fixtures archive
 
-regenerate-report-fixtures: ## regenerate fixtures
-	-rm tests/fixtures/report_results.zip
-	./tests/utils.py --build-fixtures | zip tests/fixtures/report_results -
-	printf "@ -\n@=report_results.json\n" | zipnote -w tests/fixtures/report_results.zip
+$(RESULTS_FIXTURE_ARCHIVE): FORCE
+	-rm $@
+	$(SCRIPTS_DIR)/make_fixtures | zip $@ -
+	printf "@ -\n@=report_results.json\n" | zipnote -w $@
 
-servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+FORCE:
 
 dist: clean ## builds source and wheel package
 	python setup.py sdist

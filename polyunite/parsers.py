@@ -2,10 +2,8 @@ import collections
 from contextlib import suppress
 from typing import ClassVar
 
-import regex as re
-
 from polyunite.errors import MatchError
-from polyunite.utils import colors, antecedent
+from polyunite.utils import antecedent, colors
 from polyunite.vocab import (
     ARCHIVES,
     HEURISTICS,
@@ -18,6 +16,8 @@ from polyunite.vocab import (
     PLATFORM,
     SUFFIXES,
 )
+
+import regex as re
 
 from .registry import registry
 

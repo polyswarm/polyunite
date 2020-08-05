@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+import polyunite
+
+for name, engine in polyunite.registry.items():
+    print(f'Engine: {name}\nRegex: {engine.pattern}', end='\n'*3)
