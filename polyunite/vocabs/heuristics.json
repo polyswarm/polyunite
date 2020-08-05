@@ -35,17 +35,8 @@
             "agentad",
             "agentb",
             "agentpmf",
-            "eldorado",
-            "artemis",
-            "krap",
-            "kazy",
-            "katusha",
             "pornoasset",
-            "foreign",
-            "symmi",
-            "jorik",
-            "graftor",
-            "strictor"
+            "foreign"
         ],
         "__desc__": "Contains characteristics usual of a particular class of viruses"
     },
@@ -58,9 +49,7 @@
             "behaveslike",
             "lookslike",
             "variant",
-            "VirusOrg",
             "possible-threat",
-            "Sorter\\.AVE",
             "based",
             "possible",
             "threat",

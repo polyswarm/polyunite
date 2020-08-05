@@ -1,7 +1,7 @@
 {
     "Android": {
         "__alias__": [
-            "Andr(oid)?",
+            "Andr",
             "AndroidOS"
         ],
         "__desc__": "Android Phone OS"
@@ -34,6 +34,7 @@
     "MacOSX": {
         "__alias__": [
             "OSX",
+            "MacOSX",
             "Mac(?:\\_|\\s|\\.)?OS(?:\\_|\\s|\\.)?X?",
             "MacOS",
             "Mac"
