@@ -18,16 +18,22 @@ setup(
         'console_scripts': [ 'main=polyunite.polyunite:main' ]
     },
     description="polyunite parses a variety of antimalware vendor's classification strings",
-    install_requires=['regex~=2020.5.14'],
+    install_requires=[
+        'regex~=2020.5.14',
+    ],
     long_description='file: README.rst',
     include_package_data=True,
     keywords='polyunite',
     name='polyunite',
     packages=find_packages(include=['polyunite']),
     package_data={'polyunite': ['vocabs/*.json']},
-    setup_requires=['pytest-runner~=5.2'],
+    setup_requires=[
+        'pytest-runner',
+    ],
     test_suite='tests',
-    tests_require=['pytest~=6.0.2', ],
+    tests_require=[
+        'pytest',
+    ],
     url='https://github.com/polyscore/polyunite',
     version='0.1.2',
     zip_safe=True,
