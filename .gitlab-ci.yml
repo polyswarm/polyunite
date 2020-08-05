@@ -1,0 +1,25 @@
+image: $REPO_URL/stage
+
+stages:
+  - test
+  - release
+
+variables:
+  DOCKER_HOST: tcp://localhost:2375/
+
+test:
+  stage: test
+  tags:
+    - kube
+  script:
+    - python3 setup.py pytest
+
+release:
+  stage: release
+  tags:
+    - kube
+  script:
+    - python3 setup.py sdist bdist_wheel
+    - twine upload --skip-existing ./dist/*
+  only:
+    - master
