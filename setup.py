@@ -29,6 +29,6 @@ setup(
     test_suite='tests',
     tests_require=['pytest~=6.0.2', ],
     url='https://github.com/polyscore/polyunite',
-    version='0.1.0',
+    version='0.1.1',
     zip_safe=True,
 )
