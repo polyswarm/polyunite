@@ -17,7 +17,7 @@ $ make report
 
 Output is color-coded by malware family feature (e.g `label`, `family name`, `variant id`, etc.)
 
-[Report Output](images/report.png)
+![Report Output](images/report.png)
 
 
 ### Debugging and Testing
