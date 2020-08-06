@@ -57,17 +57,17 @@ test: ## run tests
 
 .PHONY: patterns-report
 report:  ## Show colorized results report
-	- $(SCRIPTS_DIR)/colorize
+	@$(SCRIPTS_DIR)/colorize
 
 .PHONY: patterns-report
 patterns-report:  ## Show all engine's full regex patterns
-	- $(SCRIPTS_DIR)/vocabs
+	@$(SCRIPTS_DIR)/vocabs
 
 .PHONY: result-fixtures
 result-fixtures: $(RESULTS_FIXTURE_ARCHIVE) ## save the current engine's results to the test fixtures archive
 
 $(RESULTS_FIXTURE_ARCHIVE): FORCE
-	-rm $@
+	rm $@
 	$(SCRIPTS_DIR)/make_fixtures | zip $@ -
 	printf "@ -\n@=report_results.json\n" | zipnote -w $@
 
