@@ -12,14 +12,28 @@ class VocabRegex:
     name: 'str'
     parent: 'Optional[VocabRegex]'
     children: 'List[VocabRegex]'
+    description: 'Optional[str]'
     aliases: 'List[str]'
 
     def __init__(self, name, fields, *, parent=None):
-        values = [(n, v) for n, v in fields.items() if not n.startswith('__')]
         self.name = name
         self.parent = parent
-        self.children = [VocabRegex(n, v, parent=self) for n, v in values if isinstance(v, Mapping)]
-        self.aliases = fields.get('__alias__', []) + [n for n, v in values if isinstance(v, str)]
+
+        if isinstance(fields, dict):
+            self.aliases = fields.pop('__alias__', [])
+            self.description = fields.pop('__desc__', None)
+            # self.aliases.extend([n for n, v in values if isinstance(v, str)])
+            self.children = [
+                VocabRegex(n, v, parent=self) for n, v in fields.items()
+                if not n.startswith('__')
+            ]
+        elif isinstance(fields, str):
+            self.children = []
+            self.aliases = []
+            self.description = fields
+        else:
+            raise ValueError(name, fields)
+
         if parent:
             self.aliases.append(name)
 
@@ -45,7 +59,7 @@ class VocabRegex:
 
     @property
     def sublabels(self) -> 'Iterator[str]':
-        return (v.name for v in self.iter() if v.depth > self.depth and v.name)
+        yield from (v.name for v in self.iter() if v.depth > self.depth and v.name)
 
     @property
     def entries(self) -> 'Iterator[str]':
@@ -74,21 +88,21 @@ PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS)
 
 def IDENT(extra_families=[], extra_variants=[]):
     """Build a family & variant subpattern"""
-    return r'(?P<NAME>\b{family}?\b{variant}{{,2}})'.format(
+    return r'(?P<NAME>{family}?({variant}{{,2}}?)?)'.format(
         family=group(
-            r'(?P<nonmalware>(?i:eicar(?:[^a-z]test(?:[^a-z]file)?)?([.]com)?))',
-            r'(?P<CVE>CVE-?\d{4}-?\d+){i<=1:[A-Za-z]}',
-            r'[A-Za-z]{2,3}(?!$)',
-            r'i?(?:[A-Z][A-Za-z]{2,}){i<=3:\d}',
             *extra_families,
+            r'((?P<CVE>CVE-?\d{4}-?\d+){i<=1:[A-Za-z]})',
+            r'([A-Za-z]{2,3}(?!$))',
+            r'(i?(?:[A-Z][A-Za-z]{2,}){i<=3:\d})',
+            r'(?P<nonmalware>(?i:eicar(?>.?test(?>.?file)?)?([.]com)?))',
             name='FAMILY',
         ),
         variant=group(
-            rf'{antecedent:[.!@#]}(?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+)',
-            rf'(?i:{antecedent:[.!@#-]}\L<suffixes>)',
-            rf'([!]@mm|@m)',
-            rf'{antecedent:[.]}[A-Z0-9]+',
             *extra_variants,
+            rf'((?i:{antecedent:[.!@#-]}\L<suffixes>))',
+            rf'({antecedent:[.!@#]}(?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+))',
+            rf'([!](@mm|@m))',
+            rf'({antecedent:[.]}[A-Z0-9]+)',
             name='VARIANT'
         )
     )

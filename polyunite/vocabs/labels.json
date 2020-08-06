@@ -89,13 +89,13 @@
             "badjoke",
             "crack",
             "cracktool",
-            "cheat",
             "fraud-?tool",
             "hoax",
             "joke",
             "keygen",
             "misleading",
             "nettool",
+            "(?<=\\W)tool(?=\\W)",
             "program",
             "pua",
             "puf",
@@ -106,7 +106,6 @@
             "sftwrbndlr",
             "software-bundler",
             "swbndlr",
-            "tool",
             "toolbar",
             "unwanted.?(?:program|file)"
         ],
@@ -153,7 +152,7 @@
         ],
         "__alias__": [
             "not-?a-?virus",
-            "(?i:eicar(?:.?test(?:.?file)?)?)",
+            "(?i:eicar(?>[^a-z]?test(?>[^a-z]?file)?)?(?:[.]com)?)",
             "test",
             "testfile",
             "test.file",
@@ -266,8 +265,6 @@
         ],
         "__alias__": [
             "virtool",
-            "pswtool",
-            "tool",
             "hack-?tool",
             "hktl",
             "securitytool",
@@ -329,7 +326,6 @@
         "__alias__": [
             "(?:im|net|I|p2p|smtp)[-./]?worm",
             "(i-)?worm[./-](?:im|net|i|p2p|smtp)",
-            "(?<=-)worm",
             "hllw"
         ],
         "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."

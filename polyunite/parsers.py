@@ -43,6 +43,9 @@ class Classification(collections.UserDict):
         except (AttributeError, TypeError):
             raise MatchError(name)
 
+    def matches(self, name):
+        return self.regex.fullmatch(name)
+
     @classmethod
     def __init_subclass__(cls):
         cls.regex = re.compile(cls.pattern, re.VERBOSE, suffixes=list(SUFFIXES.entries), ignore_unused=True)
@@ -89,6 +92,8 @@ class Classification(collections.UserDict):
     @property
     def is_heuristic(self) -> bool:
         """Check if we've parsed this classification as a heuristic-detection"""
+        if self.data.get(HEURISTICS):
+            return True
         last_matches = self.lastgroups(HEURISTICS.name, LABELS.name, 'VARIANT', 'FAMILY')
         return any(map(HEURISTICS.compile(1, 1).fullmatch, last_matches))
 
@@ -119,18 +124,20 @@ class Classification(collections.UserDict):
 
 class Alibaba(Classification):
     pattern = rf"""^
-    (({OBFUSCATIONS}|{LABELS}*)[:])*
-    ({PLATFORM}[/])*
-    {IDENT([r'[a-z]+', r'[A-Z]{2}'], [r"[.]ali[0-9a-f]+"])}?
+    (({OBFUSCATIONS}|{LABELS})*[:])?
+    ({PLATFORM}[/])?
+    (?:
+        ((?P<nonmalware>(?P<NAME>(?P<FAMILY>eicar[.]com))))|
+        {IDENT([r'[a-z]+', r'[A-Z]{2}'], [r'[.]ali[0-9a-f]+'])}
+    )?
     $"""
 
 
 class ClamAV(Classification):
     pattern = rf"""^
     ((?P<PREFIX>BC|Clamav))?
-    ((\.|^)({PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?
+    ((\.|^)({PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?([.]|$)
     (
-        (\.|^)
         (?P<FAMILY>\w+)
         ((\:\w|\/\w+))*
         (-(?P<VARIANT>[\-0-9]+))
@@ -195,9 +202,9 @@ class Lionic(Classification):
 
 class NanoAV(Classification):
     pattern = rf"""^
-    (Marker[.])?
-    ((\b|[.-])({PLATFORM}|Text|{LABELS}|{OBFUSCATIONS}))*
-    ((\b|[.]){IDENT([r"[a-z]+[A-Z][A-Za-z]+", r"[A-Z][a-z]+-[a-z]+"])})
+    (?:Marker[.])?
+    (({PLATFORM}|Text|{LABELS}|{OBFUSCATIONS})(?:$|[.-]))*
+    ({IDENT(["hidIFrame", "(?i:Iframe-scroll)", r"[A-Z][a-z]+[-][A-Z][a-z]+"])})
     $"""
 
 
@@ -205,27 +212,27 @@ class Qihoo360(Classification):
     pattern = rf"""^
     ({HEURISTICS}[/.])?
     (
-        (?|
-            Application |
-            {PLATFORM} |
-            {LABELS} |
+        (?:
+            (Application) |
+            ({PLATFORM}) |
+            ({LABELS}) |
             (QVM\d+([.]\d+)?([.]\p{{Hex_Digit}}+)?) # QVM40.1.BB16 or QVM9
         )
-        ([./]||\Z)
+        ([./]|$)
     )*
     (?<![A-Z](?i))
-    {IDENT([r'[A-Z]+-[A-Z]+'])}?
+    {IDENT([r'([A-Za-z]+-[A-Za-z]+)'])}
     $"""
 
 
 class QuickHeal(Classification):
     pattern = rf"""^
     ({HEURISTICS}\.)?
-        (([.]|\/|\A){PLATFORM}|{LABELS}+)*
+        (([.]|\/|^)(?:{PLATFORM}|{LABELS}+(?!\w)))*
         # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
         ((\)$))?
         (
-            ([./]|\A)
+            ([./]|^)
             {IDENT([r'VirXXX-[A-Z]'], [r'[.][[:xdigit:]]+'])}
         )?
     $"""

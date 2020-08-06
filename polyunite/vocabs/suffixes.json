@@ -18,7 +18,6 @@
         "plugin": "plug-in component",
         "remnants": "remnants of a virus",
         "rfn": "an internal category used to refer to some threats",
-        "rootkit": "rootkit component of that malware",
-        "worm": "worm component of that malware"
+        "rootkit": "rootkit component of that malware"
     }
 }

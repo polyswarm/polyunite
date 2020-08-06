@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
+import pytest
 from contextlib import contextmanager
 import csv
 import json
 import zipfile
 
 import pkg_resources
+
 import polyunite
-import pytest
 
 
 @contextmanager
