@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import json
+import sys
+
+import polyunite
+
+try:
+    from conftest import match_iter
+except:
+    sys.path.append(str(Path(__file__).parent.joinpath('../tests')))
+    from conftest import match_iter
+
+
+print(
+    json.dumps(
+        [{
+            'engine': str(vr.__class__.__name__),
+            'source': label,
+            'name': vr.name,
+            'labels': list(vr.labels),
+            'operating_system': vr.operating_system,
+            'macro': vr.macro,
+            'language': vr.language,
+            'is_heuristic': vr.is_heuristic,
+        } for engine, label, vr in match_iter()],
+        indent=2,
+    )
+)

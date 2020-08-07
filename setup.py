@@ -1,28 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script."""
-
 from setuptools import setup, find_packages
 
-with open('README.rst') as readme_file:
-    readme = readme_file.read()
-
-requirements = [ ]
-
-setup_requirements = ['pytest-runner', 'regex']
-
-test_requirements = ['pytest', ]
-
 setup(
-    author="Zephyr Pellerin",
-    author_email='zp@polyswarm.io',
+    author="Polyswarm Developers",
+    author_email='developers@polyswarm.io',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'Natural Language :: English',
-        "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
@@ -32,17 +18,24 @@ setup(
         'console_scripts': [ 'main=polyunite.polyunite:main' ]
     },
     description="polyunite parses a variety of antimalware vendor's classification strings",
-    install_requires=requirements,
-    long_description=readme,
+    install_requires=[
+        'regex~=2020.5.14',
+    ],
+    long_description='file: README.rst',
+    long_description_content_type='rst',
     include_package_data=True,
     keywords='polyunite',
     name='polyunite',
     packages=find_packages(include=['polyunite']),
-    package_data={'polyunite': ['vocabs/*']},
-    setup_requires=setup_requirements,
+    package_data={'polyunite': ['vocabs/*.json']},
+    setup_requires=[
+        'pytest-runner',
+    ],
     test_suite='tests',
-    tests_require=test_requirements,
-    url='https://github.com/zv/polyunite',
-    version='0.1.0',
-    zip_safe=False,
+    tests_require=[
+        'pytest',
+    ],
+    url='https://github.com/polyscore/polyunite',
+    version='0.1.3',
+    zip_safe=True,
 )

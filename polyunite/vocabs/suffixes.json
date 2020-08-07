@@ -5,22 +5,12 @@
         "dam": "damaged malware",
         "dha": "an internal category used to refer to some threats",
         "dll": "Dynamic Link Library component of a malware",
-        "dr": {
-            "__alias__": [
-                "dropper"
-            ],
-            "__desc__": "dropper component of a malware"
-        },
-        "gen": {
-            "__alias__": [
-                "generic"
-            ],
-            "__desc__": "malware that is detected using a generic signature"
-        },
+        "based": "containers characteristics usual to a particular class of malware",
+        "dr": "dropper component of a malware",
+        "gen": "malware that is detected using a generic signature",
+        "siggen": "malware that is detected using a generic signature",
         "kit": "virus constructor",
         "ldr": "loader component of a malware",
-        "m": "worm mailers",
-        "mm": "mass mailer worm",
         "origin": "unpacked variant",
         "pak": "compressed malware",
         "pfn": "an internal category used to refer to some threats",
@@ -28,7 +18,6 @@
         "plugin": "plug-in component",
         "remnants": "remnants of a virus",
         "rfn": "an internal category used to refer to some threats",
-        "rootkit": "rootkit component of that malware",
-        "worm": "worm component of that malware"
+        "rootkit": "rootkit component of that malware"
     }
 }

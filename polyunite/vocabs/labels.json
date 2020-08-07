@@ -44,8 +44,10 @@
             "dloadr",
             "dloade",
             "malware_download",
-            "download(ware|guide)?",
-            "(?<=\\W)DL",
+            "download",
+            "\\bDL\\b",
+            "downloadguide",
+            "downloadware",
             "dload",
             "downware",
             "downagent",
@@ -81,32 +83,31 @@
             "paramalware"
         ],
         "__alias__": [
-            "fraud-?tool",
-            "keygen",
-            "Sorter\\.AVE",
+            "Bundler",
             "Harm",
-            "VirusOrg",
+            "application",
+            "badjoke",
+            "crack",
+            "cracktool",
+            "fraud-?tool",
+            "hoax",
+            "joke",
+            "keygen",
+            "misleading",
+            "nettool",
+            "(?<=\\W)tool(?=\\W)",
+            "program",
             "pua",
             "puf",
             "pup",
-            "joke",
-            "program",
-            "application",
-            "software-bundler",
-            "Bundler",
-            "tool",
-            "toolbar",
-            "nettool",
             "risktool",
             "riskware",
-            "virtool",
-            "unwanted.?(program|file)",
-            "misleading",
             "settings-modifier",
-            "hoax",
-            "badjoke",
+            "sftwrbndlr",
+            "software-bundler",
             "swbndlr",
-            "sftwrbndlr"
+            "toolbar",
+            "unwanted.?(?:program|file)"
         ],
         "__desc__": "Software that, while not definitely malicious, has a suspicious or potentially unwanted aspect."
     },
@@ -151,16 +152,11 @@
         ],
         "__alias__": [
             "not-?a-?virus",
-            ".*(?i:eicar).*",
+            "(?i:eicar(?>[^a-z]?test(?>[^a-z]?file)?)?(?:[.]com)?)",
             "test",
             "testfile",
             "test.file",
-            "testvirus",
-            "tool",
-            "keygen",
-            "crack",
-            "cracktool",
-            "joke"
+            "testvirus"
         ],
         "__desc__": "Not a virus"
     },
@@ -179,9 +175,10 @@
         ],
         "__desc__": "A type of trojan designed to perform banking fraud."
     },
-    "stealer": {
+    "password_stealer": {
         "__alias__": [
             "pws",
+            "pswtool",
             "psw",
             "stealer",
             "(password-)?stealer",
@@ -192,7 +189,8 @@
     },
     "injector": {
         "__alias__": [
-            "(vb|cee|aut|autoit|crypt(o)?|delf)?inject(\\d|or)?"
+            "(vb|cee|aut|autoit|crypt(o)?|delf)?inject(\\d|or)?",
+            "resident"
         ],
         "__desc__": "A type of trojan that injects itself into other processes or files."
     },
@@ -261,16 +259,13 @@
     "rootkit": "A method of hiding files or processes from normal methods of monitoring; often used by malware to conceal its presence and activities.",
     "scareware": "A program that reports false or significantly misleading information on the presence of security risks, threats, or system issues on the target computer.",
     "screen_capture": "A type of malware used to capture images from the target systems screen, used for exfiltration and command and control.",
-    "hacktool": {
+    "security_assessment_tool": {
         "__tag__": [
             "paramalware"
         ],
         "__alias__": [
             "virtool",
-            "pswtool",
-            "tool",
-            "risk-?tool",
-            "hack(?:tool)?",
+            "hack-?tool",
             "hktl",
             "securitytool",
             "security-?tool",
@@ -295,7 +290,7 @@
     "spyware": {
         "__alias__": [
             "Monitor",
-            "spy(?![a-z])"
+            "spy\\b"
         ],
         "__desc__": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner."
     },
@@ -305,14 +300,14 @@
     },
     "trojan": {
         "__alias__": [
-            "trojanhorse",
-            "proxy.?(program)"
+            "trojanhorse"
         ],
         "__desc__": "Malware disguised as something inert or benign."
     },
     "virus": {
         "__alias__": [
             "irus",
+            "VirusOrg",
             "spoofer",
             "constructor",
             "malware",
@@ -329,16 +324,15 @@
     },
     "worm": {
         "__alias__": [
-            "(?:im|net|I|p2p|smtp)(\\.|-|/)?worm",
+            "(?:im|net|I|p2p|smtp)[-./]?worm",
             "(i-)?worm[./-](?:im|net|i|p2p|smtp)",
-            "(?<=-)worm",
             "hllw"
         ],
         "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."
     },
     "CVE": {
         "__alias__": [
-            "CVE-\\d{4}-\\d+"
+            "CVE-?\\d{4}-?\\d+"
         ],
         "__desc__": "The Common Vulnerabilities and Exposures system provides a reference-method for publicly known information-security vulnerabilities and exposures."
     }
