@@ -6,55 +6,55 @@ from itertools import combinations
 from .parsers import Classification
 
 
-def guess_malware_name(classifications: Iterable[Union[str, 'Classification']]):
+def guess_malware_name(classifications: Iterable[Union[str, 'Classification']]) -> str:
     """
     Returns the name with the smallest total distance edit distance from `classifications`
     """
     similarity: defaultdict = defaultdict(lambda: 0)
 
-    def filter_words(cs):
-        for c in filter(None, cs):
-            o = c.name if isinstance(c, Classification) else str(c)
-            if len(o) >= 3:
+    def filtermap(cs):
+        for c in cs:
+            o = str(c.name if isinstance(c, Classification) else c or '')
+            if len(o) > 2:
                 yield o
 
-    for x, y in combinations(filter_words(classifications), 2):
-        d = _edit_distance(x, y)
+    for x, y in combinations(filtermap(classifications), 2):
+        d = _edit_distance(x, y, case_insensitive=True) ** 2
         similarity[x] += d
         similarity[y] += d
 
     return min(similarity.keys(), key=lambda k: similarity[k])
 
 
-def _edit_distance(x: str, y: str) -> float:
+def _edit_distance(x: str, y: str, case_insensitive=False) -> float:
     """
     Levenshtein edit distance between two strings (`x` & `y`)
     """
     if not isinstance(x, str) or not isinstance(y, str):
-        raise TypeError("Invalid type: x=%s, y=%s", type(x), type(y))
+        raise TypeError("Invalid arguments: type(x)=%s, type(y)=%s", type(x), type(y))
+
+    if case_insensitive:
+        x, y = map(str.lower, (x, y))
 
     if x == y:
         return 0.0
 
-    lx = len(x)
-    ly = len(y)
+    if len(x) == 0:
+        return len(y)
 
-    if lx == 0:
-        return ly
+    if len(y) == 0:
+        return len(x)
 
-    if ly == 0:
-        return lx
+    v0 = [0] * (len(y)+1)
+    v1 = [0] * (len(y)+1)
 
-    v0 = [0] * (ly+1)
-    v1 = [0] * (ly+1)
-
-    for i in range(ly + 1):
+    for i in range(len(y) + 1):
         v0[i] = i
 
-    for i in range(lx):
+    for i in range(len(x)):
         v1[0] = i + 1
 
-        for j in range(ly):
+        for j in range(len(y)):
             cost = 1
 
             if x[i] == y[j]:
@@ -64,7 +64,7 @@ def _edit_distance(x: str, y: str) -> float:
 
         v0, v1 = v1, v0
 
-    return v0[ly]
+    return v0[len(y)]
 
 
 __all__ = ['guess_malware_name']
