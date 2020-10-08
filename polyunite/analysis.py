@@ -18,22 +18,22 @@ def guess_malware_name(classifications: Iterable[Union[str, Classification]]) ->
     # sum the square of edit distance for each word-pair
     score: defaultdict = defaultdict(lambda: 0)
     for x, y in combinations(it, 2):
-        d = _edit_distance(x, y, case_insensitive=True)**2
+        d = _edit_distance(x.lower(), y.lower()) ** 2
         score[x] += d
         score[y] += d
 
     return min(score.keys(), key=lambda k: score[k])
 
 
-def _edit_distance(x: str, y: str, case_insensitive=False) -> float:
+def _edit_distance(x: str, y: str) -> float:
     """
     Levenshtein distance between `x` & `y`
     """
     if not isinstance(x, str) or not isinstance(y, str):
         raise TypeError("Invalid arguments: type(x)=%s, type(y)=%s" % type(x), type(y))
 
-    if case_insensitive:
-        x, y = map(str.lower, (x, y))
+    if x == y:
+        return 0.0
 
     if len(x) == 0:
         return len(y)
