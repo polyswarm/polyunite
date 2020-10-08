@@ -28,7 +28,6 @@
     "data_diddler": "A type of malware that makes small, random changes to data, such as data in a spreadsheet, to render the data contained in a document inaccurate and in some cases worthless.",
     "ddos": {
         "__alias__": [
-            "DoS",
             "hack\\Wddoser",
             "flooder",
             "[a-z]+flooder"
