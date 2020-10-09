@@ -105,3 +105,4 @@ ENV/
 .mypy_cache/
 
 polyunite/vocabs/*.xml
+.idea/
