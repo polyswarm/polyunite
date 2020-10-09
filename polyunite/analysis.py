@@ -3,12 +3,15 @@ from typing import Iterable, Union
 from collections import defaultdict
 from itertools import combinations
 
-from .parsers import Classification
+from polyunite.parsers import Classification
 
 
 def guess_malware_name(classifications: Iterable[Union[str, Classification]]) -> str:
     """
     Returns the name with the smallest total distance edit distance from `classifications`
+
+    >>> guess_malware_name(['Zeus', 'zeus', 'zbot', 'Zeus-Trojan', 'Agent'])
+    Zeus
     """
     cs = map(lambda c: c.name if isinstance(c, Classification) else c, classifications)
 
@@ -18,7 +21,7 @@ def guess_malware_name(classifications: Iterable[Union[str, Classification]]) ->
     # sum the square of edit distance for each word-pair
     score: defaultdict = defaultdict(lambda: 0)
     for x, y in combinations(it, 2):
-        d = _edit_distance(x.lower(), y.lower()) ** 2
+        d = _edit_distance(x.lower(), y.lower())**2
         score[x] += d
         score[y] += d
 
@@ -28,6 +31,11 @@ def guess_malware_name(classifications: Iterable[Union[str, Classification]]) ->
 def _edit_distance(x: str, y: str) -> float:
     """
     Levenshtein distance between `x` & `y`
+
+    .. seealso::
+
+        `<https://en.wikipedia.org/wiki/Levenshtein_distance#Iterative_with_two_matrix_rows>`_
+            Psuedocode & description of this implementation
     """
     if not isinstance(x, str) or not isinstance(y, str):
         raise TypeError("Invalid arguments: type(x)=%s, type(y)=%s" % type(x), type(y))
