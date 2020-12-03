@@ -143,9 +143,9 @@ class EngineRegistry(UserDict):
 
         for (x, xw), (y, yw) in combinations(((n, w) for n, w in names if len(n) > 2), 2):
             weight_ratio = xw / yw
-            d = (edit_distance(x.lower(), y.lower())**2) * weight_ratio
-            score[x] += d
-            score[y] += d
+            d = 1 + (edit_distance(x.lower(), y.lower())**2) * weight_ratio
+            score[x] *= d
+            score[y] *= d
 
         return min(score.keys(), key=lambda k: score[k])
 
