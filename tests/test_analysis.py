@@ -14,8 +14,7 @@ TEST_BOUNTIES = [
         }
     ),
     (
-        'Crypted', {'greyware', 'backdoor', 'trojan', 'virus', 'ransomware', 'worm'}, {
-            'ClamAV': 'Win.Trojan.Crypted-31',
+        'Qukart', {'greyware', 'backdoor', 'trojan', 'virus', 'ransomware', 'worm'}, {
             'CrowdStrike Falcon': 'win/malicious',
             'DrWeb': 'BackDoor.HangUp.43882',
             'FilSecLab': 'Trojan.5137BDB1395FE83B',
@@ -65,10 +64,9 @@ TEST_BOUNTIES = [
         }
     ),
     (
-        'BtcMine', {'cryptominer', 'trojan', 'downloader'}, {
+        'BtcMine', {'cryptominer', 'trojan'}, {
             'DrWeb': 'Trojan.BtcMine.3368',
             'Ikarus': 'Trojan.Win64.CoinMiner',
-            'NanoAV': 'Trojan.Win64.Downloader.hfqnmz'
         }
     ),
 ]

@@ -133,21 +133,24 @@ class EngineRegistry(UserDict):
                                   'Virusdie': 'Zeus-Trojan', 'QuickHeal': 'Agent'})
         Zeus
         """
-        return self._weighted_name_inference(((clf.name, self.weights.get(engine, 1.0))
-                                              for engine, clf in self.each(families)))
+        return self._weighted_name_inference((
+            (clf.name, self.weights.get(engine, 1.0))
+            for engine, clf in self.each(families)
+        ))
 
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
         # only consider words longer than 2 chars
         # sum the square of edit distance for each word-pair
+        iterator = ((n, w) for n, w in names if len(n) > 2)
         score: defaultdict = defaultdict(lambda: 0)
 
-        for (x, xw), (y, yw) in combinations(((n, w) for n, w in names if len(n) > 2), 2):
+        for (x, xw), (y, yw) in combinations(iterator, 2):
             weight_ratio = xw / yw
-            d = 1 + (edit_distance(x.lower(), y.lower())**2) * weight_ratio
-            score[x] *= d
-            score[y] *= d
+            d = weight_ratio * edit_distance(x.lower(), y.lower())
+            score[x] += d
+            score[y] += d
 
-        return min(score.keys(), key=lambda k: score[k])
+        return max(score.keys(), key=lambda k: score[k])
 
     @staticmethod
     def _normalize(name: 'str'):
