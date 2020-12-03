@@ -27,6 +27,7 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     sublabels = list(vocab.sublabels)
     return property(lambda self: recieve(label for label in sublabels if label in self))
 
+EICAR_REGEX = re.compile(r'(\b|_)eicar(\b|_)', re.I)
 
 class Classification(collections.UserDict):
     pattern: 'ClassVar[str]'
@@ -76,6 +77,8 @@ class Classification(collections.UserDict):
     def name(self) -> str:
         """'name' of the virus"""
         try:
+            if EICAR_REGEX.search(self.source):
+                return 'EICAR'
             return next(self.lastgroups('CVE', 'FAMILY'))
         except StopIteration:
             # Return the longest leftmost word if we haven't matched anything
@@ -121,6 +124,17 @@ class Classification(collections.UserDict):
                     markers[end] = reset + self.source[end]
         return ''.join(markers) + colors.RESET
 
+class Generic(Classification):
+    pattern = rf"""^
+    (?:
+        (?:\b | [.!@#-%:;\s)(] )
+        (?: {LABELS}|
+            {OBFUSCATIONS}|
+            {PLATFORM}|
+            {IDENT()}
+        )
+    )*?
+    $"""
 
 class Alibaba(Classification):
     pattern = rf"""^

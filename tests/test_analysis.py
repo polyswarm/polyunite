@@ -2,9 +2,19 @@ import polyunite
 import pytest
 
 
-@pytest.mark.parametrize('expected, names', [
-    ('Zeus', ('Zeus', 'Zlob', 'zlob', 'zbot', 'zeus', 'Zeus-Trojan')),
-    ('Zlob', ('Zeus', 'Zlob', 'zlob', 'zbot', '', None)),
-])
-def test_guess_malware_name(expected, names):
-    assert expected == polyunite.guess_name(names)
+@pytest.mark.parametrize(
+    'expected, results', [
+        (
+            'SubSeven', {
+                'Alibaba': 'Win32/SubSeven.6ca32fd3',
+                'ClamAV': 'Win.Trojan.SubSeven-38',
+                'DrWeb': 'BackDoor.SubSeven.145',
+                'Jiangmin': 'Backdoor/SubSeven.22.a',
+                'Lionic': 'Trojan.Win32.SubSeven.m!c',
+                'NanoAV': 'Trojan.Win32.SubSeven.dqcy',
+            }
+        ),
+    ]
+)
+def test_guess_malware_name(expected, results):
+    assert expected == polyunite.infer_name(results)
