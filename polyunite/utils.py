@@ -24,7 +24,7 @@ def group(*choices, fmt='(?:{})', name: 'Optional[str]' = None):
 
 class format_template(str):
     """A template string parameterized by it's format specification directly"""
-    __format__ = str.format
+    __format__ = str.format  # type: ignore
 
 
 # consume `{0}` if matches *AND* ensures this match is preceeded by `{0}`.
@@ -42,9 +42,6 @@ def edit_distance(x: str, y: str) -> float:
         `<https://en.wikipedia.org/wiki/Levenshtein_distance#Iterative_with_two_matrix_rows>`_
             Psuedocode & description of this implementation
     """
-    if not isinstance(x, str) or not isinstance(y, str):
-        raise TypeError("Invalid arguments: type(x)=%s, type(y)=%s" % type(x), type(y))
-
     if x == y:
         return 0.0
 

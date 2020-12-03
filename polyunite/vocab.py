@@ -1,4 +1,4 @@
-from typing import Iterator, List, Mapping, Optional
+from typing import Iterator, List, Optional
 
 from functools import lru_cache
 import json
@@ -100,7 +100,7 @@ def IDENT(extra_families=[], extra_variants=[]):
             *extra_variants,
             rf'((?i:{antecedent:[.!@#-]}\L<suffixes>))',
             rf'({antecedent:[.!@#]}(?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+))',
-            rf'([!](@mm|@m))',
+            r'([!](@mm|@m))',
             rf'({antecedent:[.]}[A-Z0-9]+)',
             name='VARIANT'
         )

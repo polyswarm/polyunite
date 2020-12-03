@@ -2,9 +2,7 @@
 
 from contextlib import contextmanager
 import csv
-import json
 import pkg_resources
-import pytest
 import zipfile
 
 import polyunite
@@ -23,7 +21,7 @@ def seen():
         yield from csv.reader(map(bytes.decode, f.readlines()))
 
 
-def format_match(engine: 'str', label: 'str', vr: 'VocabRegex'):
+def format_match(engine, label, vr):
     return ' | '.join((
         '{:<10}',
         '{:1}',
@@ -48,7 +46,6 @@ def format_match(engine: 'str', label: 'str', vr: 'VocabRegex'):
 def match_iter():
     missing = set()
     errors = []
-    it = seen()
     for engine, label in seen():
         try:
             yield (engine, label, polyunite.parse(engine, label))

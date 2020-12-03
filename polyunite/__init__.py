@@ -1,5 +1,5 @@
-from . import errors, parsers, vocab
-from .registry import registry
+from . import errors, parsers, vocab  # noqa
+from .registry import registry  # noqa
 
 # NOTE: legacy interface name
 parse = registry.decode

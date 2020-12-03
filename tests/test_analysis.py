@@ -1,4 +1,3 @@
-from operator import attrgetter
 import pytest
 
 import polyunite

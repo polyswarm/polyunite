@@ -42,23 +42,8 @@ test-py37:
   tags:
     - kube
   coverage: '/TOTAL.*\s+(\d+%)$/'
-  before_script:
-    - pip3 install tox
   script:
-    - tox -e py37
-  except:
-    - images
-
-test-py38:
-  image: python:3.8.3
-  stage: test
-  tags:
-    - kube
-  coverage: '/TOTAL.*\s+(\d+%)$/'
-  before_script:
-    - pip3 install tox
-  script:
-    - tox -e py38
+    - python setup.py test
   except:
     - images
 
