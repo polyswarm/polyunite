@@ -63,7 +63,7 @@ class EngineRegistry(UserDict):
         """Register `self` as the specialized class for handling parse requests """
         self[self._normalize(name)] = parser
 
-    def parse_each(self, results):
+    def each(self, results):
         for engine, family in results.items():
             if isinstance(family, str):
                 try:
@@ -80,7 +80,7 @@ class EngineRegistry(UserDict):
         Zeus
         """
         return self._weighted_name_inference(((clf.name, self.weights.get(engine, 1.0))
-                                              for engine, clf in self.parse_each(families)))
+                                              for engine, clf in self.each(families)))
 
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
         # only consider words longer than 2 chars

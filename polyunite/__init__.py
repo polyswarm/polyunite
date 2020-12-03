@@ -5,6 +5,7 @@ from .registry import registry
 parse = registry.decode
 decode = registry.decode
 is_heuristic = registry.is_heuristic
+each = registry.each
 infer_name = registry.infer_name
 
 __all__ = ['parsers', 'vocab', 'errors', 'registry', 'parse', 'decode', 'is_heuristic', 'guess_name']
