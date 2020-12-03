@@ -1,6 +1,8 @@
+from typing import ClassVar
+
 import collections
 from contextlib import suppress
-from typing import ClassVar
+import regex as re
 
 from polyunite.errors import MatchError
 from polyunite.utils import antecedent, colors
@@ -17,8 +19,6 @@ from polyunite.vocab import (
     SUFFIXES,
 )
 
-import regex as re
-
 from .registry import registry
 
 
@@ -26,6 +26,9 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     """Call `recieve` with a generator of all `vocab`'s matching label names"""
     sublabels = list(vocab.sublabels)
     return property(lambda self: recieve(label for label in sublabels if label in self))
+
+
+EICAR_REGEX = re.compile(r'(\b|_)eicar(\b|_)', re.I)
 
 
 class Classification(collections.UserDict):
@@ -76,6 +79,8 @@ class Classification(collections.UserDict):
     def name(self) -> str:
         """'name' of the virus"""
         try:
+            if EICAR_REGEX.search(self.source):
+                return 'EICAR'
             return next(self.lastgroups('CVE', 'FAMILY'))
         except StopIteration:
             # Return the longest leftmost word if we haven't matched anything
@@ -120,6 +125,22 @@ class Classification(collections.UserDict):
                     markers[start] = style + self.source[start]
                     markers[end] = reset + self.source[end]
         return ''.join(markers) + colors.RESET
+
+
+class Generic(Classification):
+    """
+    Generic parser, may be applied as a fallback or if the engine is unknown
+    """
+    pattern = rf"""^
+    (?:
+        (?:\b | [.!@#-%:;\s)(] )
+        (?: {LABELS}|
+            {OBFUSCATIONS}|
+            {PLATFORM}|
+            {IDENT()}
+        )
+    )*?
+    $"""
 
 
 class Alibaba(Classification):
