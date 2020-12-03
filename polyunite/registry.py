@@ -1,6 +1,6 @@
-from collections import UserDict
+from collections import UserDict, Counter
 import string
-from typing import TYPE_CHECKING, Optional, Type, Iterable, Tuple, Mapping
+from typing import TYPE_CHECKING, Optional, Type, Iterable, Tuple, Mapping, Callable, Hashable
 
 from collections import defaultdict
 from itertools import combinations
@@ -10,6 +10,9 @@ from polyunite.utils import edit_distance
 
 if TYPE_CHECKING:
     from polyunite.parsers import Classification
+
+EngineName = str
+EngineResults = Mapping[EngineName, str]
 
 _ENGINE_NAME_XLATE = str.maketrans(
     string.ascii_uppercase,
@@ -63,13 +66,38 @@ class EngineRegistry(UserDict):
         """Register `self` as the specialized class for handling parse requests """
         self[self._normalize(name)] = parser
 
-    def each(self, results):
+    def each(self, results: EngineResults):
         for engine, family in results.items():
             if isinstance(family, str):
                 try:
                     yield engine, self.decode(engine, family)
                 except (EngineNormalizeError, RegistryKeyError, MatchError):
                     continue
+
+    def summarize(
+        self,
+        results: EngineResults,
+        key: Callable[[str], Iterable],
+        top_k: int = None,
+        min_density: float = 0.0,
+    ):
+        ctr = Counter()  # type: ignore
+
+        for _, clf in self.each(results):
+            try:
+                rs = key(clf)
+
+                if isinstance(rs, (int, str, float)):
+                    ctr[rs] += 1
+
+                for r in rs:
+                    ctr[r] += 1
+            except (AttributeError, LookupError, TypeError):
+                continue
+
+        (top, top_count), *results = ctr.most_common(top_k)
+
+        return [top, *(r for r, count in results if count / top_count > min_density)]
 
     def infer_name(self, families: Mapping[str, str]):
         """
