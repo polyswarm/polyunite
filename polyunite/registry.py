@@ -9,7 +9,7 @@ from typing import (
     Union,
 )
 
-from collections import Counter, UserDict, defaultdict
+from collections import Counter, UserDict
 from itertools import combinations
 import string
 
@@ -133,24 +133,20 @@ class EngineRegistry(UserDict):
                                   'Virusdie': 'Zeus-Trojan', 'QuickHeal': 'Agent'})
         Zeus
         """
-        return self._weighted_name_inference((
-            (clf.name, self.weights.get(engine, 1.0))
-            for engine, clf in self.each(families)
-        ))
+        return self._weighted_name_inference(((clf.name, self.weights.get(engine, 1.0))
+                                              for engine, clf in self.each(families)))
 
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
-        # only consider words longer than 2 chars
-        # sum the square of edit distance for each word-pair
-        iterator = ((n, w) for n, w in names if len(n) > 2 or w == 0)
-        score: defaultdict = defaultdict(lambda: 0)
+        # only consider words longer than 2 chars & weight > 0
+        items = [(n, w) for n, w in names if len(n) > 2 or w == 0]
+        score = {k: 0.0 for k, _ in items}
 
-        for (x, xw), (y, yw) in combinations(iterator, 2):
-            weight_ratio = xw / yw
-            d = weight_ratio * edit_distance(x.lower(), y.lower())
-            score[x] += d
-            score[y] += d
+        for (x, xw), (y, yw) in combinations(items, 2):
+            d = edit_distance(x.lower(), y.lower())
+            score[x] += d * xw
+            score[y] += d * yw
 
-        return max(score.keys(), key=lambda k: score[k])
+        return max(score, key=score.__getitem__)
 
     @staticmethod
     def _normalize(name: 'str'):
