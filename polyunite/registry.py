@@ -141,7 +141,7 @@ class EngineRegistry(UserDict):
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
         # only consider words longer than 2 chars
         # sum the square of edit distance for each word-pair
-        iterator = ((n, w) for n, w in names if len(n) > 2)
+        iterator = ((n, w) for n, w in names if len(n) > 2 or w == 0)
         score: defaultdict = defaultdict(lambda: 0)
 
         for (x, xw), (y, yw) in combinations(iterator, 2):
