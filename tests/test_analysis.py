@@ -1,6 +1,7 @@
-import polyunite
 from operator import attrgetter
 import pytest
+
+import polyunite
 
 SUB7_BOUNTY = {
     'Alibaba': 'Win32/SubSeven.6ca32fd3',
@@ -23,12 +24,11 @@ def test_guess_malware_name(expected, results):
     ({'backdoor', 'trojan'}, SUB7_BOUNTY),
 ])
 def test_summarize_labels(expected, results):
-    assert expected == set(polyunite.summarize(results, key=attrgetter('labels')))
+    assert expected == set(polyunite.summarize(results, key=lambda o: o.labels))
 
 
 @pytest.mark.parametrize('expected, results', [
     ('Windows', SUB7_BOUNTY),
 ])
 def test_summarize_os(expected, results):
-    os, *_ = polyunite.summarize(results, key=attrgetter('operating_system'), top_k=1)
-    assert expected == os
+    assert expected == next(polyunite.summarize(results, lambda o: o.operating_system, top_k=1))

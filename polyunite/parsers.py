@@ -1,6 +1,8 @@
+from typing import ClassVar
+
 import collections
 from contextlib import suppress
-from typing import ClassVar
+import regex as re
 
 from polyunite.errors import MatchError
 from polyunite.utils import antecedent, colors
@@ -17,8 +19,6 @@ from polyunite.vocab import (
     SUFFIXES,
 )
 
-import regex as re
-
 from .registry import registry
 
 
@@ -27,7 +27,9 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     sublabels = list(vocab.sublabels)
     return property(lambda self: recieve(label for label in sublabels if label in self))
 
+
 EICAR_REGEX = re.compile(r'(\b|_)eicar(\b|_)', re.I)
+
 
 class Classification(collections.UserDict):
     pattern: 'ClassVar[str]'
@@ -124,7 +126,11 @@ class Classification(collections.UserDict):
                     markers[end] = reset + self.source[end]
         return ''.join(markers) + colors.RESET
 
+
 class Generic(Classification):
+    """
+    Generic parser, may be applied as a fallback or if the engine is unknown
+    """
     pattern = rf"""^
     (?:
         (?:\b | [.!@#-%:;\s)(] )
@@ -135,6 +141,7 @@ class Generic(Classification):
         )
     )*?
     $"""
+
 
 class Alibaba(Classification):
     pattern = rf"""^

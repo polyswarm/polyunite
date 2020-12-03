@@ -1,11 +1,11 @@
-from functools import lru_cache
-import json
 from typing import Iterator, List, Mapping, Optional
 
+from functools import lru_cache
+import json
 from pkg_resources import resource_stream
-from polyunite.utils import antecedent, group
-
 import regex as re
+
+from polyunite.utils import antecedent, group
 
 
 class VocabRegex:
@@ -24,8 +24,7 @@ class VocabRegex:
             self.description = fields.pop('__desc__', None)
             # self.aliases.extend([n for n, v in values if isinstance(v, str)])
             self.children = [
-                VocabRegex(n, v, parent=self) for n, v in fields.items()
-                if not n.startswith('__')
+                VocabRegex(n, v, parent=self) for n, v in fields.items() if not n.startswith('__')
             ]
         elif isinstance(fields, str):
             self.children = []
