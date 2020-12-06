@@ -117,13 +117,13 @@ class EngineRegistry(UserDict):
             except (AttributeError, LookupError, TypeError):
                 continue
 
-        (top, top_count), *rest = ctr.most_common(top_k)
-
-        yield top
-
-        for elt, count in rest:
-            if count / top_count > min_density:
-                yield elt
+        most_common = ctr.most_common(top_k)
+        if len(most_common) >= 1:
+            (top, top_count), *rest = most_common
+            yield top
+            for elt, count in rest:
+                if count / top_count > min_density:
+                    yield elt
 
     def infer_name(self, families: Mapping[str, str]):
         """
@@ -133,8 +133,11 @@ class EngineRegistry(UserDict):
                                   'Virusdie': 'Zeus-Trojan', 'QuickHeal': 'Agent'})
         Zeus
         """
-        return self._weighted_name_inference(((clf.name, self.weights.get(engine, 1.0))
-                                              for engine, clf in self.each(families)))
+        try:
+            return self._weighted_name_inference(((clf.name, self.weights.get(engine, 1.0))
+                                                  for engine, clf in self.each(families)))
+        except ValueError:
+            return None
 
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
         # only consider words longer than 2 chars & weight > 0
