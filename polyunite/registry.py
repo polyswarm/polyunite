@@ -12,12 +12,15 @@ from typing import (
 from collections import Counter, UserDict
 from itertools import combinations
 import string
+import logging
 
-from polyunite.errors import EngineNormalizeError, MatchError, RegistryKeyError
+from polyunite.errors import PolyuniteError, RegistryKeyError, EngineNormalizeError
 from polyunite.utils import edit_distance
 
 if TYPE_CHECKING:
     from polyunite.parsers import Classification
+
+log = logging.getLogger('polyunite')
 
 EngineName = str
 EngineResults = Mapping[EngineName, str]
@@ -57,7 +60,11 @@ class EngineRegistry(UserDict):
         :raises polyunite.errors.RegistryKeyError: No engine found with this name
         :raises polyunite.errors.EngineNormalizeError: Couldn't normalize engine name
         """
-        return self[engine].from_string(name)
+        try:
+            return self[engine].from_string(name)
+        except PolyuniteError as e:
+            log.debug('Error parsing %s using %s: %s', name, engine, e)
+            raise
 
     def try_decode(self, engine: 'str', name: 'str') -> 'Optional[Classification]':
         """
@@ -68,14 +75,17 @@ class EngineRegistry(UserDict):
             if not engine or not name:
                 return None
             return self.decode(engine, name)
-        except (EngineNormalizeError, RegistryKeyError, MatchError):
+        except PolyuniteError:
             return None
 
     def is_heuristic(self, engine: 'str', name: 'str') -> 'Optional[bool]':
         """
         Check if a malware family ``name`` produced by ``engine`` was heuristic
         """
-        return self.try_decode(engine, name).is_heuristic
+        try:
+            return self.decode(engine, name).is_heuristic
+        except PolyuniteError:
+            return False
 
     def register(self, parser: 'Type[Classification]', name: 'str'):
         """Register `self` as the specialized class for handling parse requests """
@@ -89,7 +99,7 @@ class EngineRegistry(UserDict):
             if isinstance(family, str):
                 try:
                     yield engine, self.decode(engine, family)
-                except (EngineNormalizeError, RegistryKeyError, MatchError):
+                except PolyuniteError:
                     continue
 
     def summarize(
