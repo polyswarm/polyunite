@@ -1,7 +1,6 @@
 from typing import ClassVar
 
 import collections
-from contextlib import suppress
 import regex as re
 
 from polyunite.errors import MatchError
@@ -30,6 +29,7 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
 
 EICAR_REGEX = re.compile(r'(\b|_)eicar(\b|_)', re.I)
 REVERSE_NAME_REGEX = re.compile(r'(?r)([-_\w]{2,})')
+CVE_PATTERN = re.compile(r'(?:CVE)(?:\b|[-_])?(?P<YEAR>\d{4})(?:\b|[-_])?(?P<NTH>\d{1,})', re.I)
 
 
 class Classification(collections.UserDict):
@@ -60,13 +60,6 @@ class Classification(collections.UserDict):
         """Build a `Classification` from the raw malware name provided by this engine"""
         return cls(name)
 
-    @classmethod
-    def guess_heuristic(cls, name: 'str') -> 'bool':
-        try:
-            return cls.from_string(name).is_heuristic
-        except MatchError:
-            return False
-
     def lastgroups(self, *groups):
         """Iterator of the last capture in `groups`"""
         yield from (self[f][-1] for f in groups if f in self)
@@ -79,25 +72,19 @@ class Classification(collections.UserDict):
     @property
     def name(self) -> str:
         """'name' of the virus"""
-        try:
-            if EICAR_REGEX.search(self.source):
-                return 'EICAR'
-            return next(self.lastgroups('CVE', 'FAMILY'))
-        except StopIteration:
-            # Return the longest leftmost word if we haven't matched anything
-            endpos = None
+        if self.is_EICAR:
+            return 'EICAR'
 
-            if 'VARIANT' in self:
-                endpos = self.match.start('VARIANT')
+        if self.is_CVE:
+            return self.extract_CVE()
 
-            match = REVERSE_NAME_REGEX.search(self.source, endpos=endpos)
+        if 'FAMILY' in self:
+            return next(self.lastgroups('FAMILY'))
 
-            if match:
-                return match[0]
-            elif self.is_heuristic:
-                return 'Generic'
-            else:
-                return self.source
+        # Return the longest leftmost word if we haven't matched anything
+        endpos = self.match.start('VARIANT') if 'VARIANT' in self else None
+        match = REVERSE_NAME_REGEX.search(self.source, endpos=endpos)
+        return match[0] if match else self.source
 
     @property
     def av_vendor(self) -> str:
@@ -105,10 +92,19 @@ class Classification(collections.UserDict):
         return self.__class__.__name__
 
     @property
+    def is_EICAR(self):
+        return EICAR_REGEX.search(self.source)
+
+    @property
+    def is_CVE(self):
+        return 'CVE' in self
+
+    def extract_CVE(self):
+        return CVE_PATTERN.sub(r'CVE-\g<YEAR>-\g<NTH>', next(self.lastgroups('CVE'))).upper()
+
+    @property
     def is_heuristic(self) -> bool:
         """Check if we've parsed this classification as a heuristic-detection"""
-        if self.data.get(HEURISTICS):
-            return True
         last_matches = self.lastgroups(HEURISTICS.name, LABELS.name, 'VARIANT', 'FAMILY')
         return any(map(HEURISTICS.compile(1, 1).fullmatch, last_matches))
 
@@ -130,10 +126,13 @@ class Classification(collections.UserDict):
         """Colorize a classification string's parts which matched the labels in `STYLE`"""
         markers = list(self.source)
         for name, style in style.items():
-            with suppress(IndexError):
+            try:
                 for start, end in self.match.spans(name):
                     markers[start] = style + self.source[start]
                     markers[end] = reset + self.source[end]
+            except IndexError:
+                continue
+
         return ''.join(markers) + colors.RESET
 
 
