@@ -84,13 +84,15 @@ OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS)
 
+CVE_PATTERN = r'(?P<CVE>((?:CVE|cve)[-_]?(?P<CVEYEAR>\d{4})[-_]?(?P<CVENTH>\d*))[A-Za-z]*)'
+
 
 def IDENT(extra_families=[], extra_variants=[]):
     """Build a family & variant subpattern"""
     return r'(?P<NAME>{family}?({variant}{{,2}}?)?)'.format(
         family=group(
+            CVE_PATTERN,
             *extra_families,
-            r'((?P<CVE>CVE-?\d{4}-?\d+){i<=1:[A-Za-z]})',
             r'([A-Za-z]{2,3}(?!$))',
             r'(i?(?:[A-Z][A-Za-z]{2,}){i<=3:\d})',
             r'(?P<nonmalware>(?i:eicar(?>.?test(?>.?file)?)?([.]com)?))',

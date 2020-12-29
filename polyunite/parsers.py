@@ -7,6 +7,7 @@ from polyunite.errors import MatchError
 from polyunite.utils import antecedent, colors
 from polyunite.vocab import (
     ARCHIVES,
+    CVE_PATTERN,
     HEURISTICS,
     IDENT,
     LABELS,
@@ -29,7 +30,6 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
 
 EICAR_REGEX = re.compile(r'(\b|_)eicar(\b|_)', re.I)
 REVERSE_NAME_REGEX = re.compile(r'(?r)([-_\w]{2,})')
-CVE_PATTERN = re.compile(r'(?:CVE)(?:\b|[-_])?(?P<YEAR>\d{4})(?:\b|[-_])?(?P<NTH>\d{1,})', re.I)
 
 
 class Classification(collections.UserDict):
@@ -39,11 +39,10 @@ class Classification(collections.UserDict):
     source: 'str'
 
     def __init__(self, name: str):
-        super().__init__()
         try:
             self.match = self.regex.fullmatch(name)
             self.source = name
-            self.data = {k: v for k, v in self.match.capturesdict().items() if v}
+            super().__init__({k: v for k, v in self.match.capturesdict().items() if v})
         except (AttributeError, TypeError):
             raise MatchError(name)
 
@@ -67,7 +66,16 @@ class Classification(collections.UserDict):
     operating_system = extract_vocabulary(OSES)
     language = extract_vocabulary(LANGS)
     macro = extract_vocabulary(MACROS)
-    labels = extract_vocabulary(LABELS, recieve=set)
+
+    @property
+    def labels(self):
+        labels = set(label for label in LABELS.sublabels if label in self)
+        if self.is_CVE:
+            labels.add('exploit')
+            labels.add('CVE')
+        if self.is_EICAR:
+            labels.add('nonmalware')
+        return labels
 
     @property
     def name(self) -> str:
@@ -100,7 +108,7 @@ class Classification(collections.UserDict):
         return 'CVE' in self
 
     def extract_CVE(self):
-        return CVE_PATTERN.sub(r'CVE-\g<YEAR>-\g<NTH>', next(self.lastgroups('CVE'))).upper()
+        return self.match.expandf("CVE-{CVEYEAR[0]}-{CVENTH[0]}").rstrip('-')
 
     @property
     def is_heuristic(self) -> bool:
@@ -161,8 +169,8 @@ class ClamAV(Classification):
     pattern = rf"""^
     ((?P<PREFIX>BC|Clamav))?
     ((\.|^)({PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?([.]|$)
-    (
-        (?P<FAMILY>\w+)
+    (?P<NAME>
+        (?P<FAMILY>\w+|{CVE_PATTERN})
         ((\:\w|\/\w+))*
         (-(?P<VARIANT>[\-0-9]+))
     )?
@@ -185,7 +193,7 @@ class Ikarus(Classification):
     ((\A|[.]|\b)(-?{LABELS}|{OBFUSCATIONS}|{PLATFORM}|Patched))*
     ((\A|[.]|\b)
         (?P<NAME>
-            (?P<FAMILY>BO|([i0-9]?[A-Z][\w_-]{{2,}}))?
+            (?P<FAMILY>{CVE_PATTERN}|BO|([i0-9]?[A-Z][\w_-]{{2,}}))?
             (?P<VARIANT>
                 [.]([0-9]+|[a-z]+|[A-Z]+|[A-F0-9]+) |
                 (?i:[.#@!]\L<suffixes>)
@@ -268,7 +276,7 @@ class QuickHeal(Classification):
 class Rising(Classification):
     pattern = rf"""^
     (?(DEFINE)
-        (?P<FAMILY>[iA-Z][-\w]+?)
+        (?P<FAMILY>{CVE_PATTERN}|[iA-Z][-\w]+?)
         (?P<PLATFORM>{PLATFORM}))
     # -----------------------------
     ([.]?{LABELS})*

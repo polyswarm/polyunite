@@ -328,11 +328,5 @@
             "hllw"
         ],
         "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."
-    },
-    "CVE": {
-        "__alias__": [
-            "CVE-?\\d{4}-?\\d+"
-        ],
-        "__desc__": "The Common Vulnerabilities and Exposures system provides a reference-method for publicly known information-security vulnerabilities and exposures."
     }
 }
