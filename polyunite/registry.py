@@ -11,10 +11,14 @@ from typing import (
 
 from collections import Counter, UserDict
 from itertools import combinations
-import string
 import logging
+import string
 
-from polyunite.errors import PolyuniteError, RegistryKeyError, EngineNormalizeError
+from polyunite.errors import (
+    EngineNormalizeError,
+    PolyuniteError,
+    RegistryKeyError,
+)
 from polyunite.utils import edit_distance
 
 if TYPE_CHECKING:

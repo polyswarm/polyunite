@@ -9,8 +9,11 @@ stages:
   - release
 
 variables:
-  DOCKER_HOST: tcp://localhost:2375/
   BASE_IMAGE_NAME: polyunite
+  DOCKER_HOST: tcp://localhost:2376
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_TLS_VERIFY: 1
+  DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
 
 default:
   before_script:
@@ -23,7 +26,7 @@ default:
 ###############################################################
 dev-pypi:
   tags:
-    - kube
+    - kube-small-new
   image: python:3.7
   stage: build
   before_script:
@@ -40,7 +43,7 @@ test-py37:
   image: python:3.7
   stage: test
   tags:
-    - kube
+    - kube-small-new
   coverage: '/TOTAL.*\s+(\d+%)$/'
   script:
     - python setup.py test
@@ -52,7 +55,7 @@ test-py37:
 ###############################################################
 release-pypi:
   tags:
-    - kube
+    - kube-small-new
   stage: release
   script:
     # release to internal pypi but do not tag yet

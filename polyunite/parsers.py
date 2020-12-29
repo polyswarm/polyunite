@@ -1,13 +1,13 @@
 from typing import ClassVar
 
 import collections
-from contextlib import suppress
 import regex as re
 
 from polyunite.errors import MatchError
 from polyunite.utils import antecedent, colors
 from polyunite.vocab import (
     ARCHIVES,
+    CVE_PATTERN,
     HEURISTICS,
     IDENT,
     LABELS,
@@ -29,6 +29,7 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
 
 
 EICAR_REGEX = re.compile(r'(\b|_)eicar(\b|_)', re.I)
+REVERSE_NAME_REGEX = re.compile(r'(?r)([-_\w]{2,})')
 
 
 class Classification(collections.UserDict):
@@ -38,11 +39,10 @@ class Classification(collections.UserDict):
     source: 'str'
 
     def __init__(self, name: str):
-        super().__init__()
         try:
             self.match = self.regex.fullmatch(name)
             self.source = name
-            self.data = {k: v for k, v in self.match.capturesdict().items() if v}
+            super().__init__({k: v for k, v in self.match.capturesdict().items() if v})
         except (AttributeError, TypeError):
             raise MatchError(name)
 
@@ -59,13 +59,6 @@ class Classification(collections.UserDict):
         """Build a `Classification` from the raw malware name provided by this engine"""
         return cls(name)
 
-    @classmethod
-    def guess_heuristic(cls, name: 'str') -> 'bool':
-        try:
-            return cls.from_string(name).is_heuristic
-        except MatchError:
-            return False
-
     def lastgroups(self, *groups):
         """Iterator of the last capture in `groups`"""
         yield from (self[f][-1] for f in groups if f in self)
@@ -73,21 +66,33 @@ class Classification(collections.UserDict):
     operating_system = extract_vocabulary(OSES)
     language = extract_vocabulary(LANGS)
     macro = extract_vocabulary(MACROS)
-    labels = extract_vocabulary(LABELS, recieve=set)
+
+    @property
+    def labels(self):
+        labels = set(label for label in LABELS.sublabels if label in self)
+        if self.is_CVE:
+            labels.add('exploit')
+            labels.add('CVE')
+        if self.is_EICAR:
+            labels.add('nonmalware')
+        return labels
 
     @property
     def name(self) -> str:
         """'name' of the virus"""
-        try:
-            if EICAR_REGEX.search(self.source):
-                return 'EICAR'
-            return next(self.lastgroups('CVE', 'FAMILY'))
-        except StopIteration:
-            # Return the longest leftmost word if we haven't matched anything
-            ss = self.source
-            if 'VARIANT' in self:
-                ss = ss[:self.match.start('VARIANT')]
-            return re.sub(r"^.*?(\w+)\W*$", r"\g<1>", ss)
+        if self.is_EICAR:
+            return 'EICAR'
+
+        if self.is_CVE:
+            return self.extract_CVE()
+
+        if 'FAMILY' in self:
+            return next(self.lastgroups('FAMILY'))
+
+        # Return the longest leftmost word if we haven't matched anything
+        endpos = self.match.start('VARIANT') if 'VARIANT' in self else None
+        match = REVERSE_NAME_REGEX.search(self.source, endpos=endpos)
+        return match[0] if match else self.source
 
     @property
     def av_vendor(self) -> str:
@@ -95,10 +100,19 @@ class Classification(collections.UserDict):
         return self.__class__.__name__
 
     @property
+    def is_EICAR(self):
+        return EICAR_REGEX.search(self.source)
+
+    @property
+    def is_CVE(self):
+        return 'CVE' in self
+
+    def extract_CVE(self):
+        return self.match.expandf("CVE-{CVEYEAR[0]}-{CVENTH[0]}").rstrip('-')
+
+    @property
     def is_heuristic(self) -> bool:
         """Check if we've parsed this classification as a heuristic-detection"""
-        if self.data.get(HEURISTICS):
-            return True
         last_matches = self.lastgroups(HEURISTICS.name, LABELS.name, 'VARIANT', 'FAMILY')
         return any(map(HEURISTICS.compile(1, 1).fullmatch, last_matches))
 
@@ -120,10 +134,13 @@ class Classification(collections.UserDict):
         """Colorize a classification string's parts which matched the labels in `STYLE`"""
         markers = list(self.source)
         for name, style in style.items():
-            with suppress(IndexError):
+            try:
                 for start, end in self.match.spans(name):
                     markers[start] = style + self.source[start]
                     markers[end] = reset + self.source[end]
+            except IndexError:
+                continue
+
         return ''.join(markers) + colors.RESET
 
 
@@ -132,14 +149,8 @@ class Generic(Classification):
     Generic parser, may be applied as a fallback or if the engine is unknown
     """
     pattern = rf"""^
-    (?:
-        (?:\b | [.!@#-%:;\s)(] )
-        (?: {LABELS}|
-            {OBFUSCATIONS}|
-            {PLATFORM}|
-            {IDENT()}
-        )
-    )*?
+    ((\A|\s|\b|[^A-Za-z0-9])({LABELS}|{OBFUSCATIONS}|{PLATFORM}))*?
+    {IDENT()}
     $"""
 
 
@@ -158,8 +169,8 @@ class ClamAV(Classification):
     pattern = rf"""^
     ((?P<PREFIX>BC|Clamav))?
     ((\.|^)({PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?([.]|$)
-    (
-        (?P<FAMILY>\w+)
+    (?P<NAME>
+        (?P<FAMILY>\w+|{CVE_PATTERN})
         ((\:\w|\/\w+))*
         (-(?P<VARIANT>[\-0-9]+))
     )?
@@ -182,7 +193,7 @@ class Ikarus(Classification):
     ((\A|[.]|\b)(-?{LABELS}|{OBFUSCATIONS}|{PLATFORM}|Patched))*
     ((\A|[.]|\b)
         (?P<NAME>
-            (?P<FAMILY>BO|([i0-9]?[A-Z][\w_-]{{2,}}))?
+            (?P<FAMILY>{CVE_PATTERN}|BO|([i0-9]?[A-Z][\w_-]{{2,}}))?
             (?P<VARIANT>
                 [.]([0-9]+|[a-z]+|[A-Z]+|[A-F0-9]+) |
                 (?i:[.#@!]\L<suffixes>)
@@ -210,7 +221,10 @@ class K7(Classification):
     @property
     def name(self) -> str:
         # K7 does not work with family names
-        return ''
+        if self.is_EICAR:
+            return 'EICAR'
+
+        return re.sub(r'^([-_\w]+) \(.*\)', r'\g<1>', self.source)
 
 
 class Lionic(Classification):
@@ -262,7 +276,7 @@ class QuickHeal(Classification):
 class Rising(Classification):
     pattern = rf"""^
     (?(DEFINE)
-        (?P<FAMILY>[iA-Z][-\w]+?)
+        (?P<FAMILY>{CVE_PATTERN}|[iA-Z][-\w]+?)
         (?P<PLATFORM>{PLATFORM}))
     # -----------------------------
     ([.]?{LABELS})*

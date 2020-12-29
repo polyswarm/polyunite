@@ -18,5 +18,9 @@ def report_results():
 
 @pytest.mark.parametrize('expected', report_results(), ids='{engine}/{source}'.format_map)
 def test_parsers(expected):
-    vr = polyunite.parse(expected.pop('engine'), expected.pop('source'))
-    assert expected == {k: getattr(vr, k) for k in expected.keys()}
+    actual = polyunite.parse(expected.pop('engine'), expected.pop('source'))
+    if 'name' in expected:
+        assert expected['name'] == actual.name
+
+    if 'labels' in expected:
+        assert expected['labels'] == actual.labels
