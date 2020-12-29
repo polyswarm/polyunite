@@ -170,7 +170,7 @@ class ClamAV(Classification):
     ((?P<PREFIX>BC|Clamav))?
     ((\.|^)({PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?([.]|$)
     (?P<NAME>
-        (?P<FAMILY>\w+|{CVE_PATTERN})
+        (?P<FAMILY>{CVE_PATTERN}|\w+)
         ((\:\w|\/\w+))*
         (-(?P<VARIANT>[\-0-9]+))
     )?
