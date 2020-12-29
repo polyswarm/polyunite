@@ -1,7 +1,7 @@
 image: $REPO_URL/stage
 
 services:
-  - docker:18.09.7-dind
+  - docker:dind
 
 stages:
   - build
