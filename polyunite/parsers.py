@@ -213,7 +213,10 @@ class K7(Classification):
     @property
     def name(self) -> str:
         # K7 does not work with family names
-        return ''
+        if self.is_EICAR:
+            return 'EICAR'
+
+        return re.sub(r'^([-_\w]+) \(.*\)', r'\g<1>', self.source)
 
 
 class Lionic(Classification):
