@@ -29,6 +29,7 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
 
 
 EICAR_REGEX = re.compile(r'(\b|_)eicar(\b|_)', re.I)
+REVERSE_NAME_REGEX = re.compile(r'(?r)([-_\w]{2,})')
 
 
 class Classification(collections.UserDict):
@@ -84,10 +85,19 @@ class Classification(collections.UserDict):
             return next(self.lastgroups('CVE', 'FAMILY'))
         except StopIteration:
             # Return the longest leftmost word if we haven't matched anything
-            ss = self.source
+            endpos = None
+
             if 'VARIANT' in self:
-                ss = ss[:self.match.start('VARIANT')]
-            return re.sub(r"^.*?(\w+)\W*$", r"\g<1>", ss)
+                endpos = self.match.start('VARIANT')
+
+            match = REVERSE_NAME_REGEX.search(self.source, endpos=endpos)
+
+            if match:
+                return match[0]
+            elif self.is_heuristic:
+                return 'Generic'
+            else:
+                return self.source
 
     @property
     def av_vendor(self) -> str:
@@ -132,14 +142,8 @@ class Generic(Classification):
     Generic parser, may be applied as a fallback or if the engine is unknown
     """
     pattern = rf"""^
-    (?:
-        (?:\b | [.!@#-%:;\s)(] )
-        (?: {LABELS}|
-            {OBFUSCATIONS}|
-            {PLATFORM}|
-            {IDENT()}
-        )
-    )*?
+    ((\A|\s|\b|[^A-Za-z0-9])({LABELS}|{OBFUSCATIONS}|{PLATFORM}))*?
+    {IDENT()}
     $"""
 
 
