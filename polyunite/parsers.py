@@ -28,7 +28,8 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     return property(lambda self: recieve(label for label in sublabels if label in self))
 
 
-EICAR_REGEX = re.compile(r'(\b|_)eicar(\b|_)', re.I)
+EICAR_PATTERN = re.compile(r'.*(?P<FAMILY>(?P<EICAR>\L<eicarvariants>))',
+                           eicarvariants=['EICAR', 'eicar', 'Eicar'])
 REVERSE_NAME_REGEX = re.compile(r'(?r)([-_\w]{2,})')
 
 
@@ -40,14 +41,14 @@ class Classification(collections.UserDict):
 
     def __init__(self, name: str):
         try:
-            self.match = self.regex.fullmatch(name)
-            self.source = name
+            self.match = EICAR_PATTERN.match(name) or self.regex.fullmatch(name)
             super().__init__({k: v for k, v in self.match.capturesdict().items() if v})
         except (AttributeError, TypeError):
-            raise MatchError(name)
+            raise MatchError(name, self.av_vendor)
 
-    def matches(self, name):
-        return self.regex.fullmatch(name)
+    @property
+    def source(self):
+        return self.match.string
 
     @classmethod
     def __init_subclass__(cls):
@@ -61,7 +62,7 @@ class Classification(collections.UserDict):
 
     def lastgroups(self, *groups):
         """Iterator of the last capture in `groups`"""
-        yield from (self[f][-1] for f in groups if f in self)
+        return (self[f][-1] for f in groups if f in self)
 
     operating_system = extract_vocabulary(OSES)
     language = extract_vocabulary(LANGS)
@@ -69,12 +70,12 @@ class Classification(collections.UserDict):
 
     @property
     def labels(self):
+        if self.is_EICAR:
+            return {'nonmalware'}
         labels = set(label for label in LABELS.sublabels if label in self)
         if self.is_CVE:
             labels.add('exploit')
             labels.add('CVE')
-        if self.is_EICAR:
-            labels.add('nonmalware')
         return labels
 
     @property
@@ -101,7 +102,7 @@ class Classification(collections.UserDict):
 
     @property
     def is_EICAR(self):
-        return EICAR_REGEX.search(self.source)
+        return self.match.re is EICAR_PATTERN
 
     @property
     def is_CVE(self):
@@ -296,6 +297,12 @@ class Rising(Classification):
         ){{,2}}
         ({antecedent:([!][0-9]+)}?[.][A-F0-9]+)?
     )?
+    $"""
+
+class Tachyon(Classification):
+    pattern = rf"""^
+    ((\A|-){LABELS})*/(?:{PLATFORM}[.-])*
+    ({IDENT([r'[-a-zA-Z0-9]{4,}'], [r'[.]Zen'])})
     $"""
 
 

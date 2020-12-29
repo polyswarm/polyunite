@@ -20,8 +20,8 @@ class EngineNormalizeError(PolyuniteError):
 
 class MatchError(PolyuniteError):
     """An exception was raised by an while decoding a malware name"""
-    def __init__(self, name):
-        super().__init__(f"An exception was raised while decoding {name} as a malware family name")
+    def __init__(self, name, source='malware'):
+        super().__init__(f"Could not decode {name} as a {source} family")
 
 
 class RegistryKeyError(PolyuniteError):
