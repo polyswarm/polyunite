@@ -281,6 +281,7 @@
         "__alias__": [
             "shellkode",
             "hack\\Wexploit",
+            "hack\\b",
             "exp\\b",
             "exploit"
         ],
