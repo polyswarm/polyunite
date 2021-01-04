@@ -307,7 +307,7 @@ class Tachyon(Classification):
     # https://tachyonlab.com/en/main_name/main_name.html
     pattern = rf"""^
     (?:
-        (?<HEURISTICS>Abuse-Worry>) |
+        (?<{HEURISTICS.name}>Abuse-Worry>) |
         (\A|-){LABELS}
     )*
     /(?:(?:{PLATFORM}|\w+)[.-])?
