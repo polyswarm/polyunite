@@ -8,6 +8,7 @@ from polyunite.utils import antecedent, colors
 from polyunite.vocab import (
     ARCHIVES,
     CVE_PATTERN,
+    FAMILY_ID,
     HEURISTICS,
     IDENT,
     LABELS,
@@ -17,6 +18,7 @@ from polyunite.vocab import (
     OSES,
     PLATFORM,
     SUFFIXES,
+    VARIANT_ID,
 )
 
 from .registry import registry
@@ -28,8 +30,9 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     return property(lambda self: recieve(label for label in sublabels if label in self))
 
 
-EICAR_PATTERN = re.compile(r'.*(?P<FAMILY>(?P<EICAR>\L<eicarvariants>))',
-                           eicarvariants=['EICAR', 'eicar', 'Eicar'])
+EICAR_PATTERN = re.compile(
+    r'.*(?P<FAMILY>(?P<EICAR>\L<eicarvariants>))', eicarvariants=['EICAR', 'eicar', 'Eicar']
+)
 REVERSE_NAME_REGEX = re.compile(r'(?r)([-_\w]{2,})')
 
 
@@ -299,11 +302,20 @@ class Rising(Classification):
     )?
     $"""
 
+
 class Tachyon(Classification):
+    # https://tachyonlab.com/en/main_name/main_name.html
     pattern = rf"""^
-    ((\A|-){LABELS})*/(?:{PLATFORM}[.-])*
-    ({IDENT([r'[-a-zA-Z0-9]{4,}'], [r'[.]Zen'])})
-    $"""
+    (?:
+        (?<HEURISTICS>Abuse-Worry>) |
+        (\A|-){LABELS}
+    )*
+    /(?:(?:{PLATFORM}|\w+)[.-])?
+    (?P<NAME>
+        {FAMILY_ID([r'[-a-zA-Z0-9]{4,}([.]Zen)?'])}
+        ([.](?P<SIZE>[0-9]+))?
+        ({VARIANT_ID()}{{,2}}?)?
+    )$"""
 
 
 class Virusdie(Classification):
