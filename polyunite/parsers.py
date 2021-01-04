@@ -8,6 +8,7 @@ from polyunite.utils import antecedent, colors
 from polyunite.vocab import (
     ARCHIVES,
     CVE_PATTERN,
+    FAMILY_ID,
     HEURISTICS,
     IDENT,
     LABELS,
@@ -17,6 +18,7 @@ from polyunite.vocab import (
     OSES,
     PLATFORM,
     SUFFIXES,
+    VARIANT_ID,
 )
 
 from .registry import registry
@@ -28,7 +30,9 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     return property(lambda self: recieve(label for label in sublabels if label in self))
 
 
-EICAR_REGEX = re.compile(r'(\b|_)eicar(\b|_)', re.I)
+EICAR_PATTERN = re.compile(
+    r'.*(?P<FAMILY>(?P<EICAR>\L<eicarvariants>))', eicarvariants=['EICAR', 'eicar', 'Eicar']
+)
 REVERSE_NAME_REGEX = re.compile(r'(?r)([-_\w]{2,})')
 
 
@@ -40,14 +44,14 @@ class Classification(collections.UserDict):
 
     def __init__(self, name: str):
         try:
-            self.match = self.regex.fullmatch(name)
-            self.source = name
+            self.match = EICAR_PATTERN.match(name) or self.regex.fullmatch(name)
             super().__init__({k: v for k, v in self.match.capturesdict().items() if v})
         except (AttributeError, TypeError):
-            raise MatchError(name)
+            raise MatchError(name, self.av_vendor)
 
-    def matches(self, name):
-        return self.regex.fullmatch(name)
+    @property
+    def source(self):
+        return self.match.string
 
     @classmethod
     def __init_subclass__(cls):
@@ -61,7 +65,7 @@ class Classification(collections.UserDict):
 
     def lastgroups(self, *groups):
         """Iterator of the last capture in `groups`"""
-        yield from (self[f][-1] for f in groups if f in self)
+        return (self[f][-1] for f in groups if f in self)
 
     operating_system = extract_vocabulary(OSES)
     language = extract_vocabulary(LANGS)
@@ -69,12 +73,12 @@ class Classification(collections.UserDict):
 
     @property
     def labels(self):
+        if self.is_EICAR:
+            return {'nonmalware'}
         labels = set(label for label in LABELS.sublabels if label in self)
         if self.is_CVE:
             labels.add('exploit')
             labels.add('CVE')
-        if self.is_EICAR:
-            labels.add('nonmalware')
         return labels
 
     @property
@@ -101,7 +105,7 @@ class Classification(collections.UserDict):
 
     @property
     def is_EICAR(self):
-        return EICAR_REGEX.search(self.source)
+        return self.match.re is EICAR_PATTERN
 
     @property
     def is_CVE(self):
@@ -170,7 +174,7 @@ class ClamAV(Classification):
     ((?P<PREFIX>BC|Clamav))?
     ((\.|^)({PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?([.]|$)
     (?P<NAME>
-        (?P<FAMILY>\w+|{CVE_PATTERN})
+        (?P<FAMILY>{CVE_PATTERN}|\w+)
         ((\:\w|\/\w+))*
         (-(?P<VARIANT>[\-0-9]+))
     )?
@@ -297,6 +301,21 @@ class Rising(Classification):
         ({antecedent:([!][0-9]+)}?[.][A-F0-9]+)?
     )?
     $"""
+
+
+class Tachyon(Classification):
+    # https://tachyonlab.com/en/main_name/main_name.html
+    pattern = rf"""^
+    (?:
+        (?<{HEURISTICS.name}>Abuse-Worry>) |
+        (\A|-){LABELS}
+    )*
+    /(?:(?:{PLATFORM}|\w+)[.-])?
+    (?P<NAME>
+        {FAMILY_ID([r'[-a-zA-Z0-9]{4,}'])}
+        ([.](?P<SIZE>[0-9]+))?
+        ({VARIANT_ID([r'[.]Zen'])}{{,2}}?)?
+    )$"""
 
 
 class Virusdie(Classification):

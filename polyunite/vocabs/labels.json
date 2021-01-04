@@ -245,6 +245,7 @@
             "miner",
             "btcmine",
             "coinminer",
+            "coinhive",
             "(bitcoin|bit|crypto|btc|eth)?coinminer"
         ],
         "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner, to use them for cryptocurrency mining without user permission."

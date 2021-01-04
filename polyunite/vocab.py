@@ -87,23 +87,28 @@ PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS)
 CVE_PATTERN = r'(?P<CVE>((?:CVE|cve)[-_]?(?P<CVEYEAR>\d{4})[-_]?(?P<CVENTH>\d*))[A-Za-z]*)'
 
 
+def VARIANT_ID(extra=[]):
+    return group(
+        *extra,
+        rf'((?i:{antecedent:[.!@#-]}\L<suffixes>))',
+        rf'({antecedent:[.!@#]}(?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+))',
+        r'([!](@mm|@m))',
+        rf'({antecedent:[.]}[A-Z0-9]+)',
+        name='VARIANT'
+    )
+
+
+def FAMILY_ID(extra=[]):
+    return group(
+        CVE_PATTERN,
+        *extra,
+        r'([A-Za-z]{2,3}(?!$))',
+        r'(i?(?:[A-Z][A-Za-z]{2,}){i<=3:\d})',
+        r'(?P<nonmalware>(?i:eicar(?>.?test(?>.?file)?)?([.]com)?))',
+        name='FAMILY',
+    )
+
+
 def IDENT(extra_families=[], extra_variants=[]):
     """Build a family & variant subpattern"""
-    return r'(?P<NAME>{family}?({variant}{{,2}}?)?)'.format(
-        family=group(
-            CVE_PATTERN,
-            *extra_families,
-            r'([A-Za-z]{2,3}(?!$))',
-            r'(i?(?:[A-Z][A-Za-z]{2,}){i<=3:\d})',
-            r'(?P<nonmalware>(?i:eicar(?>.?test(?>.?file)?)?([.]com)?))',
-            name='FAMILY',
-        ),
-        variant=group(
-            *extra_variants,
-            rf'((?i:{antecedent:[.!@#-]}\L<suffixes>))',
-            rf'({antecedent:[.!@#]}(?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+))',
-            r'([!](@mm|@m))',
-            rf'({antecedent:[.]}[A-Z0-9]+)',
-            name='VARIANT'
-        )
-    )
+    return rf'(?P<NAME>{FAMILY_ID(extra_families)}?({VARIANT_ID(extra_variants)}{{,2}}?)?)'
