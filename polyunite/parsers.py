@@ -312,7 +312,7 @@ class Tachyon(Classification):
     )*
     /(?:(?:{PLATFORM}|\w+)[.-])?
     (?P<NAME>
-        {FAMILY_ID([r'[-a-zA-Z0-9]{4,}'])}
+        {FAMILY_ID([r'(?!CVE-)[-a-zA-Z0-9]{4,}'])}
         ([.](?P<SIZE>[0-9]+))?
         ({VARIANT_ID([r'[.]Zen'])}{{,2}}?)?
     )$"""
