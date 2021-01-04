@@ -36,6 +36,6 @@ setup(
         'pytest',
     ],
     url='https://github.com/polyscore/polyunite',
-    version='0.5.1',
+    version='0.5.2',
     zip_safe=True,
 )
