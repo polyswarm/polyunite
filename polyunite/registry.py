@@ -160,8 +160,9 @@ class EngineRegistry(UserDict):
 
         for (x, xw), (y, yw) in combinations(items, 2):
             d = edit_distance(x.lower(), y.lower())
-            score[x] += d * xw
-            score[y] += d * yw
+            s = 1 / (1 + d ** 2)
+            score[x] += s * xw
+            score[y] += s * yw
 
         return max(score, key=score.__getitem__)
 
