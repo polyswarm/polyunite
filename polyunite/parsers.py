@@ -44,7 +44,11 @@ class Classification(collections.UserDict):
 
     def __init__(self, name: str):
         try:
-            self.match = EICAR_PATTERN.match(name) or self.regex.fullmatch(name)
+            self.match = EICAR_PATTERN.match(name, concurrent=True) or self.regex.fullmatch(
+                name,
+                timeout=1,
+                concurrent=True,
+            )
             super().__init__({k: v for k, v in self.match.capturesdict().items() if v})
         except (AttributeError, TypeError):
             raise MatchError(name, self.av_vendor)
@@ -55,7 +59,12 @@ class Classification(collections.UserDict):
 
     @classmethod
     def __init_subclass__(cls):
-        cls.regex = re.compile(cls.pattern, re.VERBOSE, suffixes=list(SUFFIXES.entries), ignore_unused=True)
+        cls.regex = re.compile(
+            cls.pattern,
+            re.ASCII | re.VERBOSE | re.BESTMATCH,
+            suffixes=list(SUFFIXES.entries),
+            ignore_unused=True
+        )
         registry.register(cls, cls.__name__)
 
     @classmethod
