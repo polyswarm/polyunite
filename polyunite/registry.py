@@ -12,6 +12,7 @@ from typing import (
 from collections import Counter, UserDict
 from itertools import combinations
 import logging
+import regex as re
 import string
 
 from polyunite.errors import (
@@ -19,7 +20,7 @@ from polyunite.errors import (
     PolyuniteError,
     RegistryKeyError,
 )
-from polyunite.utils import edit_distance
+from polyunite.utils import edit_distance, group
 
 if TYPE_CHECKING:
     from polyunite.parsers import Classification
@@ -35,10 +36,22 @@ _ENGINE_NAME_XLATE = str.maketrans(
     string.whitespace + string.punctuation,
 )
 
+from polyunite.vocab import ARCHIVES, HEURISTICS, LABELS, LANGS, MACROS, OSES
+
 
 class EngineRegistry(UserDict):
-    def __init__(self, *, weights={}):
+    def __init__(
+        self,
+        *,
+        weights={},
+        name_weights={
+            HEURISTICS.compile().fullmatch: 0.85,
+            LABELS.compile().fullmatch: 0.65,
+            re.compile(group(LANGS, ARCHIVES, MACROS, OSES), re.IGNORECASE).fullmatch: 0.35,
+        }
+    ):
         self.weights = {}
+        self.name_weights = name_weights
 
         for engine, weight in weights.items():
             try:
@@ -148,19 +161,35 @@ class EngineRegistry(UserDict):
         Zeus
         """
         try:
-            return self._weighted_name_inference(((clf.name, self.weights.get(engine, 1.0))
-                                                  for engine, clf in self.each(families)))
+            minimum_name_length = 2
+
+            def weighted_names():
+                for engine, clf in self.each(families):
+                    name = clf.name
+
+                    if len(name) > minimum_name_length:
+                        weight = self.weights.get(engine, 1.0)
+
+                        for predicate, adjustment in self.name_weights.items():
+                            if predicate(name):
+                                weight = weight * adjustment
+                                break
+
+                        if weight >= 0:
+                            yield name, weight
+
+            return self._weighted_name_inference(weighted_names())
         except ValueError:
             return None
 
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
         # only consider words longer than 2 chars & weight > 0
-        items = [(n, w) for n, w in names if len(n) > 2 or w == 0]
+        items = [(n, w) for n, w in names]
         score = {k: 0.0 for k, _ in items}
 
         for (x, xw), (y, yw) in combinations(items, 2):
             d = edit_distance(x.lower(), y.lower())
-            s = 1 / (1 + d ** 2)
+            s = 1 / (1 + d**2)
             score[x] += s * xw
             score[y] += s * yw
 

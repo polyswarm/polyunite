@@ -39,7 +39,7 @@ class VocabRegex:
     @lru_cache(typed=True)
     def compile(self, start: 'int' = 0, end: 'int' = 1) -> 're.Pattern':
         """Compile regex, name groups for fields nested at least ``start`` and at most ``end`` deep"""
-        return re.compile(self.pattern(start, end), re.IGNORECASE)
+        return re.compile(self.pattern(start, end), re.IGNORECASE | re.BESTMATCH)
 
     def pattern(self, start: 'int' = 0, end: 'int' = 1) -> 'str':
         """Convert this grouped regular expression pattern"""
