@@ -20,6 +20,7 @@ setup(
     description="polyunite parses a variety of antimalware vendor's classification strings",
     install_requires=[
         'regex~=2020.11.13',
+        'rapidfuzz~=0.14.2',
     ],
     long_description='file: README.rst',
     long_description_content_type='rst',
@@ -36,6 +37,6 @@ setup(
         'pytest',
     ],
     url='https://github.com/polyscore/polyunite',
-    version='0.6.0',
+    version='0.8.0',
     zip_safe=True,
 )
