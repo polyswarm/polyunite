@@ -10,8 +10,8 @@ from typing import (
 )
 
 from collections import Counter, UserDict
-from itertools import combinations
 import logging
+from rapidfuzz import process
 import regex as re
 import string
 
@@ -20,7 +20,7 @@ from polyunite.errors import (
     PolyuniteError,
     RegistryKeyError,
 )
-from polyunite.utils import edit_distance, group
+from polyunite.utils import group
 
 if TYPE_CHECKING:
     from polyunite.parsers import Classification
@@ -161,22 +161,20 @@ class EngineRegistry(UserDict):
         Zeus
         """
         try:
-            minimum_name_length = 2
 
             def weighted_names():
                 for engine, clf in self.each(families):
                     name = clf.name
 
-                    if len(name) > minimum_name_length:
-                        weight = self.weights.get(engine, 1.0)
+                    weight = self.weights.get(engine, 1.0)
 
-                        for predicate, adjustment in self.name_weights.items():
-                            if predicate(name):
-                                weight = weight * adjustment
-                                break
+                    for predicate, adjustment in self.name_weights.items():
+                        if predicate(name):
+                            weight = weight * adjustment
+                            break
 
-                        if weight >= 0:
-                            yield name, weight
+                    if weight >= 0:
+                        yield name, weight
 
             return self._weighted_name_inference(weighted_names())
         except ValueError:
@@ -184,16 +182,15 @@ class EngineRegistry(UserDict):
 
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
         # only consider words longer than 2 chars & weight > 0
-        items = [(n, w) for n, w in names]
-        score = {k: 0.0 for k, _ in items}
+        items = tuple((n, w) for n, w in names if len(n) > 2)
+        names = tuple(n for n, w in items)
+        weights = dict(items)
 
-        for (x, xw), (y, yw) in combinations(items, 2):
-            d = edit_distance(x.lower(), y.lower())
-            s = 1 / (1 + d ** 2)
-            score[x] += s * xw
-            score[y] += s * yw
+        def edit_distance(name):
+            matches = process.extract(name, names, score_cutoff=0.25)
+            return sum(score * weights[name] for _, score, _ in matches)
 
-        return max(score, key=score.__getitem__)
+        return max(names, key=edit_distance)
 
     @staticmethod
     def _normalize(name: 'str'):

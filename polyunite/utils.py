@@ -31,34 +31,3 @@ class format_template(str):
 # This may seem redundant but is useful in regular expressions where the
 # prior match may have already consumed by another regular expression.
 antecedent = format_template(r'({0}?(?<={0}))')
-
-
-def edit_distance(x: str, y: str) -> float:
-    """
-    Levenshtein distance between `x` & `y`
-
-    .. seealso::
-
-        `<https://en.wikipedia.org/wiki/Levenshtein_distance#Iterative_with_two_matrix_rows>`_
-            Psuedocode & description of this implementation
-    """
-    if x == y:
-        return 0.0
-
-    if len(x) == 0:
-        return len(y)
-
-    if len(y) == 0:
-        return len(x)
-
-    v0 = list(range(0, len(y) + 1))
-    v1 = [0] * len(v0)
-
-    for i in range(len(x)):
-        v1[0] = i + 1
-        for j in range(len(y)):
-            cost = 0 if x[i] == y[j] else 1
-            v1[j + 1] = min(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost)
-        v0, v1 = v1, v0
-
-    return v0[len(y)]

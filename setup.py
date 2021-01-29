@@ -20,6 +20,7 @@ setup(
     description="polyunite parses a variety of antimalware vendor's classification strings",
     install_requires=[
         'regex~=2020.11.13',
+        'rapidfuzz~=0.14.2',
     ],
     long_description='file: README.rst',
     long_description_content_type='rst',

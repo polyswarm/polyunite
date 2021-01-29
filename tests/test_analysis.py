@@ -56,7 +56,7 @@ TEST_BOUNTIES = [
         }
     ),
     (
-        'Skeeyah', {'trojan', 'security_assessment_tool'}, {
+        'Upantix', {'trojan', 'security_assessment_tool'}, {
             'Alibaba': 'Trojan:Win32/Skeeyah.a427b927',
             'DrWeb': 'Trojan.Packed2.39727',
             'K7': 'Trojan ( 0050a9591 )',
