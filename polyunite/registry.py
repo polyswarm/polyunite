@@ -160,12 +160,12 @@ class EngineRegistry(UserDict):
                                   'Virusdie': 'Zeus-Trojan', 'QuickHeal': 'Agent'})
         Zeus
         """
-        try:
+        def weighted_names():
+            for engine, clf in self.each(families):
+                name = clf.name
 
-            def weighted_names():
-                for engine, clf in self.each(families):
-                    name = clf.name
-
+                # Only consider strings longer than 2 chars
+                if isinstance(name, str) and len(name) > 2:
                     weight = self.weights.get(engine, 1.0)
 
                     for predicate, adjustment in self.name_weights.items():
@@ -176,13 +176,10 @@ class EngineRegistry(UserDict):
                     if weight >= 0:
                         yield name, weight
 
-            return self._weighted_name_inference(weighted_names())
-        except ValueError:
-            return None
+        return self._weighted_name_inference(weighted_names())
 
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
-        # only consider words longer than 2 chars & weight > 0
-        items = tuple((n, w) for n, w in names if len(n) > 2)
+        items = tuple((n, w) for n, w in names)
         names = tuple(n for n, w in items)
         weights = dict(items)
 
@@ -190,7 +187,8 @@ class EngineRegistry(UserDict):
             matches = process.extract(name, names, score_cutoff=0.25)
             return sum(score * weights[name] for _, score, _ in matches)
 
-        return max(names, key=edit_distance)
+        if weights:
+            return max(names, key=edit_distance)
 
     @staticmethod
     def _normalize(name: 'str'):
