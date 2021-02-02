@@ -130,9 +130,11 @@ class EngineRegistry(UserDict):
         Return an iterator of unique applications of ``key`` to the decoded malware family of each
         engine in ``results``. ``top_k`` selects only the most common k applications of key.
         """
-        applied = filter(None, (key(clf) for _, clf in self.each(results)))
-        consed = (o if isinstance(o, (list, tuple, set)) else [o] for o in applied)
-        counter = Counter(sorted(chain.from_iterable(consed)))
+        applied = (key(clf) for _, clf in self.each(results))
+        filtered = filter(None, applied)
+        consed = (o if isinstance(o, (list, tuple, set)) else [o] for o in filtered)
+        flattened = sorted(chain.from_iterable(consed))
+        counter = Counter(flattened)
         return (elt for elt, _ in counter.most_common(top_k))
 
     def infer_name(self, families: Mapping[str, str]):
