@@ -95,5 +95,12 @@ def test_summarize_labels(_family, labels, results, k):
 
 @pytest.mark.parametrize('_family,labels,results', TEST_BOUNTIES)
 def test_summarize_bad_labels(_family, labels, results):
+    def keyfn(c):
+        try:
+            return c.invalid
+        except (AttributeError, LookupError, TypeError, ValueError):
+            return None
+
     k = 2
-    assert [] == list(polyunite.summarize(results, lambda o: o.invalid, top_k=k))
+
+    assert [] == list(polyunite.summarize(results, keyfn, top_k=k))
