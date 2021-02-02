@@ -1,5 +1,7 @@
 from typing import Optional
 
+from collections.abc import Iterable
+
 
 class colors:
     BLACK_FG = '\033[30m'
@@ -31,3 +33,12 @@ class format_template(str):
 # This may seem redundant but is useful in regular expressions where the
 # prior match may have already consumed by another regular expression.
 antecedent = format_template(r'({0}?(?<={0}))')
+
+
+def flatmap(fn, seqs):
+    """ Apply ``fn`` to each elt of ``seqs``, concatenating results."""
+    for elt in map(fn, seqs):
+        if isinstance(elt, Iterable) and not isinstance(elt, str):
+            yield from elt
+        else:
+            yield elt

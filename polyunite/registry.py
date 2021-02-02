@@ -21,7 +21,7 @@ from polyunite.errors import (
     PolyuniteError,
     RegistryKeyError,
 )
-from polyunite.utils import group
+from polyunite.utils import flatmap, group
 
 if TYPE_CHECKING:
     from polyunite.parsers import Classification
@@ -130,12 +130,13 @@ class EngineRegistry(UserDict):
         Return an iterator of unique applications of ``key`` to the decoded malware family of each
         engine in ``results``. ``top_k`` selects only the most common k applications of key.
         """
-        applied = (key(clf) for _, clf in self.each(results))
-        filtered = filter(None, applied)
-        consed = (o if isinstance(o, (list, tuple, set)) else [o] for o in filtered)
-        flattened = sorted(chain.from_iterable(consed))
-        counter = Counter(flattened)
-        return (elt for elt, _ in counter.most_common(top_k))
+        each = tuple(p for _, p in self.each(results))
+
+        if not each:
+            return []
+
+        ctr = Counter(sorted(filter(None, flatmap(key, each))))
+        return [elt for elt, _ in ctr.most_common(top_k)]
 
     def infer_name(self, families: Mapping[str, str]):
         """
@@ -145,6 +146,11 @@ class EngineRegistry(UserDict):
                                   'Virusdie': 'Zeus-Trojan', 'QuickHeal': 'Agent'})
         Zeus
         """
+        if not families:
+            return
+
+        name_weights = self.name_weights.items()
+
         def weighted_names(elts):
             for engine, clf in elts:
                 name = clf.name
@@ -153,7 +159,7 @@ class EngineRegistry(UserDict):
                 if isinstance(name, str) and len(name) > 2:
                     weight = self.weights.get(engine, 1.0)
 
-                    for predicate, adjustment in self.name_weights.items():
+                    for predicate, adjustment in name_weights:
                         if predicate(name):
                             weight = weight * adjustment
                             break
