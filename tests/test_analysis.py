@@ -88,6 +88,12 @@ def test_summarize_os(_family, _labels, results):
 
 
 @pytest.mark.parametrize('_family,labels,results', TEST_BOUNTIES)
-@pytest.mark.parametrize('k', range(5))
+@pytest.mark.parametrize('k', [None, *range(5)])
 def test_summarize_labels(_family, labels, results, k):
     assert labels[0:k] == list(polyunite.summarize(results, lambda o: o.labels, top_k=k))
+
+
+@pytest.mark.parametrize('_family,labels,results', TEST_BOUNTIES)
+def test_summarize_bad_labels(_family, labels, results):
+    k = 2
+    assert [] == list(polyunite.summarize(results, lambda o: o.invalid, top_k=k))
