@@ -10,6 +10,7 @@ from typing import (
 )
 
 from collections import Counter, UserDict
+from itertools import chain
 import logging
 from rapidfuzz import process
 import regex as re
@@ -124,33 +125,17 @@ class EngineRegistry(UserDict):
         results: EngineResults,
         key: Callable[['Classification'], Union[Iterable[str], str]] = None,
         top_k: int = None,
-        min_density: float = 0.0,
     ):
         """
         Return an iterator of unique applications of ``key`` to the decoded malware family of each
-        engine in ``results``. ``top_k`` selects only the most common k applications of key,
-        ``min_density`` excludes any whose frequency divided by the most common element's frequency
-        is below this value.
+        engine in ``results``. ``top_k`` selects only the most common k applications of key.
         """
-        ctr: Counter = Counter()
-
-        for _, clf in self.each(results):
-            try:
-                r = key(clf)
-                if isinstance(r, str):
-                    ctr[r] += 1
-                else:
-                    ctr.update(r)
-            except (AttributeError, LookupError, TypeError):
-                continue
-
-        most_common = ctr.most_common(top_k)
-        if len(most_common) >= 1:
-            (top, top_count), *rest = most_common
-            yield top
-            for elt, count in rest:
-                if count / top_count > min_density:
-                    yield elt
+        applied = (key(clf) for _, clf in self.each(results))
+        filtered = filter(None, applied)
+        consed = (o if isinstance(o, (list, tuple, set)) else [o] for o in filtered)
+        flattened = sorted(chain.from_iterable(consed))
+        counter = Counter(flattened)
+        return (elt for elt, _ in counter.most_common(top_k))
 
     def infer_name(self, families: Mapping[str, str]):
         """
@@ -160,8 +145,8 @@ class EngineRegistry(UserDict):
                                   'Virusdie': 'Zeus-Trojan', 'QuickHeal': 'Agent'})
         Zeus
         """
-        def weighted_names():
-            for engine, clf in self.each(families):
+        def weighted_names(elts):
+            for engine, clf in elts:
                 name = clf.name
 
                 # Only consider strings longer than 2 chars
@@ -176,7 +161,7 @@ class EngineRegistry(UserDict):
                     if weight >= 0:
                         yield name, weight
 
-        return self._weighted_name_inference(weighted_names())
+        return self._weighted_name_inference(weighted_names(self.each(families)))
 
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
         items = tuple((n, w) for n, w in names)

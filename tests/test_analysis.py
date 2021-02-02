@@ -4,7 +4,7 @@ import polyunite
 
 TEST_BOUNTIES = [
     (
-        'SubSeven', {'trojan', 'backdoor'}, {
+        'SubSeven', ['trojan', 'backdoor'], {
             'Alibaba': 'Win32/SubSeven.6ca32fd3',
             'ClamAV': 'Win.Trojan.SubSeven-38',
             'DrWeb': 'BackDoor.SubSeven.145',
@@ -14,7 +14,7 @@ TEST_BOUNTIES = [
         }
     ),
     (
-        'Qukart', {'greyware', 'backdoor', 'trojan', 'virus', 'ransomware', 'worm'}, {
+        'Qukart', ['backdoor', 'trojan', 'greyware', 'ransomware', 'virus', 'worm'], {
             'CrowdStrike Falcon': 'win/malicious',
             'DrWeb': 'BackDoor.HangUp.43882',
             'FilSecLab': 'Trojan.5137BDB1395FE83B',
@@ -29,7 +29,7 @@ TEST_BOUNTIES = [
         }
     ),
     (
-        'ShipUp', {'trojan', 'dropper'}, {
+        'ShipUp', ['trojan', 'dropper'], {
             'Alibaba': 'TrojanDropper:Win32/ShipUp.a8d51701',
             'ClamAV': 'Win.Trojan.Redirect-6055402-0',
             'DrWeb': 'Trojan.Redirect.140',
@@ -44,7 +44,7 @@ TEST_BOUNTIES = [
         }
     ),
     (
-        'Mepaow', {'trojan', 'virus', 'prepender'}, {
+        'Mepaow', ['virus', 'trojan', 'prepender'], {
             'ClamAV': 'Win.Malware.Mepaow-6725393-0',
             'DrWeb': 'Win32.HLLP.Stone.2',
             'Ikarus': 'Trojan.Win32.Mepaow',
@@ -56,7 +56,7 @@ TEST_BOUNTIES = [
         }
     ),
     (
-        'Upantix', {'trojan', 'security_assessment_tool'}, {
+        'Upantix', ['trojan', 'security_assessment_tool'], {
             'Alibaba': 'Trojan:Win32/Skeeyah.a427b927',
             'DrWeb': 'Trojan.Packed2.39727',
             'K7': 'Trojan ( 0050a9591 )',
@@ -64,7 +64,7 @@ TEST_BOUNTIES = [
         }
     ),
     (
-        'BtcMine', {'cryptominer', 'trojan'}, {
+        'BtcMine', ['cryptominer', 'trojan'], {
             'DrWeb': 'Trojan.BtcMine.3368',
             'Ikarus': 'Trojan.Win64.CoinMiner',
         }
@@ -79,9 +79,28 @@ def test_guess_malware_name(family, _labels, results):
 
 @pytest.mark.parametrize('_family,labels,results', TEST_BOUNTIES)
 def test_summarize_labels(_family, labels, results):
-    assert labels == set(polyunite.summarize(results, key=lambda o: o.labels))
+    assert set(labels) == set(polyunite.summarize(results, key=lambda o: o.labels))
 
 
 @pytest.mark.parametrize('_family,_labels,results', TEST_BOUNTIES)
 def test_summarize_os(_family, _labels, results):
     assert 'Windows' == next(polyunite.summarize(results, lambda o: o.operating_system, top_k=1))
+
+
+@pytest.mark.parametrize('_family,labels,results', TEST_BOUNTIES)
+@pytest.mark.parametrize('k', [None, *range(5)])
+def test_summarize_labels(_family, labels, results, k):
+    assert labels[0:k] == list(polyunite.summarize(results, lambda o: o.labels, top_k=k))
+
+
+@pytest.mark.parametrize('_family,labels,results', TEST_BOUNTIES)
+def test_summarize_bad_labels(_family, labels, results):
+    def keyfn(c):
+        try:
+            return c.invalid
+        except (AttributeError, LookupError, TypeError, ValueError):
+            return None
+
+    k = 2
+
+    assert [] == list(polyunite.summarize(results, keyfn, top_k=k))
