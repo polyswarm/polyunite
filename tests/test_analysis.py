@@ -84,23 +84,20 @@ def test_summarize_labels(_family, labels, results):
 
 @pytest.mark.parametrize('_family,_labels,results', TEST_BOUNTIES)
 def test_summarize_os(_family, _labels, results):
-    assert 'Windows' == next(polyunite.summarize(results, lambda o: o.operating_system, top_k=1))
+    assert 'Windows' == polyunite.summarize(results, lambda o: o.operating_system, top_k=1)[0]
 
 
 @pytest.mark.parametrize('_family,labels,results', TEST_BOUNTIES)
 @pytest.mark.parametrize('k', [None, *range(5)])
 def test_summarize_labels(_family, labels, results, k):
-    assert labels[0:k] == list(polyunite.summarize(results, lambda o: o.labels, top_k=k))
+    assert labels[0:k] == polyunite.summarize(results, lambda o: o.labels, top_k=k)
 
 
-@pytest.mark.parametrize('_family,labels,results', TEST_BOUNTIES)
-def test_summarize_bad_labels(_family, labels, results):
-    def keyfn(c):
-        try:
-            return c.invalid
-        except (AttributeError, LookupError, TypeError, ValueError):
-            return None
+@pytest.mark.parametrize('_family,_labels,results', TEST_BOUNTIES)
+def test_summarize_bad_labels(_family, _labels, results):
+    def keyfn(_):
+        return None
 
     k = 2
 
-    assert [] == list(polyunite.summarize(results, keyfn, top_k=k))
+    assert [] == polyunite.summarize(results, keyfn, top_k=k)
