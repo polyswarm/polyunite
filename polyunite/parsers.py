@@ -22,6 +22,7 @@ from polyunite.vocab import (
 )
 
 from .registry import registry
+from .utils import antecedent
 
 
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
@@ -173,20 +174,32 @@ class Alibaba(Classification):
     ({PLATFORM}[/])?
     (?:
         ((?P<nonmalware>(?P<NAME>(?P<FAMILY>eicar[.]com))))|
-        {IDENT([r'[a-z]+', r'[A-Z]{2}'], [r'[.]ali[0-9a-f]+'])}
+        {IDENT([r'[a-z]+', r'[A-Z]{2}'], [r'[.]ali[0-9a-f]+', '[.]None'])}
     )?
     $"""
 
 
 class ClamAV(Classification):
     pattern = rf"""^
-    ((?P<PREFIX>BC|Clamav))?
-    ((\.|^)({PLATFORM}|{LABELS}|{OBFUSCATIONS}))*?([.]|$)
+    (?:BC|Clamav)?
+    (?|
+        ((\.|^)(
+            {PLATFORM}
+            | {HEURISTICS}
+            | {LABELS}
+            | {OBFUSCATIONS}
+            | Revoked[.]Certificate
+        ))*?
+        | Blacklist[.]CRT
+    )
     (?P<NAME>
-        (?P<FAMILY>{CVE_PATTERN}|\w+)
-        ((\:\w|\/\w+))*
-        (-(?P<VARIANT>[\-0-9]+))
-    )?
+        (([./]|^){FAMILY_ID(r'[A-Z](?:[[:alnum:]]|_)+',
+                            r'Test[.]File',
+                            r'[[:alpha:]]+(?=-)',
+                            r'(?P<HEURISTICS>Agent[0-9]+)')})?
+        {VARIANT_ID(r'([-.:][[:xdigit:]]+)?-[0-9]+(?:-[0-9])?',
+                    r'/CRDF(?:-[[:alnum:]])?')}
+    )
     $"""
 
 
@@ -202,26 +215,43 @@ class DrWeb(Classification):
 
 class Ikarus(Classification):
     pattern = rf"""^
-    ({HEURISTICS}\:?)?
-    ((\A|[.]|\b)(-?{LABELS}|{OBFUSCATIONS}|{PLATFORM}|Patched))*
-    ((\A|[.]|\b)
-        (?P<NAME>
-            (?P<FAMILY>{CVE_PATTERN}|BO|([i0-9]?[A-Z][\w_-]{{2,}}))?
-            (?P<VARIANT>
-                [.]([0-9]+|[a-z]+|[A-Z]+|[A-F0-9]+) |
-                (?i:[.#@!]\L<suffixes>)
-             ){{,2}}
+    (
+        (?:[.:]|^)
+        (?:
+            {LABELS}(-?(?&LABELS)|[a-zA-Z0-9]+)?
+            | {PLATFORM}
+            | AD
+            | Patched
         )
-        ([.]({OSES}|{LANGS}|{MACROS}|{HEURISTICS}))?
+    )*
+    (?:
+        (?:^|[.])
+        (?P<NAME>
+            (?: {FAMILY_ID(r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)')}?
+                {VARIANT_ID(r'[A-Z][a-z][a-z]',
+                            r'[.]([0-9]+|[a-z]+|[A-Z]+|[A-F0-9]+)')}{{,2}}
+                | .{{3,}}))
+        (?:[.]{PLATFORM})?
     )?
     $"""
 
 
 class Jiangmin(Classification):
     pattern = rf"""^
-    ({HEURISTICS}:?)?
-    ((({LABELS}{{,2}})|{OBFUSCATIONS}|{PLATFORM})[./]|\b)+
-    {IDENT(["cnPeace", r"[A-Z][a-z]+-[0-9]"], [r"[a-z]+[0-9]"])}?
+    (?:
+        (?:[./:]|^)
+        (?:
+            {HEURISTICS}
+            | Intended
+            | Garbage
+            | {LABELS}(-?(?&LABELS))?
+            | {OBFUSCATIONS}
+            | {PLATFORM}
+        )
+    )*
+    (?P<NAME>
+        (([./]|^){FAMILY_ID(r'cnPeace')})?
+        {VARIANT_ID(r'[.][[:alnum:]]+$')}{{,2}})
     $"""
 
 
@@ -244,45 +274,71 @@ class Lionic(Classification):
     pattern = rf"""^
     {LABELS}?
     ((\A|[.]){PLATFORM})*
-    ((\A|[.]){IDENT()})?
+    (?P<NAME>
+        (([.]|^){FAMILY_ID(r"[0-9A-Z][a-zA-Z0-9]_[0-9]")})?
+        {VARIANT_ID()}{{,2}})?
     $"""
 
 
 class NanoAV(Classification):
     pattern = rf"""^
-    (?:Marker[.])?
-    (({PLATFORM}|Text|{LABELS}|{OBFUSCATIONS})(?:$|[.-]))*
-    ({IDENT(["hidIFrame", "(?i:Iframe-scroll)", r"[A-Z][a-z]+[-][A-Z][a-z]+"])})
+    ((?:[.-]|^)
+        (?:
+            {PLATFORM}
+            | Riff
+            | {LABELS}
+            | {OBFUSCATIONS}
+        )
+    )*
+    (?P<NAME>
+        (([./]|^){FAMILY_ID(r'hidIFrame',
+                            r'(?i:Iframe-scroll)',
+                            r'[A-Z][[:alnum:]]+')})?
+        {VARIANT_ID()}{{,2}}
+    )
     $"""
 
 
 class Qihoo360(Classification):
     pattern = rf"""^
-    ({HEURISTICS}[/.])?
+    (?=[a-z](?i))
+    {HEURISTICS}?
     (
+        (?:[./-]|^)
         (?:
-            (Application) |
-            ({PLATFORM}) |
-            ({LABELS}) |
-            (QVM\d+([.]\d+)?([.]\p{{Hex_Digit}}+)?) # QVM40.1.BB16 or QVM9
+            Application
+            | Sorter
+            | AVE
+            | (?<HEURISTICS>AutoVirus)
+            | {PLATFORM}
+            | {LABELS}
+            | (QVM\d+([.]\d+)?([.]\p{{Hex_Digit}}+)?) # QVM40.1.BB16 or QVM9
         )
-        ([./]|$)
     )*
-    (?<![A-Z](?i))
-    {IDENT([r'([A-Za-z]+-[A-Za-z]+)'])}
+    (?P<NAME>
+        ([./]{FAMILY_ID()})?
+        (({VARIANT_ID()}{{,2}}))?
+    )
     $"""
 
 
 class QuickHeal(Classification):
     pattern = rf"""^
-    ({HEURISTICS}\.)?
-        (([.]|\/|^)(?:{PLATFORM}|{LABELS}+(?!\w)))*
-        # This trailing (\)$) handle wierd cases like 'Adware)' or 'PUP)'
-        ((\)$))?
-        (
-            ([./]|^)
-            {IDENT([r'VirXXX-[A-Z]'], [r'[.][[:xdigit:]]+'])}
+    (?:
+        (?:[./]|^)
+        (?:{PLATFORM}|{LABELS}(?&LABELS)?|Cmd)
+    )*
+    (?P<NAME>
+        (?:
+            (?:[./]|^)
+            {FAMILY_ID(r'VirXXX-[A-Z]')}
         )?
+        {VARIANT_ID(
+            r'[.]S[[:xdigit:]]+',
+            r'[.][A-Z]+[0-9]+',
+            r'[.][[:xdigit:]]+'
+            )}{{,2}}
+    )
     $"""
 
 
@@ -321,17 +377,17 @@ class Tachyon(Classification):
     )*
     /(?:(?:{PLATFORM}|\w+)[.-])?
     (?P<NAME>
-        {FAMILY_ID([r'(?!CVE-)[-a-zA-Z0-9]{4,}'])}
+        {FAMILY_ID(r'(?!CVE-)[-a-zA-Z0-9]{4,}')}
         ([.](?P<SIZE>[0-9]+))?
-        ({VARIANT_ID([r'[.]Zen'])}{{,2}}?)?
+        ({VARIANT_ID(r'[.]Zen')}{{,2}}?)?
     )$"""
 
 
 class Virusdie(Classification):
     pattern = rf"""^
     ({HEURISTICS})?
-    ((\A|[.])({PLATFORM}|{LABELS}))*
-    (?i:(\A|[.]){IDENT()})?
+    (?:(?:^|[.])({PLATFORM}|{LABELS}))*
+    (?i:(^|[.]){IDENT([r'[[:alpha:]]+[.][[:alpha:]]'])})?
     $"""
 
 

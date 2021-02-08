@@ -1,40 +1,168 @@
 {
-    "7zip": {
-        "__alias__": [
-            "7Z"
-        ],
-        "__desc__": "7zip"
+  "group": "archives",
+  "children": {
+    "SEVENZIP": {
+      "description": "7zip",
+      "match": [
+        "7Z",
+        "7zip"
+      ]
     },
-    "APM": "APM",
-    "ARJ": "ARJ",
-    "AutoIt": "AutoIT scripts",
-    "BINHEX": "BINHEX",
-    "BZIP": "BZIP",
-    "CAB": "CAB",
-    "CHM": "CHM",
-    "CPIO": "CPIO",
-    "DMG": "DMG",
-    "EGG": "EGG archive",
-    "GPT": "Boot GPT",
-    "GZIP": "GZIP",
-    "HFSPLUS": "HFSPLUS",
-    "ISHIELD": "ISHIELD",
-    "InnoSetup": "Innosetup",
-    "ISO9660": "ISO9660",
-    "MBR": "Boot MBR",
-    "NSIS": "Nullsoft Installation Language",
-    "OLE": {
-        "__alias__": [
-            "OLE2"
-        ],
-        "__desc__": "Object linking and embedding"
+    "APM": {
+      "description": "APM",
+      "match": [
+        "APM"
+      ]
     },
-    "PASSWD": "Unix PASSWD",
-    "RAR": "RAR",
-    "SIS": "SIS",
-    "SZDD": "SZDD",
-    "TAR": "POSIX TAR",
-    "XAR": "XAR",
-    "XZ": "XZ",
-    "ZIP": "ZIP"
+    "ARJ": {
+      "description": "ARJ",
+      "match": [
+        "ARJ"
+      ]
+    },
+    "AutoIt": {
+      "description": "AutoIT scripts",
+      "match": [
+        "AutoIt"
+      ]
+    },
+    "BINHEX": {
+      "description": "BINHEX",
+      "match": [
+        "BINHEX"
+      ]
+    },
+    "BZIP": {
+      "description": "BZIP",
+      "match": [
+        "BZIP"
+      ]
+    },
+    "CAB": {
+      "description": "CAB",
+      "match": [
+        "CAB"
+      ]
+    },
+    "CHM": {
+      "description": "CHM",
+      "match": [
+        "CHM"
+      ]
+    },
+    "CPIO": {
+      "description": "CPIO",
+      "match": [
+        "CPIO"
+      ]
+    },
+    "DMG": {
+      "description": "DMG",
+      "match": [
+        "DMG"
+      ]
+    },
+    "EGG": {
+      "description": "EGG archive",
+      "match": [
+        "EGG"
+      ]
+    },
+    "GPT": {
+      "description": "Boot GPT",
+      "match": [
+        "GPT"
+      ]
+    },
+    "GZIP": {
+      "description": "GZIP",
+      "match": [
+        "GZIP"
+      ]
+    },
+    "HFSPLUS": {
+      "description": "HFSPLUS",
+      "match": [
+        "HFSPLUS"
+      ]
+    },
+    "ISHIELD": {
+      "description": "ISHIELD",
+      "match": [
+        "ISHIELD"
+      ]
+    },
+    "InnoSetup": {
+      "description": "Innosetup",
+      "match": [
+        "InnoSetup"
+      ]
+    },
+    "ISO9660": {
+      "description": "ISO9660",
+      "match": [
+        "ISO9660"
+      ]
+    },
+    "MBR": {
+      "description": "Boot MBR",
+      "match": [
+        "MBR"
+      ]
+    },
+    "NSIS": {
+      "description": "Nullsoft Installation Language",
+      "match": [
+        "NSIS"
+      ]
+    },
+    "PASSWD": {
+      "description": "Unix PASSWD",
+      "match": [
+        "PASSWD"
+      ]
+    },
+    "RAR": {
+      "description": "RAR",
+      "match": [
+        "RAR"
+      ]
+    },
+    "SIS": {
+      "description": "SIS",
+      "match": [
+        "SIS"
+      ]
+    },
+    "SZDD": {
+      "description": "SZDD",
+      "match": [
+        "SZDD"
+      ]
+    },
+    "TAR": {
+      "description": "POSIX TAR",
+      "match": [
+        "TAR"
+      ]
+    },
+    "XAR": {
+      "description": "XAR",
+      "match": [
+        "XAR"
+      ]
+    },
+    "XZ": {
+      "description": "XZ",
+      "match": [
+        "XZ"
+      ]
+    },
+    "ZIP": {
+      "description": "ZIP",
+      "match": [
+        "ZIP"
+      ]
+    }
+  }
 }

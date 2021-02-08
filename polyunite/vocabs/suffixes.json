@@ -1,23 +1,172 @@
 {
-    "suffixes": {
-        "bit": "an internal category used to refer to some threats",
-        "cl": "an internal category used to refer to some threats",
-        "dam": "damaged malware",
-        "dha": "an internal category used to refer to some threats",
-        "dll": "Dynamic Link Library component of a malware",
-        "based": "containers characteristics usual to a particular class of malware",
-        "dr": "dropper component of a malware",
-        "gen": "malware that is detected using a generic signature",
-        "siggen": "malware that is detected using a generic signature",
-        "kit": "virus constructor",
-        "ldr": "loader component of a malware",
-        "origin": "unpacked variant",
-        "pak": "compressed malware",
-        "pfn": "an internal category used to refer to some threats",
-        "plock": "an internal category used to refer to some threats",
-        "plugin": "plug-in component",
-        "remnants": "remnants of a virus",
-        "rfn": "an internal category used to refer to some threats",
-        "rootkit": "rootkit component of that malware"
+    "group": "suffixes",
+    "children": {
+        "bit": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                "!bit"
+            ]
+        },
+        "cl": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                "!cl",
+                ".Cl"
+            ]
+        },
+        "cv": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                "!cv"
+            ]
+        },
+        "cur": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                ".cur",
+                ".cur1"
+            ]
+        },
+        "dam": {
+            "description": "damaged malware",
+            "match": [
+                ".dam",
+                ".dam#1",
+                ".dam#2",
+                ".dam#3"
+            ]
+        },
+        "dha": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                "!dha"
+            ]
+        },
+        "dll": {
+            "description": "Dynamic Link Library component of a malware",
+            "match": [
+                "#dll",
+                ".dll",
+                "@dll"
+            ]
+        },
+        "based": {
+            "description": "containers characteristics usual to a particular class of malware",
+            "match": [
+                "-based",
+                ".based"
+            ]
+        },
+        "dr": {
+            "description": "dropper component of a malware",
+            "match": [
+                ".Dr"
+            ]
+        },
+        "gen": {
+            "description": "malware that is detected using a generic signature",
+            "match": [
+                ".gen",
+                ".heur",
+                ".generic"
+            ]
+        },
+        "siggen": {
+            "description": "malware that is detected using a generic signature",
+            "match": [
+                ".siggen"
+            ]
+        },
+        "Zen": {
+            "description": "ALibaba specific field",
+            "match": [
+                ".Zen"
+            ]
+        },
+        "MUE": {
+            "description": "Who knows what it means",
+            "match": [
+                ".mue"
+            ]
+        },
+        "kit": {
+            "description": "virus constructor",
+            "match": [
+                ".kit"
+            ]
+        },
+        "ldr": {
+            "description": "loader component of a malware",
+            "match": [
+                ".ldr"
+            ]
+        },
+        "origin": {
+            "description": "unpacked variant",
+            "match": [
+                "-origin",
+                ".origin"
+            ]
+        },
+        "pak": {
+            "description": "compressed malware",
+            "match": [
+                ".pak"
+            ]
+        },
+        "pfn": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                ".pfn"
+            ]
+        },
+        "plock": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                ".plock"
+            ]
+        },
+        "plugin": {
+            "description": "plug-in component",
+            "match": [
+                ".plugin"
+            ]
+        },
+        "remnants": {
+            "description": "remnants of a virus",
+            "match": [
+                "!remnants"
+            ]
+        },
+        "rfn": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                "!rfn"
+            ]
+        },
+        "rootkit_suffix": {
+            "description": "rootkit component of that malware",
+            "match": [
+                "!rootkit"
+            ]
+        },
+        "mm": {
+            "description": "mass mailer",
+            "match": [
+                "@mm"
+            ]
+        },
+        "m": {
+            "description": "mass mailer",
+            "match": [
+                "@m"
+            ]
+        },
+        "mue": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                ".mue"
+            ]
+        }
     }
 }

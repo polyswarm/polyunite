@@ -1,73 +1,74 @@
 {
+  "group": "obfuscations",
+  "children": {
     "packing": {
-        "__alias__": [
-            "pack(er|ed)?",
-            "obfuscator",
-            "msilobfuscator",
-            "encoder",
-
-            "parite",
-            "kriz",
-            "magistr",
-            "polipos",
-            "md5sect",
-            "upx",
-            "fsg",
-            "swizzor",
-            "petite",
-            "pespin",
-            "wwpack",
-            "nspack",
-            "mew",
-            "upack",
-            "aspack",
-            "matchicon",
-            "imptbl",
-
-            "malpack",
-            "encpk",
-            "malob",
-            "genpack",
-            "krypt",
-            "kryptk",
-            "kryptik",
-            "obfuscated",
-            "obfus",
-            "obfusc",
-            "obfuscate",
-            "malcrypt",
-            "vbcrypt",
-            "vbkrypt",
-            "vbpack",
-            "xpack",
-            "zpack",
-
-            "suspiciouspacker",
-
-            "asprotect",
-            "nspack",
-            "pecompact",
-            "upack",
-            "themida",
-            "vmprotect"
-        ],
-        "__desc__": "Packing of the malware instance code, not including encryption."
+      "description": "Packing of the malware instance code, not including encryption.",
+      "match": [
+        {
+          "pattern": "pack(er|ed)?"
+        },
+        "aspack",
+        "asprotect",
+        "encoder",
+        "encpk",
+        "fsg",
+        "genpack",
+        "imptbl",
+        "kriz",
+        "krypt",
+        "kryptik",
+        "kryptk",
+        "magistr",
+        "malcrypt",
+        "malob",
+        "malpack",
+        "matchicon",
+        "md5sect",
+        "mew",
+        "msilobfuscator",
+        "nspack",
+        "obfus",
+        "obfusc",
+        "obfuscate",
+        "obfuscated",
+        "obfuscator",
+        "packing",
+        "parite",
+        "pecompact",
+        "pespin",
+        "petite",
+        "polipos",
+        "suspiciouspacker",
+        "swizzor",
+        "themida",
+        "upack",
+        "upx",
+        "vbcrypt",
+        "vbkrypt",
+        "vbpack",
+        "vmprotect",
+        "wwpack",
+        "xpack",
+        "zpack"
+      ]
     },
-    "code-encryption": {
-        "__alias__": [
-            "cryptor",
-            "crypter",
-            "cryp",
-            "crypt",
-            "crypted",
-            "cryptic"
-        ],
-        "__desc__": "Encryption of the malware instance code."
+    "code_encryption": {
+      "description": "Encryption of the malware instance code.",
+      "match": [
+        "code-encryption",
+        "cryp",
+        "crypt",
+        "crypted",
+        "crypter",
+        "cryptic",
+        "cryptor"
+      ]
     },
     "unpacked": {
-        "__alias__": [
-            "unpacked"
-        ],
-        "__desc__": "Upacked binary or code from the original malware"
+      "description": "Upacked binary or code from the original malware",
+      "match": [
+        "unpacked"
+      ]
     }
+  }
 }

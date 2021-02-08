@@ -1,85 +1,183 @@
 {
+  "group": "operating_systems",
+  "children": {
     "Android": {
-        "__alias__": [
-            "Andr",
-            "AndroidOS"
-        ],
-        "__desc__": "Android Phone OS"
+      "description": "Android Phone OS",
+      "match": [
+        "Andr",
+        "Android",
+        "AndroidOS"
+      ]
     },
     "Boot": {
-        "__alias__": [
-            "Boot-DOS"
-        ],
-        "__desc__": "Uses or resides in the Master Boot Record (MBR) or DOS Boot Sector of an operating system"
+      "description": "Uses or resides in the Master Boot Record (MBR) or DOS Boot Sector of an operating system",
+      "match": [
+        "Boot",
+        "Boot-DOS"
+      ]
     },
-    "DOS": "MS-DOS",
-    "EPOC": "Psion devices",
-    "FreeBSD": "FreeBSD platform",
+    "DOS": {
+      "description": "MS-DOS",
+      "match": [
+        "DOS"
+      ]
+    },
+    "EPOC": {
+      "description": "Psion devices",
+      "match": [
+        "EPOC"
+      ]
+    },
+    "FreeBSD": {
+      "description": "FreeBSD platform",
+      "match": [
+        "FreeBSD"
+      ]
+    },
     "Multi": {
-        "__alias__": [
-            "System",
-            "Application",
-            "Any",
-            "Legacy",
-            "multios",
-            "Multi"
-        ]
+      "match": [
+        "Any",
+        "Application",
+        "Legacy",
+        "Multi",
+        "System",
+        "multios"
+      ]
     },
     "Linux": {
-        "__alias__": [
-            "(?i:ELF.?(Linux|ARM|x)?\\d*)"
-        ],
-        "__desc__": "Linux platform"
+      "description": "Linux platform",
+      "match": [
+        {
+          "pattern": "(?i:ELF.?(Linux|ARM|x)?\\d*)"
+        },
+        "Linux"
+      ]
     },
     "MacOSX": {
-        "__alias__": [
-            "OSX",
-            "MacOSX",
-            "Mac(?:\\_|\\s|\\.)?OS(?:\\_|\\s|\\.)?X?",
-            "MacOS",
-            "Mac"
-        ],
-        "__desc__": "MACOSX 10.0 or later"
+      "description": "MACOSX 10.0 or later",
+      "match": [
+        {
+          "pattern": "Mac(?:\\_|\\s|\\.)?OS(?:\\_|\\s|\\.)?X?"
+        },
+        "Mac",
+        "MacOS",
+        "MacOSX",
+        "OSX"
+      ]
     },
-    "OS2": "OS2 platform",
-    "Palm": "Palm operating system",
-    "Script": "Interpreted",
-    "Solaris": "System V-based Unix platforms",
-    "SunOS": "Unix platforms 4.1.3 or lower",
-    "SymbOS": "Symbian operating system",
-    "UKP": {},
+    "OS2": {
+      "description": "OS2 platform",
+      "match": [
+        "OS2"
+      ]
+    },
+    "Palm": {
+      "description": "Palm operating system",
+      "match": [
+        "Palm"
+      ]
+    },
+    "Script": {
+      "description": "Interpreted",
+      "match": [
+        "Script"
+      ]
+    },
+    "Solaris": {
+      "description": "System V-based Unix platforms",
+      "match": [
+        "Solaris"
+      ]
+    },
+    "SunOS": {
+      "description": "Unix platforms 4.1.3 or lower",
+      "match": [
+        "SunOS"
+      ]
+    },
+    "SymbOS": {
+      "description": "Symbian operating system",
+      "match": [
+        "SymbOS"
+      ]
+    },
+    "UKP": {
+      "match": [
+        "UKP"
+      ]
+    },
     "UNIX": {
-        "__desc__": "general Unix platforms"
+      "description": "general Unix platforms",
+      "match": [
+        "UNIX"
+      ]
     },
     "Windows": {
-        "Win16": "Win16 (3.1) platform",
-        "Win2K": "Windows 2000 platform",
+      "description": "Microsoft windows",
+      "match": [
+        "Win",
+        "Win32.64",
+        "Windows"
+      ],
+      "children": {
+        "Win16": {
+          "description": "Win16 (3.1) platform",
+          "match": [
+            "Win16"
+          ]
+        },
+        "Win2K": {
+          "description": "Windows 2000 platform",
+          "match": [
+            "Win2K"
+          ]
+        },
         "Win32": {
-            "__alias__": [
-                "W32"
-            ],
-            "__desc__": "Windows 32-bit platform"
+          "description": "Windows 32-bit platform",
+          "match": [
+            "W32",
+            "Win32"
+          ]
         },
         "Win64": {
-            "__alias__": [
-                "W64"
-            ],
-            "__desc__": "Windows 64-bit platform"
+          "description": "Windows 64-bit platform",
+          "match": [
+            "W64",
+            "Win64"
+          ]
         },
-        "Win95": "Windows 95, 98 and ME platforms",
-        "Win98": "Windows 98 platform only",
-        "WinCE": "Windows CE platform",
-        "WinNT": "WinNT",
-        "__alias__": [
-            "Win32.64",
-            "Win"
-        ],
-        "__desc__": "Microsoft windows"
+        "Win95": {
+          "description": "Windows 95, 98 and ME platforms",
+          "match": [
+            "Win95"
+          ]
+        },
+        "Win98": {
+          "description": "Windows 98 platform only",
+          "match": [
+            "Win98"
+          ]
+        },
+        "WinCE": {
+          "description": "Windows CE platform",
+          "match": [
+            "WinCE"
+          ]
+        },
+        "WinNT": {
+          "description": "WinNT",
+          "match": [
+            "WinNT"
+          ]
+        }
+      }
     },
     "iPhoneOS": {
-        "__alias__": [
-            "IOS"
-        ],
-        "__desc__": "IPhone"
+      "description": "IPhone",
+      "match": [
+        "IOS",
+        "iPhoneOS"
+      ]
     }
+  }
 }

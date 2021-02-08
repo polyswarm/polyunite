@@ -1,73 +1,253 @@
 {
-    "ABAP": "Advanced Business Application Programming scripts",
-    "ALisp": "ALisp scripts",
-    "ANSI": "American National Standards Institute scripts",
-    "ASP": "Active Server Pages scripts",
-    "AmiPro": "AmiPro script",
-    "AppleScript": "compiled Apple scripts",
-    "BAS": "Basic scripts",
-    "BAT": "Basic scripts",
-    "CS": "Uses the CorelScript interpreter found in many Corel products",
-    "HTA": "HTML Application scripts",
-    "HTML": {
-        "__alias__": [
-            "url",
-            "iframe"
-        ],
-        "__desc__": "HTML Application scripts"
-    },
-    "IDA": "Uses the IDA Pro application",
-    "IMAGE": {
-        "__alias__": [
-            "BMP",
-            "GIF",
-            "IMG-[A-Z]+",
-            "JPE?G",
-            "PNG",
-            "TIFF"
-        ],
-        "__desc__": "Image files"
-    },
-    "TXT": "Text file",
-    "INF": "Uses Windows INF files",
-    "INI": "Uses mIRC INI files",
-    "IRC": "mIRC/pIRC scripts",
-    "JS": "Javascript scripts",
-    "Java": "Java binaries (classes)",
-    "LOGO": "LOGO scripts",
-    "MPB": "MapBasic scripts",
-    "MSH": "Monad shell scripts",
-    "COM": {
-        "__alias__": ["ComObj"],
-        "__desc__": "Component Object Model"
-    },
-    "MSIL": ".Net intermediate language scripts",
-    "PHP": "Hypertext Preprocessor scripts",
-    "PS": "Postscript",
-    "Perl": "Perl scripts",
-    "PowerShell": "Powershell",
-    "Python": "Python scripts",
-    "SAP": "SAP platform scripts",
-    "SH": "Shell scripts",
-    "SMS": "Uses Short Messaging System (SMS) messages",
-    "VBS": {
-        "__alias__": [
-            "VB", "VBA"
-        ],
-        "__desc__": "Visual Basic scripts"
-    },
-    "WinBAT": "Winbatch scripts",
-    "WinHlp": {
-        "__alias__": [
-            "hlp"
-        ],
-        "__desc__": "Windows Help scripts"
-    },
-    "WinLNK": "Windows shortcut",
-    "WinREG": {
-        "__alias__": [
-            "REG"
-        ],
-        "__desc__": "Windows registry scripts"
+    "group": "langs",
+    "children": {
+        "ABAP": {
+            "description": "Advanced Business Application Programming scripts",
+            "match": [
+                "ABAP"
+            ]
+        },
+        "ALisp": {
+            "description": "ALisp scripts",
+            "match": [
+                "ALisp"
+            ]
+        },
+        "ANSI": {
+            "description": "American National Standards Institute scripts",
+            "match": [
+                "ANSI"
+            ]
+        },
+        "ASP": {
+            "description": "Active Server Pages scripts",
+            "match": [
+                "ASP"
+            ]
+        },
+        "AmiPro": {
+            "description": "AmiPro script",
+            "match": [
+                "AmiPro"
+            ]
+        },
+        "AppleScript": {
+            "description": "compiled Apple scripts",
+            "match": [
+                "AppleScript"
+            ]
+        },
+        "BAS": {
+            "description": "Basic scripts",
+            "match": [
+                "BAS"
+            ]
+        },
+        "BAT": {
+            "description": "Basic scripts",
+            "match": [
+                "BAT"
+            ]
+        },
+        "CS": {
+            "description": "Uses the CorelScript interpreter found in many Corel products",
+            "match": [
+                "CS"
+            ]
+        },
+        "HTA": {
+            "description": "HTML Application scripts",
+            "match": [
+                "HTA"
+            ]
+        },
+        "HTML": {
+            "description": "HTML Application scripts",
+            "match": [
+                "HTML",
+                "iframe",
+                "url"
+            ]
+        },
+        "IDA": {
+            "description": "Uses the IDA Pro application",
+            "match": [
+                "IDA"
+            ]
+        },
+        "IMAGE": {
+            "description": "Image files",
+            "match": [
+                {
+                    "pattern": "JPE?G"
+                },
+                {
+                    "pattern": "IMG-[A-Z]+"
+                },
+                "BMP",
+                "GIF",
+                "IMAGE",
+                "PNG",
+                "TIFF"
+            ]
+        },
+        "TXT": {
+            "description": "Text file",
+            "match": [
+                "TXT",
+                "Text",
+                "Text.File",
+                "Txt.File",
+                "Txt-File",
+                "Text-File",
+                "TxtFile",
+                "TextFile"
+            ]
+        },
+        "INF": {
+            "description": "Uses Windows INF files",
+            "match": [
+                {"pattern": "AutoRun[.-_]?INF"},
+                "INF"
+            ]
+        },
+        "INI": {
+            "description": "Uses mIRC INI files",
+            "match": [
+                "INI"
+            ]
+        },
+        "IRC": {
+            "description": "mIRC/pIRC scripts",
+            "match": [
+                "IRC"
+            ]
+        },
+        "JS": {
+            "description": "Javascript scripts",
+            "match": [
+                "JS"
+            ]
+        },
+        "Java": {
+            "description": "Java binaries (classes)",
+            "match": [
+                "Java"
+            ]
+        },
+        "LOGO": {
+            "description": "LOGO scripts",
+            "match": [
+                "LOGO"
+            ]
+        },
+        "MPB": {
+            "description": "MapBasic scripts",
+            "match": [
+                "MPB"
+            ]
+        },
+        "MSH": {
+            "description": "Monad shell scripts",
+            "match": [
+                "MSH"
+            ]
+        },
+        "COM": {
+            "description": "Component Object Model",
+            "match": [
+                "COM",
+                "ComObj"
+            ]
+        },
+        "MSIL": {
+            "description": ".Net intermediate language scripts",
+            "match": [
+                "MSIL"
+            ]
+        },
+        "PHP": {
+            "description": "Hypertext Preprocessor scripts",
+            "match": [
+                "PHP"
+            ]
+        },
+        "PS": {
+            "description": "Postscript",
+            "match": [
+                "PS"
+            ]
+        },
+        "Perl": {
+            "description": "Perl scripts",
+            "match": [
+                "Perl"
+            ]
+        },
+        "PowerShell": {
+            "description": "Powershell",
+            "match": [
+                "PowerShell"
+            ]
+        },
+        "Python": {
+            "description": "Python scripts",
+            "match": [
+                "Python"
+            ]
+        },
+        "SAP": {
+            "description": "SAP platform scripts",
+            "match": [
+                "SAP"
+            ]
+        },
+        "SH": {
+            "description": "Shell scripts",
+            "match": [
+                "SH"
+            ]
+        },
+        "SMS": {
+            "description": "Uses Short Messaging System (SMS) messages",
+            "match": [
+                "SMS"
+            ]
+        },
+        "VBS": {
+            "description": "Visual Basic scripts",
+            "match": [
+                "VB",
+                "VBA",
+                "VBS"
+            ]
+        },
+        "WinBAT": {
+            "description": "Winbatch scripts",
+            "match": [
+                "WinBAT"
+            ]
+        },
+        "WinHlp": {
+            "description": "Windows Help scripts",
+            "match": [
+                "WinHlp",
+                "hlp"
+            ]
+        },
+        "WinLNK": {
+            "description": "Windows shortcut",
+            "match": [
+                "LNK",
+                "WinLNK"
+            ]
+        },
+        "WinREG": {
+            "description": "Windows registry scripts",
+            "match": [
+                "REG",
+                "WinREG"
+            ]
+        }
     }
 }

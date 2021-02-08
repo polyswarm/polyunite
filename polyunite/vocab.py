@@ -20,21 +20,14 @@ class VocabRegex:
         self.parent = parent
 
         if isinstance(fields, dict):
-            self.aliases = fields.pop('__alias__', [])
-            self.description = fields.pop('__desc__', None)
+            self.match = [{'const': v} if isinstance(v, str) else v for v in fields.get('match', [])]
+            self.aliases = [v['const'] for v in self.match if 'const' in v]
+            self.patterns = [v['pattern'] for v in self.match if 'pattern' in v]
+            self.description = fields.get('description', None)
             # self.aliases.extend([n for n, v in values if isinstance(v, str)])
-            self.children = [
-                VocabRegex(n, v, parent=self) for n, v in fields.items() if not n.startswith('__')
-            ]
-        elif isinstance(fields, str):
-            self.children = []
-            self.aliases = []
-            self.description = fields
+            self.children = [VocabRegex(n, v, parent=self) for n, v in fields.get('children', dict()).items()]
         else:
             raise ValueError(name, fields)
-
-        if parent:
-            self.aliases.append(name)
 
     @lru_cache(typed=True)
     def compile(self, start: 'int' = 0, end: 'int' = 1) -> 're.Pattern':
@@ -45,7 +38,9 @@ class VocabRegex:
         """Convert this grouped regular expression pattern"""
         use_group_name = start <= self.depth <= end and self.name.isidentifier()
         name = self.name if use_group_name else None
-        return group(*(c.pattern(start, end) for c in self.children), *self.aliases, name=name)
+        return group(
+            *(c.pattern(start, end) for c in self.children), *self.aliases, *self.patterns, name=name
+        )
 
     def iter(self) -> 'Iterator[VocabRegex]':
         yield self
@@ -82,33 +77,40 @@ OSES = VocabRegex.from_resource('OPERATING_SYSTEMS')
 HEURISTICS = VocabRegex.from_resource('HEURISTICS')
 OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
-PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS)
+PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS, OBFUSCATIONS)
 
-CVE_PATTERN = r'(?P<CVE>((?:CVE|cve)[-_]?(?P<CVEYEAR>\d{4})[-_]?(?P<CVENTH>\d*))[A-Za-z]*)'
+CVE_PATTERN = r'(?:(?P<CVE>(?|CVE|Cve|cve)[-_]?(?P<CVEYEAR>[[:digit:]]{4})[-_]?(?P<CVENTH>[[:digit:]]+))[A-Za-z]*)'
 
 
-def VARIANT_ID(extra=[]):
+def VARIANT_ID(*extra):
     return group(
+        r'(?i:\L<suffixes>)',
         *extra,
-        rf'((?i:{antecedent:[.!@#-]}\L<suffixes>))',
-        rf'({antecedent:[.!@#]}(?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+))',
-        r'([!](@mm|@m))',
-        rf'({antecedent:[.]}[A-Z0-9]+)',
+        r'[#]\d+',
+        r'[!]ET',
+        r'[.][[:alpha:]]+[!][[:digit:]]+',
+        r'[.][[:digit:]]+[!][[:alpha:]]+',
+        r'[!][A-Z]+[.][0-9]+',
+        r'[.](?:GEN|Gen|gen)\d*',
+        r'[.!@#](?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+)',
+        r'[.](?-i:[A-Z]{,3}|[a-z]{,3}|[0-9]{,3})',
+        r'[.][[:alnum:]]',
         name='VARIANT'
     )
 
 
-def FAMILY_ID(extra=[]):
-    return group(
+def FAMILY_ID(*extra):
+    return '(?P<FAMILY>{}|(?!CVE){})'.format(
         CVE_PATTERN,
-        *extra,
-        r'([A-Za-z]{2,3}(?!$))',
-        r'(i?(?:[A-Z][A-Za-z]{2,}){i<=3:\d})',
-        r'(?P<nonmalware>(?i:eicar(?>.?test(?>.?file)?)?([.]com)?))',
-        name='FAMILY',
+        group(
+            *extra,
+            r'MS[[:digit:]]{2}-[[:digit:]]+',
+            r'(?:[a-z]?[A-Z][A-Za-z]{2,}){i<=3:[-\d]}',
+            r'(?P<nonmalware>(?i:eicar(?>.?test(?>.?file)?)?([.]com)?))',
+        ),
     )
 
 
 def IDENT(extra_families=[], extra_variants=[]):
     """Build a family & variant subpattern"""
-    return rf'(?P<NAME>{FAMILY_ID(extra_families)}?({VARIANT_ID(extra_variants)}{{,2}}?)?)'
+    return rf'(?P<NAME>{FAMILY_ID(*extra_families)}?({VARIANT_ID(*extra_variants)}{{,2}}?)?)'
