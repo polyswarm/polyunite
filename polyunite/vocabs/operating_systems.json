@@ -77,6 +77,12 @@
         "Palm"
       ]
     },
+    "Symbian": {
+        "description": "Symbian",
+        "match": [
+            "Symbian"
+        ]
+    },
     "Script": {
       "description": "Interpreted",
       "match": [
@@ -155,6 +161,7 @@
         "Win98": {
           "description": "Windows 98 platform only",
           "match": [
+            "Win9x",
             "Win98"
           ]
         },

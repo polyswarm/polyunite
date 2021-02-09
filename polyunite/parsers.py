@@ -22,7 +22,7 @@ from polyunite.vocab import (
 )
 
 from .registry import registry
-from .utils import antecedent
+from .utils import antecedent, group
 
 
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
@@ -34,7 +34,7 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
 EICAR_PATTERN = re.compile(
     r'.*(?P<FAMILY>(?P<EICAR>\L<eicarvariants>))', eicarvariants=['EICAR', 'eicar', 'Eicar']
 )
-REVERSE_NAME_REGEX = re.compile(r'(?r)([-_\w]{2,})')
+REVERSE_NAME_REGEX = re.compile(r'(?r)(?:[A-Z]+[-])?[A-Z][-_\w]{2,}(?:[.-][A-Z]+)?')
 
 
 class Classification(collections.UserDict):
@@ -193,10 +193,11 @@ class ClamAV(Classification):
         | Blacklist[.]CRT
     )
     (?P<NAME>
-        (([./]|^){FAMILY_ID(r'[A-Z](?:[[:alnum:]]|_)+',
-                            r'Test[.]File',
-                            r'[[:alpha:]]+(?=-)',
-                            r'(?P<HEURISTICS>Agent[0-9]+)')})?
+        (([./]|^){FAMILY_ID(
+                r'[A-Z](?:[[:alnum:]]|_)+',
+                r'Test[.]File',
+                r'[[:alpha:]]+(?=-)'
+            )})?
         {VARIANT_ID(r'([-.:][[:xdigit:]]+)?-[0-9]+(?:-[0-9])?',
                     r'/CRDF(?:-[[:alnum:]])?')}
     )
@@ -271,13 +272,23 @@ class K7(Classification):
 
 
 class Lionic(Classification):
-    pattern = rf"""^
-    {LABELS}?
-    ((\A|[.]){PLATFORM})*
+    pattern = group(
+        rf"""^
+    ((?:^|[.]){PLATFORM}|Email|HTTP|{LABELS}(-?(?&LABELS))?)*
     (?P<NAME>
-        (([.]|^){FAMILY_ID(r"[0-9A-Z][a-zA-Z0-9]_[0-9]")})?
-        {VARIANT_ID()}{{,2}})?
-    $"""
+        (?:
+            (?:[.]|^)
+            {FAMILY_ID(
+                r"[0-9A-Z][a-zA-Z0-9]_[0-9]",
+                r'[A-Z][a-z](?![.])',
+                r'([0-9]{{,3}})[A-Z][A-Za-z][0-9]{{4}}',
+                )}
+        )?
+        {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]')}{{,2}}
+    )
+    $""",
+        r"(?P<NAME>(?P<FAMILY>(?:[0-9]+|[A-Z])\w{3,}))",
+    )
 
 
 class NanoAV(Classification):
@@ -348,7 +359,7 @@ class Rising(Classification):
         (?P<FAMILY>{CVE_PATTERN}|[iA-Z][-\w]+?)
         (?P<PLATFORM>{PLATFORM}))
     # -----------------------------
-    ([.]?{LABELS})*
+    ((?:[.]|^){LABELS}(?:[-]?(?&LABELS))?)*
     ((\A|[.])(?&PLATFORM))*
     (?|
         [.](?&FAMILY) |
@@ -371,23 +382,23 @@ class Rising(Classification):
 class Tachyon(Classification):
     # https://tachyonlab.com/en/main_name/main_name.html
     pattern = rf"""^
-    (?:
-        (?<{HEURISTICS.name}>Abuse-Worry>) |
-        (\A|-){LABELS}
-    )*
-    /(?:(?:{PLATFORM}|\w+)[.-])?
+    (?:{PLATFORM}|{LABELS}([-]?(?&LABELS))?)[/]{PLATFORM}[.]
     (?P<NAME>
-        {FAMILY_ID(r'(?!CVE-)[-a-zA-Z0-9]{4,}')}
-        ([.](?P<SIZE>[0-9]+))?
-        ({VARIANT_ID(r'[.]Zen')}{{,2}}?)?
+        {FAMILY_ID('[A-Z][A-Z]-[A-Z][[:alpha]]+')}
+        {VARIANT_ID(r'[.][0-9]+')}{{,2}}
     )$"""
 
 
 class Virusdie(Classification):
     pattern = rf"""^
-    ({HEURISTICS})?
-    (?:(?:^|[.])({PLATFORM}|{LABELS}))*
-    (?i:(^|[.]){IDENT([r'[[:alpha:]]+[.][[:alpha:]]'])})?
+    (?:(?:^|[.])(?:{PLATFORM}|{LABELS}([-]?(?&LABELS))?))*
+    (?P<NAME>
+        (?:
+            (^|[.])
+            {FAMILY_ID(r'Exec[.]Stdio', r'Iframe[.]dnnViewState')}
+        )?
+        {VARIANT_ID()}{{,2}}
+    )
     $"""
 
 

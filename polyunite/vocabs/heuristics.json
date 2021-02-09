@@ -1,10 +1,10 @@
 {
     "group": "heuristics",
+    "tag": ["is_heuristic"],
     "children": {
         "generic": {
             "description": "Generic virus detection",
-            "match": [
-                {
+            "match": [{
                     "pattern": "heuristics?"
                 },
                 {
@@ -36,7 +36,9 @@
         },
         "family": {
             "description": "Contains characteristics usual of a particular class of viruses",
-            "match": [
+            "match": [{
+                    "pattern": "[Aa]gent[0-9]+"
+                },
                 "agent",
                 "agentad",
                 "agentb",
@@ -49,7 +51,11 @@
         "suspicious": {
             "description": "Suspicious behavior without signature match",
             "match": [
+                {
+                    "pattern": "\\bSusp?\\b"
+                },
                 "based",
+                "Abuse-Worry",
                 "behaveslike",
                 "confidence",
                 "highconfidence",

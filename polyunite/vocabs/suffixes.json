@@ -50,6 +50,12 @@
                 "@dll"
             ]
         },
+        "corrupted": {
+            "description": "Corrupted virus component",
+            "match": [
+                ".corrupted"
+            ]
+        },
         "based": {
             "description": "containers characteristics usual to a particular class of malware",
             "match": [
@@ -80,7 +86,7 @@
         "Zen": {
             "description": "ALibaba specific field",
             "match": [
-                ".Zen"
+                ".zen"
             ]
         },
         "MUE": {

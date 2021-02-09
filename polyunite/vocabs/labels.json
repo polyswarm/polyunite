@@ -106,6 +106,8 @@
                 "dwnldr",
                 "exedown",
                 "macrodown",
+                "TjnDownldr",
+                "TrjnDwnlder",
                 "malware_download"
             ]
         },
@@ -124,7 +126,8 @@
                 "exedrop",
                 "mdropper",
                 "muldrop",
-                "tjndropper"
+                "tjndropper",
+                "TjnDroppr"
             ]
         },
         "exploit_kit": {
@@ -163,6 +166,11 @@
                 {
                     "pattern": "fraud-?tool"
                 },
+                "VirusConstructor",
+                "SoftwareBndlr",
+                "SoftwareBundle",
+                "SoftwareBundler",
+                "SoftwareBndlr",
                 "Bundler",
                 "Harm",
                 "application",
@@ -380,6 +388,7 @@
                 "ransomcrypt",
                 "ransomlock",
                 "ransomware",
+                "TjnRansm",
                 "virlock"
             ]
         },
@@ -524,7 +533,9 @@
                 "irus",
                 "malware",
                 "spoofer",
-                "virus"
+                "virus",
+                "Trivial"
+
             ]
         },
         "web_bug": {
