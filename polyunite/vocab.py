@@ -88,7 +88,6 @@ def VARIANT_ID(*extra):
         *extra,
         r'[#]\d+',
         r'[!]ET',
-        r'[.](?:GEN|Gen|gen)\d*',
         r'[.!@#](?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+)',
         r'[.](?-i:[A-Z]{,3}|[a-z]{,3}|[0-9]{,3})',
         r'[.][[:alnum:]]',

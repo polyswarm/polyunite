@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import json
+import sys
+import csv
+
+import polyunite
+from contextlib import contextmanager
+from collections import defaultdict
+
+try:
+    from conftest import open_fixture
+except:
+    sys.path.append(str(Path(__file__).parent.joinpath('../tests')))
+    from conftest import open_fixture
+
+
+@contextmanager
+def build_writer():
+    output = sys.argv[1] if len(sys.argv) > 1 else '/dev/stdout'
+    with open(output, 'wt') as f:
+        writer = csv.DictWriter(f, ['engine', 'instance_id', 'classification'])
+        writer.writeheader()
+        yield writer
+
+
+def match_iter():
+    existing = defaultdict(set)
+    sfx = polyunite.vocab.SUFFIXES.compile()
+
+    with build_writer() as writer:
+        fixtures = open_fixture('engine_families.csv')
+        for row in csv.DictReader(fixtures.decode('utf-8').splitlines()):
+            engine = row['engine']
+            label = row['classification']
+            try:
+                if engine == 'K7':
+                    nlabel = label[0:label.rfind('(')]
+                else:
+                    vr = polyunite.parse(engine, label)
+                    nlabel = label
+                    gd = vr.match.groupdict()
+                    var = gd.pop('VARIANT', None)
+                    if var and len(var) - 2 < len(label):
+                        if nlabel.endswith(var):
+                            if sfx.search(var):
+                                pass
+                            else:
+                                nlabel = nlabel[0:-len(var)+1]
+
+                nlabel = (len(label), nlabel)
+            except Exception as e:
+                print('Error: ', e, file=sys.stderr)
+                pass
+            else:
+                if nlabel in existing[engine]:
+                    # print(f'Duplicate: {engine}//{label} [{nlabel}]')
+                    continue
+                else:
+                    existing[engine].add(nlabel)
+
+            writer.writerow({
+                'engine': engine,
+                'instance_id': row['instance_id'],
+                'classification': label,
+            })
+
+
+match_iter()
