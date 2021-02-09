@@ -70,12 +70,8 @@
         "ddos": {
             "description": "A tool used to perform a distributed denial of service attack.",
             "match": [
-                {
-                    "pattern": "hack\\Wddoser"
-                },
-                {
-                    "pattern": "[a-z]?flooder"
-                },
+                "flooder",
+                "ddoser",
                 "DoS",
                 "ddos"
             ]
@@ -201,6 +197,7 @@
         "implant": {
             "description": "Code inserted into an existing program using a code patcher or other tool.",
             "match": [
+                {"pattern": "\\bPOS\\b"},
                 "behavior",
                 "implant"
             ]
@@ -244,7 +241,6 @@
                 "phishing",
                 "smtp",
                 "spam",
-                "spambot",
                 "spam-tool",
                 "spamtool",
                 "spammer"
@@ -310,19 +306,13 @@
             "description": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system.",
             "match": [
                 {
-                    "pattern": "infosteal(er)?"
+                    "pattern": "(?:pws|psw|password)[-_]?(?|steal(?:er)?|thief)"
                 },
-                {
-                    "pattern": "pwsteal(er)?"
-                },
-                {
-                    "pattern": "(password-)?stealer"
-                },
+                "PWS",
+                "pwsteal",
                 "gamethief",
-                "password_stealer",
-                "psw",
-                "pswtool",
-                "pws",
+                "infostealer",
+                "infothief",
                 "stealer"
             ]
         },
@@ -456,7 +446,10 @@
         "security_assessment_tool": {
             "description": "A program that can be used to gather information for unauthorized access to computer systems.",
             "match": [
+                "hack",
                 "hack-tool",
+                "psw",
+                "pswtool",
                 "hacktool",
                 "security-tool",
                 "securitytool",
@@ -471,13 +464,7 @@
             "description": "Either a small piece of code that activates a command-line interface to a system that can be used to disable security measures, open a backdoor, or download further malicious code; or a small piece of code that opens a system up for exploitation, sometimes by not necessarily involving a command-line shell.",
             "match": [
                 {
-                    "pattern": "hack\\Wexploit"
-                },
-                {
                     "pattern": "exp\\b"
-                },
-                {
-                    "pattern": "hack\\b"
                 },
                 "exploit",
                 "shellcode",
@@ -488,7 +475,7 @@
             "description": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner.",
             "match": [
                 {
-                    "pattern": "spy\\b"
+                    "pattern": "Spy(?![[:alnum:]])"
                 },
                 "Monitor",
                 "spyware",
@@ -523,9 +510,6 @@
                 },
                 "Mal",
                 "VirusOrg",
-                "alware",
-                "constructor",
-                "irus",
                 "malware",
                 "spoofer",
                 "virus",

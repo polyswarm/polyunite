@@ -62,7 +62,7 @@ class Classification(collections.UserDict):
     def __init_subclass__(cls):
         cls.regex = re.compile(
             cls.pattern,
-            re.ASCII | re.VERBOSE | re.BESTMATCH,
+            re.ASCII | re.VERBOSE,
             suffixes=list(SUFFIXES.entries),
             ignore_unused=True
         )
@@ -174,7 +174,7 @@ class Alibaba(Classification):
     ({PLATFORM}[/])?
     (?:
         ((?P<nonmalware>(?P<NAME>(?P<FAMILY>eicar[.]com))))|
-        {IDENT([r'[a-z]+', r'[A-Z]{2}'], [r'[.]ali[0-9a-f]+', '[.]None'])}
+        {IDENT([r'(?&LANGS)', r'(?&MACROS)', r'[a-z]+', r'[A-Z]{3}', r'[A-Z][a-z]{2}'], [r'[.]ali[0-9a-f]+', '[.]None'])}
     )?
     $"""
 
@@ -196,7 +196,9 @@ class ClamAV(Classification):
         (([./]|^){FAMILY_ID(
                 r'[A-Z](?:[[:alnum:]]|_)+',
                 r'Test[.]File',
-                r'[[:alpha:]]+(?=-)'
+                r'[[:alpha:]]+(?=-)',
+                r'[A-Z]{3}',
+                r'[0-9]+[A-Z][[:alpha:]]+',
             )})?
         {VARIANT_ID(r'([-.:][[:xdigit:]]+)?-[0-9]+(?:-[0-9])?',
                     r'/CRDF(?:-[[:alnum:]])?')}
@@ -206,10 +208,10 @@ class ClamAV(Classification):
 
 class DrWeb(Classification):
     pattern = rf"""^
-    ({HEURISTICS}(\s+(of\s*)?)?)?
-    ((\A|\b|[.])({LABELS}|{PLATFORM}))*
-    ((\b|[.]) # MulDrop6.38732 can appear alone or in front of another `.`
-        {IDENT()}
+    (?:(?|probably|modification\s of|modification|possible|possibly)\s)?
+    (?:(?:\b|[.])(?:{LABELS}(-?(?&LABELS))?|{PLATFORM}))*
+    (?:(?:\b|[.]) # MulDrop6.38732 can appear alone or in front of another `.`
+        {IDENT([r"PWS[.][[:alnum:]]+", r"[A-Z][a-z]{2}"], [r'[.]Log'])}
     )?
     $"""
 
@@ -223,16 +225,26 @@ class Ikarus(Classification):
             | {PLATFORM}
             | AD
             | Patched
+            | FTP
+            | X2000M
         )
     )*
     (?:
         (?:^|[.])
         (?P<NAME>
-            (?: {FAMILY_ID(r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)')}?
-                {VARIANT_ID(r'[A-Z][a-z][a-z]',
-                            r'[.]([0-9]+|[a-z]+|[A-Z]+|[A-F0-9]+)')}{{,2}}
-                | .{{3,}}))
-        (?:[.]{PLATFORM})?
+            (?: {FAMILY_ID(
+                    r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
+                    r'(?P<HEURISTICS>Agent[.][A-Z]+)',
+                    r'[A-Z]{3}',
+                    r'[A-Z][a-z]{1,2}',
+                    r'(?&LANGS)',
+                )}?
+                {VARIANT_ID(
+                    r'[.]([0-9]+|[a-z]+|[A-Z]+|[A-F0-9]+)',
+                    r'[.][A-Z][a-z][a-z]',
+                    r'[.]Gen[0-9]*',
+                )}{{,2}}
+              ))
     )?
     $"""
 
@@ -280,8 +292,8 @@ class Lionic(Classification):
             (?:[.]|^)
             {FAMILY_ID(
                 r"[0-9A-Z][a-zA-Z0-9]_[0-9]",
-                r'[A-Z][a-z](?![.])',
                 r'([0-9]{{,3}})[A-Z][A-Za-z][0-9]{{4}}',
+                r'[A-Z]{3}',
                 )}
         )?
         {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]')}{{,2}}
@@ -342,7 +354,8 @@ class QuickHeal(Classification):
     (?P<NAME>
         (?:
             (?:[./]|^)
-            {FAMILY_ID(r'VirXXX-[A-Z]')}
+            {FAMILY_ID(r'VirXXX-[A-Z]',
+                       rf'(?P<{HEURISTICS.name}>Agent[.][[:alnum:]]+)')}
         )?
         {VARIANT_ID(
             r'[.]S[[:xdigit:]]+',

@@ -1,6 +1,12 @@
 {
     "group": "langs",
     "children": {
+        "AutoHotKey":{
+            "match": [
+                "AutohotKey",
+                "AHK"
+            ]
+        },
         "ABAP": {
             "description": "Advanced Business Application Programming scripts",
             "match": [
@@ -164,6 +170,11 @@
             "description": ".Net intermediate language scripts",
             "match": [
                 "MSIL"
+            ]
+        },
+        "MusicMaker": {
+            "match": [
+                "MMM"
             ]
         },
         "PHP": {

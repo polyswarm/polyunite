@@ -73,6 +73,7 @@
             "description": "malware that is detected using a generic signature",
             "match": [
                 ".gen",
+                "-gen",
                 ".heur",
                 ".generic"
             ]
@@ -105,6 +106,13 @@
             "description": "loader component of a malware",
             "match": [
                 ".ldr"
+            ]
+        },
+        "packed": {
+            "description": "packed malawre",
+            "match": [
+                ".packed",
+                "-packed"
             ]
         },
         "origin": {

@@ -7,12 +7,7 @@
             "match": [{
                     "pattern": "heuristics?"
                 },
-                {
-                    "pattern": "gen{i<=1:[a-z0-9]}"
-                },
-                {
-                    "pattern": "generic{i<=1:[a-z0-9]}"
-                },
+                      "Gen",
                 "advml",
                 "attribute",
                 "behaveslike",
@@ -36,8 +31,9 @@
         },
         "family": {
             "description": "Contains characteristics usual of a particular class of viruses",
-            "match": [{
-                    "pattern": "[Aa]gent[0-9]+"
+            "match": [
+                {
+                    "pattern": "Agent[0-9]+"
                 },
                 "agent",
                 "agentad",
@@ -54,7 +50,6 @@
                 {
                     "pattern": "\\bSusp?\\b"
                 },
-                "based",
                 "Abuse-Worry",
                 "behaveslike",
                 "confidence",

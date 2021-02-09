@@ -32,7 +32,7 @@ class VocabRegex:
     @lru_cache(typed=True)
     def compile(self, start: 'int' = 0, end: 'int' = 1) -> 're.Pattern':
         """Compile regex, name groups for fields nested at least ``start`` and at most ``end`` deep"""
-        return re.compile(self.pattern(start, end), re.IGNORECASE | re.BESTMATCH)
+        return re.compile(self.pattern(start, end), re.IGNORECASE)
 
     def pattern(self, start: 'int' = 0, end: 'int' = 1) -> 'str':
         """Convert this grouped regular expression pattern"""
@@ -90,7 +90,7 @@ def VARIANT_ID(*extra):
         r'[!]ET',
         r'[.!@#](?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+)',
         r'[.](?-i:[A-Z]{,3}|[a-z]{,3}|[0-9]{,3})',
-        r'[.][[:alnum:]]',
+        r'[.!][[:alnum:]]',
         name='VARIANT'
     )
 
@@ -103,10 +103,9 @@ def FAMILY_ID(*extra, heuristics=True):
         CVE_PATTERN,
         group(
             *extra,
-            r'MS[[:digit:]]{2}-[[:digit:]]+',
-            r'(?:[a-z]?[A-Z][A-Za-z]{3,})',
-            r'(?:[A-Z][A-Za-z]{2,}){i<=3:[-\d]}',
-            r'(?P<nonmalware>(?i:eicar(?>.?test(?>.?file)?)?([.]com)?))',
+            r'MS\d{2}-\d{,8}',
+            r'[A-Z][a-z][a-z]',
+            r'(?:[a-z]|\d|\d\d)?[A-Z]([[:alpha:]]{3,}){i<=2:[0-9-_]}\d{,4}',
         )
     )
 
