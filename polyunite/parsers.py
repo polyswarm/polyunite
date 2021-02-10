@@ -61,10 +61,7 @@ class Classification(collections.UserDict):
     @classmethod
     def __init_subclass__(cls):
         cls.regex = re.compile(
-            cls.pattern,
-            re.ASCII | re.VERBOSE,
-            suffixes=list(SUFFIXES.entries),
-            ignore_unused=True
+            cls.pattern, re.ASCII | re.VERBOSE, suffixes=list(SUFFIXES.entries), ignore_unused=True
         )
         registry.register(cls, cls.__name__)
 
@@ -260,10 +257,9 @@ class Ikarus(Classification):
     (?P<VEID>
       (?:
           (?:^|[.:])
-            {FAMILY_ID(
-            r'(?<=Exploit[.]).*$',
-            r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
-          )}
+          {FAMILY_ID(
+            r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)'
+           )}
        )?
        {VARIANT_ID(
                 r'20[0-9]{2}-[0-9]{1,6}',
@@ -278,8 +274,8 @@ class Ikarus(Classification):
                 r'[.][A-Z][a-z0-9]$',
                 r'[:][[:alpha:]]+',
        )}{{,2}}
-    )?
-    (?:[.](?:(?&OPERATING_SYSTEMS)|(?&LANGS)|(?&MACROS)|(?&OBFUSCATIONS)))?
+        (?:[.](?:(?&OPERATING_SYSTEMS)|(?&LANGS)|(?&MACROS)|(?&OBFUSCATIONS)))?
+    )
     $"""
 
 
