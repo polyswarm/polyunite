@@ -20,7 +20,7 @@ from polyunite.vocab import (
     VARIANT_ID,
 )
 
-from .registry import registry
+from .registry import EngineRegistry
 from .utils import group
 
 
@@ -60,7 +60,7 @@ class Classification(collections.UserDict):
     @classmethod
     def __init_subclass__(cls):
         cls.regex = re.compile(cls.pattern, re.ASCII | re.VERBOSE)
-        registry.register(cls, cls.__name__)
+        EngineRegistry.register(cls, cls.__name__)
 
     @classmethod
     def from_string(cls, name: 'str') -> 'Classification':
@@ -104,8 +104,12 @@ class Classification(collections.UserDict):
 
     @property
     def av_vendor(self) -> str:
+        return self.registration_name()
+
+    @classmethod
+    def registration_name(cls):
         """Engine / AV vendor's name"""
-        return self.__class__.__name__
+        return cls.__name__
 
     @property
     def is_EICAR(self):
