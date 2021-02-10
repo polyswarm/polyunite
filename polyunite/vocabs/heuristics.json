@@ -1,63 +1,72 @@
 {
-    "generic": {
-        "__alias__": [
-            "advml",
-            "attribute",
-            "bloodhound",
-            "cloud",
-            "gen",
-            "igeneric",
-            "tsgeneric",
-            "generic[a-z]*",
-            "genetic",
-            "genmalicious",
-            "genome",
-            "heur",
-            "Heuristic",
-            "heuristics",
-            "behaveslike",
-            "kcloud",
-            "maltrec",
-            "memscan",
-            "sape",
-            "score",
-            "siggen",
-            "static",
-            "symvt",
-            "undefined"
-        ],
-        "__desc__": "Generic virus detection"
-    },
-    "family": {
-        "__alias__": [
-            "not-a-virus",
-            "agent",
-            "agentad",
-            "agentb",
-            "agentpmf",
-            "pornoasset",
-            "foreign"
-        ],
-        "__desc__": "Contains characteristics usual of a particular class of viruses"
-    },
-    "suspicious": {
-        "__alias__": [
-            "suspect",
-            "suspected",
-            "suspicious",
-            "reputation",
-            "behaveslike",
-            "lookslike",
-            "variant",
-            "possible-threat",
-            "based",
-            "possible",
-            "threat",
-            "probably",
-            "modification",
-            "confidence",
-            "highconfidence"
-        ],
-        "__desc__": "Suspicious behavior without signature match"
+    "group": "HEURISTICS",
+    "tags": ["heuristic"],
+    "children": {
+        "generic": {
+            "description": "Generic virus detection",
+            "match": [{
+                    "pattern": "heuristics?"
+                },
+                "Gen",
+                "advml",
+                "attribute",
+                "behaveslike",
+                "bloodhound",
+                "cloud",
+                "generic",
+                "genetic",
+                "genmalicious",
+                "heur",
+                "score",
+                "static",
+                "undefined"
+            ]
+        },
+        "family": {
+            "description": "Contains characteristics usual of a particular class of viruses",
+            "match": [{
+                    "pattern": "Agent[0-9]+"
+                },
+                "agent",
+                "agentad",
+                "agentb",
+                "agentpmf",
+                "Delf",
+                "family",
+                "foreign",
+                "genericnrv",
+                "genome",
+                "kcloud",
+                "maltrec",
+                "memscan",
+                "sape",
+                "symvt",
+                "undefined",
+                "vgeneric"
+            ]
+        },
+        "suspicious": {
+            "description": "Suspicious behavior without signature match",
+            "match": [{
+                    "pattern": "\\bSusp?\\b"
+                },
+                "Abuse-Worry",
+                "behaveslike",
+                "confidence",
+                "highconfidence",
+                "lookslike",
+                "modification",
+                "possible",
+                "possible-threat",
+                "probably",
+                "reputation",
+                "suspect",
+                "suspected",
+                "suspicious",
+                "threat",
+                "variant",
+                "DangerousObject"
+            ]
+        }
     }
 }

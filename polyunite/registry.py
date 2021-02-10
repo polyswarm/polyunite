@@ -9,11 +9,9 @@ from typing import (
     Union,
 )
 
-from collections import Counter, UserDict
-from itertools import chain
+from collections import Counter
 import logging
 from rapidfuzz import process
-import regex as re
 import string
 
 from polyunite.errors import (
@@ -21,7 +19,8 @@ from polyunite.errors import (
     PolyuniteError,
     RegistryKeyError,
 )
-from polyunite.utils import flatmap, group
+
+from .utils import flatmap
 
 if TYPE_CHECKING:
     from polyunite.parsers import Classification
@@ -37,38 +36,46 @@ _ENGINE_NAME_XLATE = str.maketrans(
     string.whitespace + string.punctuation,
 )
 
-from polyunite.vocab import ARCHIVES, HEURISTICS, LABELS, LANGS, MACROS, OSES
+from .vocab import (
+    ARCHIVES,
+    HEURISTICS,
+    LABELS,
+    LANGS,
+    MACROS,
+    OBFUSCATIONS,
+    OSES,
+)
 
 
-class EngineRegistry(UserDict):
+class EngineRegistry:
+    _registry = dict()
+
     def __init__(
         self,
-        *,
         weights={},
         name_weights={
-            HEURISTICS.compile().fullmatch: 0.85,
-            LABELS.compile().fullmatch: 0.65,
-            re.compile(group(LANGS, ARCHIVES, MACROS, OSES), re.IGNORECASE).fullmatch: 0.35,
+            LABELS.compile(1, 0).fullmatch: 0.80,
+            HEURISTICS.compile(1, 0).fullmatch: 0.55,
+            OBFUSCATIONS.compile(1, 0).fullmatch: 0.55,
+            LANGS.compile(1, 0).fullmatch: 0.20,
+            ARCHIVES.compile(1, 0).fullmatch: 0.20,
+            MACROS.compile(1, 0).fullmatch: 0.20,
+            OSES.compile(1, 0).fullmatch: 0.20,
         }
     ):
-        self.weights = {}
+        self.weights = {self._normalize(k): v for k, v in weights.items()}
         self.name_weights = name_weights
-
-        for engine, weight in weights.items():
-            try:
-                self.weights[self._normalize(engine)] = weight
-            except EngineNormalizeError:
-                continue
-
         super().__init__()
 
-    def __contains__(self, engine):
-        return super().__contains__(self._normalize(engine))
+    @classmethod
+    def __contains__(cls, engine):
+        return cls._registry.__contains__(cls._normalize(engine))
 
-    def __getitem__(self, engine):
+    @classmethod
+    def __getitem__(cls, engine):
         """Lookup the engine-specialized parser"""
         try:
-            return super().__getitem__(self._normalize(engine))
+            return cls._registry.__getitem__(cls._normalize(engine))
         except KeyError:
             raise RegistryKeyError(engine)
 
@@ -105,9 +112,10 @@ class EngineRegistry(UserDict):
         except PolyuniteError:
             return False
 
-    def register(self, parser: 'Type[Classification]', name: 'str'):
+    @classmethod
+    def register(cls, parser: 'Type[Classification]', name: 'str'):
         """Register `self` as the specialized class for handling parse requests """
-        self[self._normalize(name)] = parser
+        cls._registry[cls._normalize(name)] = parser
 
     def each(self, results: EngineResults) -> Iterable[Tuple[EngineName, 'Classification']]:
         """
@@ -116,7 +124,8 @@ class EngineRegistry(UserDict):
         for engine, family in results.items():
             if isinstance(family, str):
                 try:
-                    yield engine, self.decode(engine, family)
+                    clf = self.decode(engine, family)
+                    yield clf.registration_name(), clf
                 except PolyuniteError:
                     continue
 
@@ -188,6 +197,3 @@ class EngineRegistry(UserDict):
             return name.translate(_ENGINE_NAME_XLATE)
         except AttributeError as e:
             raise EngineNormalizeError(type(name)) from e
-
-
-registry = EngineRegistry()

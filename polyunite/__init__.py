@@ -1,9 +1,10 @@
-from . import errors, parsers, vocab  # noqa
-from .registry import registry  # noqa
+from . import errors, parsers, registry, vocab  # noqa
+
+Registry = registry.EngineRegistry()
 
 # NOTE: legacy interface name
-parse = registry.decode
-decode = registry.decode
-is_heuristic = registry.is_heuristic
-summarize = registry.summarize
-infer_name = registry.infer_name
+parse = Registry.decode
+decode = Registry.decode
+is_heuristic = Registry.is_heuristic
+summarize = Registry.summarize
+infer_name = Registry.infer_name

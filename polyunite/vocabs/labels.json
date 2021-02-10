@@ -1,334 +1,542 @@
 {
-    "adware": "Any software that is funded by advertising. Adware may also gather sensitive user information from a system.",
-    "appender": "File-infecting malware that places its code at the end of the files it infects, adjusting the file's entry point to cause its code to be executed before that in the original file.",
-    "backdoor": {
-        "__alias__": [
-            "proxy"
-        ],
-        "__desc__": "Malware which, once running on a system, opens a communication vector to the outside so the computer can be accessed remotely by an attacker."
-    },
-    "boot_sector_virus": "Malware that infects the master boot record of a storage device.",
-    "bot": "Malware that resides on an infected system, communicating with and forming part of a botnet. The bot may be implanted by a worm or trojan, which opens a backdoor. The bot then monitors the backdoor for further instructions.",
-    "browser_modifier": {
-        "__alias__": [
-            "bho",
-            "WebToolbar",
-            "BrowserModifier"
-        ],
-        "__desc__": "extension or plugin that modifies browser behavior"
-    },
-    "cavity_filler": "A type of file-infecting virus that seeks unused space within the files it infects, inserting its code into these gaps to avoid changing the size of the file and thus not alerting integrity-checking software to its presence.",
-    "clicker": {
-        "__alias__": [
-            "cliqker"
-        ],
-        "__desc__": "A trojan that makes a system visit a specific web page, often very frequently and usually with the aim of increasing the traffic recorded by the site and thus increasing revenue from advertising. Clickers may also be used to carry out DDoS attacks."
-    },
-    "companion_virus": "A virus that takes the place of a particular file on a system instead of injecting code into it.",
-    "data_diddler": "A type of malware that makes small, random changes to data, such as data in a spreadsheet, to render the data contained in a document inaccurate and in some cases worthless.",
-    "ddos": {
-        "__alias__": [
-            "hack\\Wddoser",
-            "flooder",
-            "[a-z]+flooder"
-        ],
-        "__desc__": "A tool used to perform a distributed denial of service attack."
-    },
-    "downloader": {
-        "__alias__": [
-            "downldr",
-            "dloader",
-            "dwnldr",
-            "dldr",
-            "dloadr",
-            "dloade",
-            "malware_download",
-            "download",
-            "\\bDL\\b",
-            "downloadguide",
-            "downloadware",
-            "dload",
-            "downware",
-            "downagent",
-            "exedown",
-            "downldexe",
-            "dropped",
-            "docdl",
-            "macrodown",
-            "dloadware"
-        ],
-        "__desc__": "Malware programmed to download and execute other files, usually more complex malware."
-    },
-    "dropper": {
-        "__alias__": [
-            "docdrop",
-            "docdrp",
-            "drop",
-            "dropr",
-            "dldrop",
-            "mdropper",
-            "muldrop",
-            "exedrop",
-            "droppr"
-        ],
-        "__desc__": "A type of Trojan that deposits an enclosed payload onto a destination host computer by loading itself into memory, extracting the malicious payload, and then writing it to the file system."
-    },
-    "exploit_kit": "A software toolkit to target common vulnerabilities.",
-    "file_infector_virus": "A virus that infects a system by inserting itself somewhere in existing files; this is the classic form of virus.",
-    "file_less": "Malware that is file-less, i.e., executes through some other mechanism such as Powershell.",
-    "fork_bomb": "A simple form of malware, a type of rabbit which launches more copies of itself. Once a fork bomb is executed, it will attempt to run several identical processes, which will do the same, the number growing exponentially until the system resources are overwhelmed by the number of identical processes running, which may in some cases bring the system down and cause a denial of service.",
-    "greyware": {
-        "__tag__": [
-            "paramalware"
-        ],
-        "__alias__": [
-            "Bundler",
-            "Harm",
-            "application",
-            "badjoke",
-            "crack",
-            "cracktool",
-            "fraud-?tool",
-            "hoax",
-            "joke",
-            "keygen",
-            "misleading",
-            "nettool",
-            "(?<=\\W)tool(?=\\W)",
-            "program",
-            "pua",
-            "puf",
-            "pup",
-            "risktool",
-            "riskware",
-            "settings-modifier",
-            "sftwrbndlr",
-            "software-bundler",
-            "swbndlr",
-            "toolbar",
-            "unwanted.?(?:program|file)"
-        ],
-        "__desc__": "Software that, while not definitely malicious, has a suspicious or potentially unwanted aspect."
-    },
-    "implant": {
-        "__alias__": [
-            "behavior"
-        ],
-        "__desc__": "Code inserted into an existing program using a code patcher or other tool."
-    },
-    "keylogger": {
-        "__alias__": [
-            "monitoring-tool"
-        ],
-        "__desc__": "A type of program implanted on a system to monitor the keys pressed and thus record any sensitive data, such as passwords, entered by the user."
-    },
-    "kleptographic_worm": "A worm that encrypts information assets on compromised systems so they can only be decrypted by the worm's author, also known as information-stealing worm.",
-    "macro_virus": {
-        "__alias__": ["macro"],
-        "__desc__": "A virus that uses a macro language, for example in Microsoft Office documents."
-    },
-    "malware_as_a_service": "Malware that is sold or produced as a service.",
-    "mass_mailer": {
-        "__alias__": [
-            "mail",
-            "email",
-            "hllm",
-            "spammer",
-            "smtp",
-            "spam",
-            "spambot",
-            "phishing"
-        ],
-        "__desc__": "A worm that uses email to propagate across the internet."
-    },
-    "metamorphic_virus": "A virus that changes its own code with each infection.",
-    "mid_infector": "A type of file_infecting virus which places its code in the middle of files it infects. It may move a section of the original code to the end of the file, or simply push the code aside to make space for its own code.",
-    "mobile_code": "Either code received from remote, possibly untrusted systems, but executed on a local system; or software transferred between systems (e.g across a network) and executed on a local system without explicit installation or execution by the recipient.",
-    "multipartite_virus": "Malware that infects boot records, boot sectors, and files.",
-    "nonmalware": {
-        "__tag__": [
-            "paramalware"
-        ],
-        "__alias__": [
-            "not-?a-?virus",
-            "(?i:eicar(?>[^a-z]?test(?>[^a-z]?file)?)?(?:[.]com)?)",
-            "test",
-            "testfile",
-            "test.file",
-            "testvirus"
-        ],
-        "__desc__": "Not a virus"
-    },
-    "parental_control": {
-        "__tag__": [
-            "paramalware"
-        ],
-        "__alias__": [
-            "monitoring-tool"
-        ],
-        "__desc__": "A program that monitors or limits machine usage. Such programs can run undetected and can transmit monitoring information to another machine."
-    },
-    "banker": {
-        "__alias__": [
-            "banker(\\d)?"
-        ],
-        "__desc__": "A type of trojan designed to perform banking fraud."
-    },
-    "password_stealer": {
-        "__alias__": [
-            "pws",
-            "pswtool",
-            "psw",
-            "stealer",
-            "(password-)?stealer",
-            "pwsteal(er)?",
-            "infosteal(er)?"
-        ],
-        "__desc__": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system."
-    },
-    "injector": {
-        "__alias__": [
-            "(vb|cee|aut|autoit|crypt(o)?|delf)?inject(\\d|or)?",
-            "resident"
-        ],
-        "__desc__": "A type of trojan that injects itself into other processes or files."
-    },
-    "infector": {
-        "__alias__": [
-            "infect(or)?"
-        ],
-        "__desc__": "A type of trojan that spreads by attaching its code to other files."
-    },
-    "polymorphic_virus": "A type of virus that encrypts its code differently with each infection (or with each generation of infections).",
-    "sms": {
-        "__alias__": ["((?<=trojan).?|(?<=[./-_\\s]))(?-i:SMS)(?!\\w)"],
-        "__desc__": "Malware that uses SMS for malicious purpose"
-    },
-    "premium_dialer_smser": {
-        "__alias__": ["dialer", "porn\\W?dialer"],
-        "__desc__": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers."
-    },
-    "prepender": {
-        "__alias__": ["hllp"],
-        "__desc__": "A file-infecting virus that inserts code at the beginning of the files it infects."
-    },
-    "ransomware": {
-        "__alias__": [
-            "ansom",
-            "ransom",
-            "ransom-?encoder",
-            "virlock",
-            "ransomlock",
-            "ransomcrypt",
-            "filecoder",
-            "filecryptor"
-        ],
-        "__desc__": "Malware that encrypts files on a victim's system, demanding payment of ransom in return for the access codes required to unlock files."
-    },
-    "remote_access_trojan": {
-        "__alias__": [
-            "rat",
-            "remote-access",
-            "remoteadmin",
-            "remote\\W?admin"
-        ],
-        "__desc__": "A remote access trojan program (or RAT), is a trojan horse capable of controlling a machine through commands issued by a remote attacker."
-    },
-    "resource_exploiter": {
-        "__alias__": [
-            "zipbomb"
-        ],
-        "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles)."
-    },
-    "cryptominer": {
-        "__alias__": [
-            "miner",
-            "btcmine",
-            "coinminer",
-            "coinhive",
-            "(bitcoin|bit|crypto|btc|eth)?coinminer"
-        ],
-        "__desc__": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner, to use them for cryptocurrency mining without user permission."
-    },
-    "rogue_security_software": {
-        "__alias__": [
-            "rogue"
-        ],
-        "__desc__": "A fake security product that demands money to clean phony infections."
-    },
-    "rootkit": "A method of hiding files or processes from normal methods of monitoring; often used by malware to conceal its presence and activities.",
-    "scareware": "A program that reports false or significantly misleading information on the presence of security risks, threats, or system issues on the target computer.",
-    "screen_capture": "A type of malware used to capture images from the target systems screen, used for exfiltration and command and control.",
-    "security_assessment_tool": {
-        "__tag__": [
-            "paramalware"
-        ],
-        "__alias__": [
-            "virtool",
-            "hack-?tool",
-            "hktl",
-            "securitytool",
-            "security-?tool",
-            "spam(?:tool)?",
-            "crack(?:tool)?",
-            "gamehack"
-        ],
-        "__desc__": "A program that can be used to gather information for unauthorized access to computer systems."
-    },
-    "exploit": {
-        "__tag__": [
-            "paramalware"
-        ],
-        "__alias__": [
-            "shellkode",
-            "hack\\Wexploit",
-            "hack\\b",
-            "exp\\b",
-            "exploit"
-        ],
-        "__desc__": "Either a small piece of code that activates a command-line interface to a system that can be used to disable security measures, open a backdoor, or download further malicious code; or a small piece of code that opens a system up for exploitation, sometimes by not necessarily involving a command-line shell."
-    },
-    "spyware": {
-        "__alias__": [
-            "Monitor",
-            "spy\\b"
-        ],
-        "__desc__": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner."
-    },
-    "trackware": {
-        "__alias__": ["AdDisplay"],
-        "__desc__": "Malware that traces a user's path on the Internet and sends information to third parties. Compare to spyware, which monitors system activity to capture confidential information such as passwords."
-    },
-    "trojan": {
-        "__alias__": [
-            "trojanhorse"
-        ],
-        "__desc__": "Malware disguised as something inert or benign."
-    },
-    "virus": {
-        "__alias__": [
-            "irus",
-            "VirusOrg",
-            "spoofer",
-            "constructor",
-            "malware",
-            "Mal",
-            "alware"
-        ],
-        "__desc__": "Self-replicating malware that requires human interaction to spread; also, self-replicating malware that runs and spreads by modifying and inserting itself into other programs or files."
-    },
-    "web_bug": {
-        "__tag__": [
-            "paramalware"
-        ],
-        "__desc__": "Code embedded in a web page or email that checks whether a user has accessed the content (e.g., a tiny, transparent GIF image)."
-    },
-    "worm": {
-        "__alias__": [
-            "(?:im|net|I|p2p|smtp)[-./]?worm",
-            "(i-)?worm[./-](?:im|net|i|p2p|smtp)",
-            "hllw"
-        ],
-        "__desc__": "Self-replicating malware that propagates across a network either with or without human interaction."
+    "group": "LABELS",
+    "children": {
+        "adware": {
+            "description": "Any software that is funded by advertising. Adware may also gather sensitive user information from a system.",
+            "match": [{
+                    "pattern": "(?<!\\w)AD(?!\\w)"
+                },
+                "adware",
+                "AdInstaller"
+            ]
+        },
+        "appender": {
+            "description": "File-infecting malware that places its code at the end of the files it infects, adjusting the file's entry point to cause its code to be executed before that in the original file.",
+            "match": [
+                "appender"
+            ]
+        },
+        "backdoor": {
+            "description": "Malware which, once running on a system, opens a communication vector to the outside so the computer can be accessed remotely by an attacker.",
+            "match": [
+                "backdoor",
+                "backdoorr",
+                {
+                    "pattern": "(?<!\\w)BC(?!\\w)",
+                    "description": "Backdoor Connector"
+                },
+                "proxy"
+            ]
+        },
+        "boot_sector_virus": {
+            "description": "Malware that infects the master boot record of a storage device.",
+            "match": [
+                "boot_sector_virus"
+            ]
+        },
+        "bot": {
+            "description": "Malware that resides on an infected system, communicating with and forming part of a botnet. The bot may be implanted by a worm or trojan, which opens a backdoor. The bot then monitors the backdoor for further instructions.",
+            "match": [
+                "bot",
+                "ircbot"
+            ]
+        },
+        "browser_modifier": {
+            "description": "extension or plugin that modifies browser behavior",
+            "match": [
+                "BrowserModifier",
+                "WebToolbar",
+                "Hijacker",
+                "bho",
+                "browser_modifier"
+            ]
+        },
+        "cavity_filler": {
+            "description": "A type of file-infecting virus that seeks unused space within the files it infects, inserting its code into these gaps to avoid changing the size of the file and thus not alerting integrity-checking software to its presence.",
+            "match": [
+                "cavity_filler"
+            ]
+        },
+        "clicker": {
+            "description": "A trojan that makes a system visit a specific web page, often very frequently and usually with the aim of increasing the traffic recorded by the site and thus increasing revenue from advertising. Clickers may also be used to carry out DDoS attacks.",
+            "match": [
+                "clicker",
+                "cliqker"
+            ]
+        },
+        "companion_virus": {
+            "description": "A virus that takes the place of a particular file on a system instead of injecting code into it.",
+            "match": [
+                "companion_virus"
+            ]
+        },
+        "data_diddler": {
+            "description": "A type of malware that makes small, random changes to data, such as data in a spreadsheet, to render the data contained in a document inaccurate and in some cases worthless.",
+            "match": [
+                "data_diddler"
+            ]
+        },
+        "ddos": {
+            "description": "A tool used to perform a distributed denial of service attack.",
+            "match": [
+                "im-flooder",
+                "flooder",
+                "ddoser",
+                "DoS",
+                "ddos"
+            ]
+        },
+        "downloader": {
+            "description": "Malware programmed to download and execute other files, usually more complex malware.",
+            "match": [{
+                    "pattern": "\\bDL\\b"
+                },
+                "dldr",
+                "dload",
+                "dloade",
+                "dloader",
+                "dloadr",
+                "dloadware",
+                "docdl",
+                "downagent",
+                "Downlaoder",
+                "Downlder",
+                "downldexe",
+                "downldr",
+                "download",
+                "downloader",
+                "downloadguide",
+                "downloadware",
+                "downware",
+                "dwnldr",
+                "exedown",
+                "macrodown",
+                "malware_download",
+                "TjnDownldr",
+                "TrjnDwnlder"
+            ]
+        },
+        "dropper": {
+            "description": "A type of Trojan that deposits an enclosed payload onto a destination host computer by loading itself into memory, extracting the malicious payload, and then writing it to the file system.",
+            "match": [
+                "dldrop",
+                "docdrop",
+                "docdrp",
+                "drop",
+                {
+                    "pattern": "(?<=\\W)DP[-](?=\\W)",
+                    "description": "Dropper shortcode"
+                },
+                "Droper",
+                "dropped",
+                "dropper",
+                "Dropper",
+                "droppr",
+                "exedrop",
+                "mdropper",
+                "muldrop",
+                "tjndropper",
+                "TjnDroppr"
+            ]
+        },
+        "exploit_kit": {
+            "description": "A software toolkit to target common vulnerabilities.",
+            "match": [
+                "exploit_kit"
+            ]
+        },
+        "file_infector_virus": {
+            "description": "A virus that infects a system by inserting itself somewhere in existing files; this is the classic form of virus.",
+            "match": [
+                "file_infector_virus"
+            ]
+        },
+        "file_less": {
+            "description": "Malware that is file-less, i.e., executes through some other mechanism such as Powershell.",
+            "match": [
+                "file_less"
+            ]
+        },
+        "fork_bomb": {
+            "description": "A simple form of malware, a type of rabbit which launches more copies of itself. Once a fork bomb is executed, it will attempt to run several identical processes, which will do the same, the number growing exponentially until the system resources are overwhelmed by the number of identical processes running, which may in some cases bring the system down and cause a denial of service.",
+            "match": [
+                "fork_bomb"
+            ]
+        },
+        "greyware": {
+            "description": "Software that, while not definitely malicious, has a suspicious or potentially unwanted aspect.",
+            "match": [{
+                    "pattern": "unwanted.?(?:program|file)"
+                },
+                {
+                    "pattern": "(?:Software|SW|SFTWR)-?(?:Bndlr|Bundle|Bundler|Bundlr|Bndlr)"
+                },
+                "application",
+                "badjoke",
+                "Bundler",
+                "crack",
+                "crack-tool",
+                "cracktool",
+                "fraud-tool",
+                "fraudtool",
+                "greyware",
+                "Harm",
+                "hoax",
+                "joke",
+                "keygen",
+                "misleading",
+                "nettool",
+                "porntool",
+                "porn-tool",
+                "program",
+                "pua",
+                "puf",
+                "pup",
+                "riskware",
+                "settings-modifier",
+                "toolbar"
+            ]
+        },
+        "implant": {
+            "description": "Code inserted into an existing program using a code patcher or other tool.",
+            "match": [{
+                    "pattern": "\\bPOS\\b"
+                },
+                "behavior",
+                "implant"
+            ]
+        },
+        "keylogger": {
+            "description": "A type of program implanted on a system to monitor the keys pressed and thus record any sensitive data, such as passwords, entered by the user.",
+            "match": [
+                "keylogger",
+                "monitoring.tool",
+                "monitoringtool"
+            ]
+        },
+        "kleptographic_worm": {
+            "description": "A worm that encrypts information assets on compromised systems so they can only be decrypted by the worm's author, also known as information-stealing worm.",
+            "match": [
+                "kleptographic_worm"
+            ]
+        },
+        "macro_virus": {
+            "description": "A virus that uses a macro language, for example in Microsoft Office documents.",
+            "match": [
+                "macro",
+                "macro_virus"
+            ]
+        },
+        "malware_as_a_service": {
+            "description": "Malware that is sold or produced as a service.",
+            "match": [
+                "malware_as_a_service"
+            ]
+        },
+        "mass_mailer": {
+            "description": "A worm that uses email to propagate across the internet.",
+            "match": [{
+                    "pattern": "Client-?SMTP"
+                },
+                "email",
+                "hllm",
+                "mail",
+                "mass_mailer",
+                "phishing",
+                "smtp",
+                "spam",
+                "spam-tool",
+                "spamtool",
+                "spammer"
+            ]
+        },
+        "metamorphic_virus": {
+            "description": "A virus that changes its own code with each infection.",
+            "match": [
+                "metamorphic_virus"
+            ]
+        },
+        "mid_infector": {
+            "description": "A type of file_infecting virus which places its code in the middle of files it infects. It may move a section of the original code to the end of the file, or simply push the code aside to make space for its own code.",
+            "match": [
+                "mid_infector"
+            ]
+        },
+        "mobile_code": {
+            "description": "Either code received from remote, possibly untrusted systems, but executed on a local system; or software transferred between systems (e.g across a network) and executed on a local system without explicit installation or execution by the recipient.",
+            "match": [
+                "mobile_code"
+            ]
+        },
+        "multipartite_virus": {
+            "description": "Malware that infects boot records, boot sectors, and files.",
+            "match": [
+                "multipartite_virus"
+            ]
+        },
+        "nonmalware": {
+            "description": "Not a virus",
+            "tags": [
+                "nonmalware"
+            ],
+            "match": [{
+                    "pattern": "(?i:eicar(?>[^a-z]?test(?>[^a-z]?file)?)?(?:[.]com)?)"
+                },
+                "AntivirusTest",
+                "nonmalware",
+                "not-a-virus",
+                "notavirus",
+                "not-virus",
+                "test",
+                "test.file",
+                "testfile",
+                "testvirus"
+            ]
+        },
+        "parental_control": {
+            "description": "A program that monitors or limits machine usage. Such programs can run undetected and can transmit monitoring information to another machine.",
+            "match": [
+                "monitoring-tool",
+                "parental_control"
+            ]
+        },
+        "banker": {
+            "description": "A type of trojan designed to perform banking fraud.",
+            "match": [{
+                    "pattern": "banker(\\d)?"
+                },
+                "banker"
+            ]
+        },
+        "password_stealer": {
+            "description": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system.",
+            "match": [{
+                    "pattern": "(?:pws|psw|password)[-_]?(?|steal(?:er)?|thief)"
+                },
+                "PWS",
+                "pwsteal",
+                "gamethief",
+                "infostealer",
+                "infothief",
+                "stealer"
+            ]
+        },
+        "injector": {
+            "description": "A type of trojan that injects itself into other processes or files.",
+            "match": [{
+                    "pattern": "(vb|cee|aut|autoit|crypt(o)?|delf)?inject(\\d|or)?"
+                },
+                "injector",
+                "resident"
+            ]
+        },
+        "infector": {
+            "description": "A type of trojan that spreads by attaching its code to other files.",
+            "match": [{
+                    "pattern": "infect(or)?"
+                },
+                "infector"
+            ]
+        },
+        "polymorphic_virus": {
+            "description": "A type of virus that encrypts its code differently with each infection (or with each generation of infections).",
+            "match": [
+                "polymorphic_virus"
+            ]
+        },
+        "sms": {
+            "description": "Malware that uses SMS for malicious purpose",
+            "match": [
+                "sms",
+                "smstheft"
+            ]
+        },
+        "premium_dialer_smser": {
+            "description": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers.",
+            "match": [{
+                    "pattern": "porn\\W?dialer"
+                },
+                "dialer",
+                "premium-sms",
+                "premium_dialer_smser"
+            ]
+        },
+        "prepender": {
+            "description": "A file-infecting virus that inserts code at the beginning of the files it infects.",
+            "match": [
+                "hllp",
+                "prepender"
+            ]
+        },
+        "ransomware": {
+            "description": "Malware that encrypts files on a victim's system, demanding payment of ransom in return for the access codes required to unlock files.",
+            "match": [{
+                    "pattern": "ransom-?encoder"
+                },
+                "ansom",
+                "filecoder",
+                "filecryptor",
+                "ransm",
+                "ransom",
+                "ransomx",
+                "ransomcrypt",
+                "ransomlock",
+                "ransomware",
+                "TjnRansm",
+                "virlock"
+            ]
+        },
+        "remote_access_trojan": {
+            "description": "A remote access trojan program (or RAT), is a trojan horse capable of controlling a machine through commands issued by a remote attacker.",
+            "match": [{
+                    "pattern": "remote\\W?admin"
+                },
+                "rat",
+                "remote-access",
+                "remote_access_trojan",
+                "remoteadmin"
+            ]
+        },
+        "resource_exploiter": {
+            "description": "A type of malware that steals a system's resources (e.g., CPU cycles).",
+            "match": [
+                "resource_exploiter",
+                "zipbomb"
+            ]
+        },
+        "cryptominer": {
+            "description": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner, to use them for cryptocurrency mining without user permission.",
+            "match": [{
+                    "pattern": "(?|bitcoin|bit|crypto|btc|eth|xmr)?(?:coin)?[-]?miner"
+                },
+                "btcmine",
+                "coinhive",
+                "cryptominer"
+            ]
+        },
+        "rogue_security_software": {
+            "description": "A fake security product that demands money to clean phony infections.",
+            "match": [
+                "rogue",
+                "fakeav",
+                "fakav",
+                "rogue_security_software"
+            ]
+        },
+        "rootkit": {
+            "description": "A method of hiding files or processes from normal methods of monitoring; often used by malware to conceal its presence and activities.",
+            "match": [
+                "rootkit",
+                "Rkit"
+            ]
+        },
+        "scareware": {
+            "description": "A program that reports false or significantly misleading information on the presence of security risks, threats, or system issues on the target computer.",
+            "match": [
+                "scareware"
+            ]
+        },
+        "screen_capture": {
+            "description": "A type of malware used to capture images from the target systems screen, used for exfiltration and command and control.",
+            "match": [
+                "screen_capture"
+            ]
+        },
+        "security_assessment_tool": {
+            "description": "A program that can be used to gather information for unauthorized access to computer systems.",
+            "match": [{
+                    "pattern": "(?<=[.])Tool(?=[.])"
+                },
+                "virtool",
+                "hack",
+                "hack-tool",
+                "VirusConstructor",
+                "MalMaker",
+                "Constructor",
+                "psw",
+                "pswtool",
+                "hacktool",
+                "security-tool",
+                "securitytool",
+                "gamehack",
+                "risktool",
+                "hktl",
+                "security_assessment_tool",
+                "securitytool",
+                "virtool"
+            ]
+        },
+        "exploit": {
+            "description": "Either a small piece of code that activates a command-line interface to a system that can be used to disable security measures, open a backdoor, or download further malicious code; or a small piece of code that opens a system up for exploitation, sometimes by not necessarily involving a command-line shell.",
+            "match": [{
+                    "pattern": "exp\\b"
+                },
+                "exploit",
+                "shellcode",
+                "shellkode"
+            ]
+        },
+        "spyware": {
+            "description": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner.",
+            "match": [{
+                    "pattern": "Spy(?![[:alnum:]])"
+                },
+                "Monitor",
+                "spyware",
+                "tjnspy"
+            ]
+        },
+        "trackware": {
+            "description": "Malware that traces a user's path on the Internet and sends information to third parties. Compare to spyware, which monitors system activity to capture confidential information such as passwords.",
+            "match": [
+                "AdDisplay",
+                "AdTool",
+                "trackware"
+            ]
+        },
+        "trojan": {
+            "description": "Malware disguised as something inert or benign.",
+            "match": [{
+                    "pattern": "\\bTr\\b"
+                },
+                "trjn",
+                "trojan",
+                "trojanapt",
+                "trojanhorse",
+                "trojanvariant"
+            ]
+        },
+        "virus": {
+            "description": "Self-replicating malware that requires human interaction to spread; also, self-replicating malware that runs and spreads by modifying and inserting itself into other programs or files.",
+            "match": [
+                "HLL",
+                "HLLC",
+                "Mal",
+                "VirusOrg",
+                "malware",
+                "spoofer",
+                "virus",
+                "Trivial"
+
+            ]
+        },
+        "web_bug": {
+            "description": "Code embedded in a web page or email that checks whether a user has accessed the content (e.g., a tiny, transparent GIF image).",
+            "match": [
+                "web_bug"
+            ]
+        },
+        "worm": {
+            "description": "Self-replicating malware that propagates across a network either with or without human interaction.",
+            "match": [{
+                    "pattern": "(?|I|IM|Net|P2P)[-.]?Worm"
+                },
+                "Worm.P2p",
+                "Worm/P2p",
+                "i-worm/p2p",
+                "hllw",
+                "worm"
+            ]
+        }
     }
 }

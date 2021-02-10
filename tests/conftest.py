@@ -2,23 +2,24 @@
 
 from contextlib import contextmanager
 import csv
+import os.path
 import pkg_resources
 import zipfile
+from zipimport import zipimporter
 
 import polyunite
 
 
-@contextmanager
-def open_fixture(filename, fname=None):
-    zippath = 'fixtures/{}.zip'.format(fname or next(iter(filename.rsplit('.', 1))))
-    with zipfile.ZipFile(pkg_resources.resource_filename(__name__, zippath)) as zf:
-        with zf.open(filename) as f:
-            yield f
+def open_fixture(filename):
+    name, _ = filename.split('.')
+    path = os.path.join(os.path.dirname(__file__), 'fixtures', f'{name}.zip')
+    return zipimporter(path).get_data(filename)
 
 
 def seen():
-    with open_fixture('engine_families.csv') as f:
-        yield from csv.reader(map(bytes.decode, f.readlines()))
+    fixtures = open_fixture('engine_families.csv')
+    for row in csv.DictReader(fixtures.decode('utf-8').splitlines()):
+        yield row['engine'], row['classification']
 
 
 def format_match(engine, label, vr):
@@ -43,10 +44,13 @@ def format_match(engine, label, vr):
     )
 
 
-def match_iter():
+def match_iter(only=None):
     missing = set()
     errors = []
     for engine, label in seen():
+        if only and engine not in only:
+            continue
+
         try:
             yield (engine, label, polyunite.parse(engine, label))
         except polyunite.errors.MatchError as e:

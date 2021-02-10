@@ -16,7 +16,7 @@ def section(name):
     yield lambda *a, **kw: print('  ', *a, **kw)
 
 try:
-    it = match_iter()
+    it = match_iter(sys.argv[1:] or None)
     while True:
         print(format_match(*next(it)))
 except StopIteration as e:
@@ -28,6 +28,3 @@ with section('MISSING') as pr:
 with section('FAILURES') as pr:
     for engine, label, err in errors:
         pr("{:<15}: {:85} : {}".format(engine, label, err))
-
-with section('INFO') as pr:
-    pr('compile.cache_info: ', polyunite.vocab.VocabRegex.compile.cache_info())

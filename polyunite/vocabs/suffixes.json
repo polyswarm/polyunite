@@ -1,23 +1,199 @@
 {
-    "suffixes": {
-        "bit": "an internal category used to refer to some threats",
-        "cl": "an internal category used to refer to some threats",
-        "dam": "damaged malware",
-        "dha": "an internal category used to refer to some threats",
-        "dll": "Dynamic Link Library component of a malware",
-        "based": "containers characteristics usual to a particular class of malware",
-        "dr": "dropper component of a malware",
-        "gen": "malware that is detected using a generic signature",
-        "siggen": "malware that is detected using a generic signature",
-        "kit": "virus constructor",
-        "ldr": "loader component of a malware",
-        "origin": "unpacked variant",
-        "pak": "compressed malware",
-        "pfn": "an internal category used to refer to some threats",
-        "plock": "an internal category used to refer to some threats",
-        "plugin": "plug-in component",
-        "remnants": "remnants of a virus",
-        "rfn": "an internal category used to refer to some threats",
-        "rootkit": "rootkit component of that malware"
+    "group": "SUFFIXES",
+    "children": {
+        "bit": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                "!bit"
+            ]
+        },
+        "cv": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                "!cv"
+            ]
+        },
+        "cur": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                ".cur",
+                ".cur1"
+            ]
+        },
+        "dam": {
+            "description": "damaged malware",
+            "match": [
+                ".dam",
+                ".dam#1",
+                ".dam#2",
+                ".dam#3"
+            ]
+        },
+        "dha": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                "!dha"
+            ]
+        },
+        "dll": {
+            "description": "Dynamic Link Library component of a malware",
+            "match": [
+                "#dll",
+                ".dll",
+                "@dll"
+            ]
+        },
+        "corrupted": {
+            "description": "Corrupted virus component",
+            "match": [
+                ".corrupted"
+            ]
+        },
+        "based": {
+            "description": "containers characteristics usual to a particular class of malware",
+            "match": [
+                "-based",
+                ".based"
+            ]
+        },
+        "dr": {
+            "description": "dropper component of a malware",
+            "match": [
+                ".Dr"
+            ]
+        },
+        "gen": {
+            "description": "malware that is detected using a generic signature",
+            "match": [
+                ".gen",
+                {
+                    "pattern": ".gen[0-9]+"
+                },
+                "-gen",
+                ".heur",
+                ".generic"
+            ]
+        },
+        "siggen": {
+            "tags": [
+                "heuristic"
+            ],
+            "description": "malware that is detected using a generic signature",
+            "match": [
+                ".siggen"
+            ]
+        },
+        "Zen": {
+            "description": "ALibaba specific field",
+            "match": [
+                ".zen"
+            ]
+        },
+        "MUE": {
+            "description": "Who knows what it means",
+            "match": [
+                ".mue"
+            ]
+        },
+        "kit": {
+            "description": "virus constructor",
+            "match": [
+                ".kit"
+            ]
+        },
+        "ldr": {
+            "description": "loader component of a malware",
+            "match": [
+                ".ldr"
+            ]
+        },
+        "packed": {
+            "description": "packed malawre",
+            "match": [
+                ".packed",
+                "-packed"
+            ]
+        },
+        "origin": {
+            "description": "unpacked variant",
+            "match": [
+                "-origin",
+                ".origin"
+            ]
+        },
+        "pak": {
+            "description": "compressed malware",
+            "match": [
+                ".pak"
+            ]
+        },
+        "patched": {
+            "match": [
+                ".Patched"
+            ]
+        },
+        "pfn": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                ".pfn"
+            ]
+        },
+        "plock": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                ".plock"
+            ]
+        },
+        "plugin": {
+            "description": "plug-in component",
+            "match": [
+                ".plugin"
+            ]
+        },
+        "remnants": {
+            "description": "remnants of a virus",
+            "match": [
+                "!remnants"
+            ]
+        },
+        "rfn": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                "!rfn"
+            ]
+        },
+        "rootkit_suffix": {
+            "description": "rootkit component of that malware",
+            "match": [
+                "!rootkit"
+            ]
+        },
+        "mm_suffix": {
+            "description": "mass mailer",
+            "match": [
+                "@mm",
+                "@m"
+            ]
+        },
+        "mue": {
+            "description": "an internal category used to refer to some threats",
+            "match": [
+                ".mue"
+            ]
+        },
+        "server": {
+            "description": "server component",
+            "match": [
+                "!srv",
+                ".srv"
+            ]
+        },
+        "client": {
+            "description": "client component",
+            "match": [
+                "!cl",
+                ".Cl"
+            ]
+        }
     }
 }
