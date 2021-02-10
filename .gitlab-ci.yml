@@ -57,6 +57,8 @@ release-pypi:
   tags:
     - kube-small-new
   stage: release
+  only:
+    - master
   script:
     # release to internal pypi but do not tag yet
     - e2e release --skip-tag --remote https://github.com/polyswarm/$CI_PROJECT_NAME.git
