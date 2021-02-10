@@ -70,6 +70,7 @@
             "match": [
                 "PE-Encrypt",
                 "code-encryption",
+                "EXEHeader.AntiArj",
                 {
                     "pattern": "crypt(?:ed|er|ic|or)?"
                 }

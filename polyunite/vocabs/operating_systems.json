@@ -20,10 +20,13 @@
         "DOS": {
             "description": "MS-DOS",
             "match": [
+                {
+                    "pattern": "(?-i:DOS|Dos|dos)"
+                },
                 "MSDOS",
                 "FDOS",
                 "DOSCOM",
-                "DOS"
+                "PS-MPC"
             ]
         },
         "EPOC": {

@@ -94,7 +94,7 @@ OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS, OBFUSCATIONS)
 
-CVE_PATTERN = r'(?P<CVE>(?i:CVE)([-_]?(?P<CVEYEAR>[0-9]{4})([-_]?((?P<CVENTH>[0-9]+)[[:alpha:]]*))))'
+CVE_PATTERN = r'(?P<CVE>(CVE|Cve|cve)([-_]?(?P<CVEYEAR>[0-9]{4})([-_]?((?P<CVENTH>[0-9]+)[[:alpha:]]*))))'
 
 
 def VARIANT_ID(*extra):
@@ -110,13 +110,14 @@ def VARIANT_ID(*extra):
 
 
 def FAMILY_ID(*extra):
-    return '(?P<FAMILY>{}|MS[0-9]{{2}}-[0-9]{{,6}}|{})'.format(
+    return '(?P<FAMILY>{}|{}|{})'.format(
         CVE_PATTERN,
+        r'MS[0-9]{2}-[0-9]{,6}',
         group(
             *extra,
             format(HEURISTICS['family'], '-g'),
             format(OBFUSCATIONS, '-g'),
-            r'CVE(-[0-9]{4})?',
+            r'CVE(-[0-9]{4})?(?![0-9.-_])',
             r'[0-9a-z]{1,2}[A-Z][a-zA-Z]{2,}',
             r'[A-Z][a-zA-Z0-9_]{3,}',
         ),
