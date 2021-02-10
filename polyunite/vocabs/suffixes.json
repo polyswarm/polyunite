@@ -1,5 +1,5 @@
 {
-    "group": "suffixes",
+    "group": "SUFFIXES",
     "children": {
         "bit": {
             "description": "an internal category used to refer to some threats",
@@ -72,6 +72,9 @@
             ]
         },
         "siggen": {
+            "tags": [
+                "heuristic"
+            ],
             "description": "malware that is detected using a generic signature",
             "match": [
                 ".siggen"
@@ -162,15 +165,10 @@
                 "!rootkit"
             ]
         },
-        "mm": {
+        "mm_suffix": {
             "description": "mass mailer",
             "match": [
-                "@mm"
-            ]
-        },
-        "m": {
-            "description": "mass mailer",
-            "match": [
+                "@mm",
                 "@m"
             ]
         },

@@ -1,5 +1,5 @@
 {
-    "group": "langs",
+    "group": "LANGS",
     "children": {
         "AutoHotKey": {
             "match": [

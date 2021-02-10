@@ -1,5 +1,5 @@
 {
-    "group": "labels",
+    "group": "LABELS",
     "children": {
         "adware": {
             "description": "Any software that is funded by advertising. Adware may also gather sensitive user information from a system.",
@@ -276,13 +276,17 @@
         },
         "nonmalware": {
             "description": "Not a virus",
+            "tags": [
+                "nonmalware"
+            ],
             "match": [{
                     "pattern": "(?i:eicar(?>[^a-z]?test(?>[^a-z]?file)?)?(?:[.]com)?)"
                 },
+                "AntivirusTest",
+                "nonmalware",
                 "not-a-virus",
                 "notavirus",
                 "not-virus",
-                "nonmalware",
                 "test",
                 "test.file",
                 "testfile",

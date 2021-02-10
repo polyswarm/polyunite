@@ -1,6 +1,6 @@
 {
-    "group": "heuristics",
-    "tag": ["is_heuristic"],
+    "group": "HEURISTICS",
+    "tags": ["heuristic"],
     "children": {
         "generic": {
             "description": "Generic virus detection",
@@ -13,20 +13,12 @@
                 "behaveslike",
                 "bloodhound",
                 "cloud",
-                "Delf",
                 "generic",
                 "genetic",
                 "genmalicious",
-                "genome",
                 "heur",
-                "kcloud",
-                "maltrec",
-                "memscan",
-                "sape",
                 "score",
-                "siggen",
                 "static",
-                "symvt",
                 "undefined"
             ]
         },
@@ -39,9 +31,18 @@
                 "agentad",
                 "agentb",
                 "agentpmf",
+                "Delf",
                 "family",
                 "foreign",
-                "pornoasset"
+                "genericnrv",
+                "genome",
+                "kcloud",
+                "maltrec",
+                "memscan",
+                "sape",
+                "symvt",
+                "undefined",
+                "vgeneric"
             ]
         },
         "suspicious": {

@@ -4,7 +4,7 @@ import collections
 import regex as re
 
 from polyunite.errors import MatchError
-from polyunite.utils import antecedent, colors
+from polyunite.utils import colors
 from polyunite.vocab import (
     ARCHIVES,
     CVE_PATTERN,
@@ -17,12 +17,11 @@ from polyunite.vocab import (
     OBFUSCATIONS,
     OSES,
     PLATFORM,
-    SUFFIXES,
     VARIANT_ID,
 )
 
 from .registry import registry
-from .utils import antecedent, group
+from .utils import group
 
 
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
@@ -60,9 +59,7 @@ class Classification(collections.UserDict):
 
     @classmethod
     def __init_subclass__(cls):
-        cls.regex = re.compile(
-            cls.pattern, re.ASCII | re.VERBOSE, suffixes=list(SUFFIXES.entries), ignore_unused=True
-        )
+        cls.regex = re.compile(cls.pattern, re.ASCII | re.VERBOSE)
         registry.register(cls, cls.__name__)
 
     @classmethod
@@ -190,7 +187,7 @@ class ClamAV(Classification):
     (?P<VEID>
         (?:
             (?:[.]|^)
-            {FAMILY_ID(r'Test[.]File')}
+            {FAMILY_ID()}
         )?
         {VARIANT_ID(r'[:-][0-9]',
                     r'-[[:xdigit:]]+',
@@ -395,7 +392,7 @@ class QuickHeal(Classification):
     pattern = rf"""^
     (?:
         (?:[./]|^)
-        (?:{PLATFORM}|{LABELS}(?&LABELS)?|Cmd|PIF)
+        (?:{PLATFORM}|{LABELS}(?&LABELS)?|Cmd|PIF|alware)
     )*
     (?P<VEID>
         (?![.]S[[:xdigit:]]+\b)
@@ -407,6 +404,7 @@ class QuickHeal(Classification):
             )}
         )?
         {VARIANT_ID(
+            r'[.]HTML[.][A-Z]',
             r'[-][A-Z]',
             r'[.]S[[:xdigit:]]+',
             r'[.][A-Z]{1,2}[0-9]{1,2}',

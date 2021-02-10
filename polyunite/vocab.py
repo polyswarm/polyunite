@@ -5,7 +5,7 @@ import json
 from pkg_resources import resource_stream
 import regex as re
 
-from polyunite.utils import antecedent, group
+from polyunite.utils import group
 
 
 class VocabRegex:
@@ -18,13 +18,14 @@ class VocabRegex:
     def __init__(self, name, fields, *, parent=None):
         self.name = name
         self.parent = parent
+        self.group_name = name
 
         if isinstance(fields, dict):
-            self.match = [{'const': v} if isinstance(v, str) else v for v in fields.get('match', [])]
-            self.aliases = [v['const'] for v in self.match if 'const' in v]
-            self.patterns = [v['pattern'] for v in self.match if 'pattern' in v]
+            match = [{'const': v} if isinstance(v, str) else v for v in fields.get('match', [])]
+            self.aliases = list({re.escape(v['const']) for v in match if 'const' in v})
+            self.patterns = list({v['pattern'] for v in match if 'pattern' in v})
+            self.tags = set(map(str.lower, fields.get('tags', [])))
             self.description = fields.get('description', None)
-            # self.aliases.extend([n for n, v in values if isinstance(v, str)])
             self.children = [VocabRegex(n, v, parent=self) for n, v in fields.get('children', dict()).items()]
         else:
             raise ValueError(name, fields)
@@ -36,10 +37,13 @@ class VocabRegex:
 
     def pattern(self, start: 'int' = 0, end: 'int' = 1) -> 'str':
         """Convert this grouped regular expression pattern"""
-        use_group_name = start <= self.depth <= end and self.name.isidentifier()
-        name = self.name if use_group_name else None
+        use_group_name = start <= self.depth <= end
+        name = self.group_name if use_group_name else None
         return group(
-            *(c.pattern(start, end) for c in self.children), *self.aliases, *self.patterns, name=name
+            *(c.pattern(start, end) for c in self.children),
+            *self.aliases,
+            *self.patterns,
+            name=name,
         )
 
     def iter(self) -> 'Iterator[VocabRegex]':
@@ -61,7 +65,20 @@ class VocabRegex:
             yield from v.aliases
 
     def __format__(self, spec) -> 'str':
-        return '(?i:{})'.format(self.pattern())
+        pat = self.pattern(start=1, end=0) if spec and '-g' in spec else self.pattern()
+        return pat if spec and '-i' in spec else '(?i:{})'.format(pat)
+
+    def __str__(self):
+        return format(self)
+
+    def __getitem__(self, k):
+        try:
+            return next(c for c in self.children if c.name == k)
+        except StopIteration:
+            raise KeyError
+
+    def has_tag(self, tag):
+        return tag.lower() in self.tags
 
     @classmethod
     def from_resource(cls, name: 'str') -> 'VocabRegex':
@@ -84,7 +101,7 @@ CVE_PATTERN = r'(?P<CVE>(?i:CVE)(?:[-_]?(?P<CVEYEAR>[0-9]{4})(?:[-_]?(?:(?P<CVEN
 
 def VARIANT_ID(*extra):
     return group(
-        r'(?i:\L<suffixes>)',
+        format(SUFFIXES, '-g'),
         *extra,
         r'[#]\d+',
         r'[!]ET',
@@ -99,16 +116,13 @@ def VARIANT_ID(*extra):
     )
 
 
-def FAMILY_ID(*extra, heuristics=True):
-    if heuristics:
-        extra = *extra, str(HEURISTICS)
-
+def FAMILY_ID(*extra):
     return '(?P<FAMILY>{}|MS[0-9]{{2}}-[0-9]{{,6}}|{})'.format(
         CVE_PATTERN,
         group(
             *extra,
-            str(next(c for c in HEURISTICS.children if c.name == 'family')),
-            str(OBFUSCATIONS),
+            format(HEURISTICS['family'], '-g'),
+            format(OBFUSCATIONS, '-g'),
             r'CVE(?:-[0-9]{4})?',
             r'[0-9a-z]{1,2}[A-Z][a-zA-Z]{2,}',
             r'[A-Z][a-zA-Z0-9_]{3,}',

@@ -1,5 +1,5 @@
 {
-    "group": "operating_systems",
+    "group": "OPERATING_SYSTEMS",
     "children": {
         "Android": {
             "description": "Android Phone OS",

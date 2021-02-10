@@ -1,5 +1,5 @@
 {
-    "group": "obfuscations",
+    "group": "OBFUSCATIONS",
     "children": {
         "packing": {
             "description": "Packing of the malware instance code, not including encryption.",

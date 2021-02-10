@@ -2,12 +2,13 @@
 
 from contextlib import contextmanager
 import csv
+import os.path
 import pkg_resources
 import zipfile
 from zipimport import zipimporter
-import os.path
 
 import polyunite
+
 
 def open_fixture(filename):
     name, _ = filename.split('.')
