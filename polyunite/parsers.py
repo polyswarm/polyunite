@@ -441,11 +441,13 @@ class Rising(Classification):
         )?
         (?:/(?:(?&LABELS)|(?&PLATFORM)))?
         {VARIANT_ID(
+            r'[!][A-Z0-9][.][A-Z0-9]+',
             re.escape('[HT]'),
+            r'[#][0-9]{1,3}%',
+            r'[!]ET',
             r'[!][[:xdigit:]][.][[:xdigit:]]+',
             r'[#][A-Z][A-Z0-9]+',
             r'[/][[:alpha:]][[:alnum:]]+',
-            r'[#][0-9]{1,3}%',
             r'[@](?|CV|EP|URL|VE)',
         )}{{,3}}
     )

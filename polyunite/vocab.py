@@ -22,9 +22,9 @@ class VocabRegex:
 
         if isinstance(fields, dict):
             match = [{'const': v} if isinstance(v, str) else v for v in fields.get('match', [])]
-            self.aliases = list({re.escape(v['const']) for v in match if 'const' in v})
-            self.patterns = list({v['pattern'] for v in match if 'pattern' in v})
-            self.tags = set(map(str.lower, fields.get('tags', [])))
+            self.aliases = [re.escape(v['const']) for v in match if 'const' in v]
+            self.patterns = [v['pattern'] for v in match if 'pattern' in v]
+            self.tags = {f.lower() for f in fields.get('tags', [])}
             self.description = fields.get('description', None)
             self.children = [VocabRegex(n, v, parent=self) for n, v in fields.get('children', dict()).items()]
         else:
@@ -59,12 +59,8 @@ class VocabRegex:
     def sublabels(self) -> 'Iterator[str]':
         yield from (v.name for v in self.iter() if v.depth > self.depth and v.name)
 
-    @property
-    def entries(self) -> 'Iterator[str]':
-        for v in self.iter():
-            yield from v.aliases
-
     def __format__(self, spec) -> 'str':
+        """Format this vocabulary as a regular expression, accepts `-g` to remove groups and `-i` for case-sensitivity"""
         pat = self.pattern(start=1, end=0) if spec and '-g' in spec else self.pattern()
         return pat if spec and '-i' in spec else '(?i:{})'.format(pat)
 
@@ -72,12 +68,14 @@ class VocabRegex:
         return format(self)
 
     def __getitem__(self, k):
+        """Find a child vocabulary by name"""
         try:
             return next(c for c in self.children if c.name == k)
         except StopIteration:
             raise KeyError
 
     def has_tag(self, tag):
+        """Check if this vocabulary has an associated tag"""
         return tag.lower() in self.tags
 
     @classmethod
@@ -103,14 +101,9 @@ def VARIANT_ID(*extra):
     return group(
         format(SUFFIXES, '-g'),
         *extra,
-        r'[#]\d+',
-        r'[!]ET',
-        r'[.!@#][[:xdigit:]]+',
-        r'[.][a-z]{3,8}',
-        r'[.](?-i:[A-Z]{,3}|[a-z]{,3}|[0-9]{,3})',
-        r'[.](?|GEN|Gen|gen)[0-9]+',
-        r'[!][[:alnum:]]',
-        r'[.][[:alnum:]]',
+        r'[.][A-Z]{1,3}',
+        r'[.][a-z]{1,8}',
+        r'[.!][[:xdigit:]]+',
         r'[.][A-Z][a-z]{2}',
         name='VARIANT'
     )

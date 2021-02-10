@@ -66,6 +66,9 @@
             "description": "malware that is detected using a generic signature",
             "match": [
                 ".gen",
+                {
+                    "pattern": ".gen[0-9]+"
+                },
                 "-gen",
                 ".heur",
                 ".generic"
