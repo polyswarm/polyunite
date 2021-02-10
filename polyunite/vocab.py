@@ -103,9 +103,10 @@ def FAMILY_ID(*extra, heuristics=True):
         CVE_PATTERN,
         group(
             *extra,
-            r'MS\d{2}-\d{,8}',
-            r'[A-Z][a-z][a-z]',
-            r'(?:[a-z]|\d|\d\d)?[A-Z]([[:alpha:]]{3,}){i<=2:[0-9-_]}\d{,4}',
+            r'MS\d{2}-\d{,6}',
+            r'[A-Z][[:alpha:]]{2}',
+            r'[A-Z][[:alpha:]]+-[A-Z][[:alpha:]]+',
+            r'[a-z0-9]?[A-Z]\w{3,}',
         )
     )
 

@@ -38,6 +38,7 @@
             "match": [
                 "BrowserModifier",
                 "WebToolbar",
+                "Hijacker",
                 "bho",
                 "browser_modifier"
             ]
@@ -90,34 +91,34 @@
                 "dloadware",
                 "docdl",
                 "downagent",
-                "downldexe",
+                "Downlaoder",
                 "Downlder",
+                "downldexe",
                 "downldr",
                 "download",
                 "downloader",
                 "downloadguide",
                 "downloadware",
                 "downware",
-                "dropped",
                 "dwnldr",
                 "exedown",
                 "macrodown",
+                "malware_download",
                 "TjnDownldr",
-                "TrjnDwnlder",
-                "malware_download"
+                "TrjnDwnlder"
             ]
         },
         "dropper": {
             "description": "A type of Trojan that deposits an enclosed payload onto a destination host computer by loading itself into memory, extracting the malicious payload, and then writing it to the file system.",
             "match": [
-                {
-                    "pattern": "dropp?r"
-                },
                 "dldrop",
                 "docdrop",
                 "docdrp",
                 "drop",
+                "Droper",
+                "dropped",
                 "dropper",
+                "Dropper",
                 "droppr",
                 "exedrop",
                 "mdropper",
@@ -344,10 +345,8 @@
         "sms": {
             "description": "Malware that uses SMS for malicious purpose",
             "match": [
-                {
-                    "pattern": "((?<=trojan).?|(?<=[./-_\\s]))(?-i:SMS)(?!\\w)"
-                },
-                "sms"
+                "sms",
+                "smstheft"
             ]
         },
         "premium_dialer_smser": {
@@ -422,6 +421,7 @@
             "match": [
                 "rogue",
                 "fakeav",
+                "fakav",
                 "rogue_security_software"
             ]
         },
