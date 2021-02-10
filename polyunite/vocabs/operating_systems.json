@@ -13,6 +13,7 @@
             "description": "Uses or resides in the Master Boot Record (MBR) or DOS Boot Sector of an operating system",
             "match": [
                 "Boot",
+                "TSR",
                 "Boot-DOS"
             ]
         },
@@ -20,6 +21,7 @@
             "description": "MS-DOS",
             "match": [
                 "MSDOS",
+                "FDOS",
                 "DOSCOM",
                 "DOS"
             ]

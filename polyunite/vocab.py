@@ -79,7 +79,7 @@ OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS, OBFUSCATIONS)
 
-CVE_PATTERN = r'(?:(?P<CVE>(CVE|Cve|cve)[-_]?(?P<CVEYEAR>[[:digit:]]{4})[-_]?(?P<CVENTH>[[:digit:]]+))[A-Za-z]*)'
+CVE_PATTERN = r'(?P<CVE>(?i:CVE)(?:[-_]?(?P<CVEYEAR>[0-9]{4})(?:[-_]?(?:(?P<CVENTH>[0-9]+)[[:alpha:]]*))))'
 
 
 def VARIANT_ID(*extra):
@@ -88,10 +88,13 @@ def VARIANT_ID(*extra):
         *extra,
         r'[#]\d+',
         r'[!]ET',
-        r'[.!@#](?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+)',
+        r'[.!@#][[:xdigit:]]+',
+        r'[.][a-z]{3,8}',
         r'[.](?-i:[A-Z]{,3}|[a-z]{,3}|[0-9]{,3})',
         r'[.](?|GEN|Gen|gen)[0-9]+',
+        r'[!][[:alnum:]]',
         r'[.][[:alnum:]]',
+        r'[.][A-Z][a-z]{2}',
         name='VARIANT'
     )
 
@@ -100,17 +103,19 @@ def FAMILY_ID(*extra, heuristics=True):
     if heuristics:
         extra = *extra, str(HEURISTICS)
 
-    return '(?P<FAMILY>{}|(?!CVE){})'.format(
+    return '(?P<FAMILY>{}|MS[0-9]{{2}}-[0-9]{{,6}}|{})'.format(
         CVE_PATTERN,
         group(
             *extra,
-            r'MS\d{2}-\d{,6}',
-            r'[A-Z][[:alpha:]]{2}',
-            r'[a-z0-9]?[A-Z]\w{3,}',
-        )
+            str(next(c for c in HEURISTICS.children if c.name == 'family')),
+            str(OBFUSCATIONS),
+            r'CVE(?:-[0-9]{4})?',
+            r'[0-9a-z]{1,2}[A-Z][a-zA-Z]{2,}',
+            r'[A-Z][a-zA-Z0-9_]{3,}',
+        ),
     )
 
 
 def IDENT(extra_families=[], extra_variants=[]):
     """Build a family & variant subpattern"""
-    return rf'(?P<NAME>{FAMILY_ID(*extra_families)}?({VARIANT_ID(*extra_variants)}{{,2}}?)?)'
+    return rf'(?P<VEID>{FAMILY_ID(*extra_families)}?({VARIANT_ID(*extra_variants)}{{,2}}?)?)'

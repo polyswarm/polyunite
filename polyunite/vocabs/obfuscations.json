@@ -4,14 +4,14 @@
         "packing": {
             "description": "Packing of the malware instance code, not including encryption.",
             "match": [{
-                    "pattern": "pack(er|ed)?"
+                    "pattern": "(?<=[.])Pack(?=[.])"
                 },
                 "aspack",
                 "asprotect",
+                "badPE",
                 "encoder",
                 "encpk",
                 "fsg",
-                "badPE",
                 "genpack",
                 "imptbl",
                 "kriz",
@@ -24,14 +24,14 @@
                 "malpack",
                 "matchicon",
                 "md5sect",
-                "mew",
-                "msilobfuscator",
                 "nspack",
                 "obfus",
                 "obfusc",
-                "obfuscate",
-                "obfuscated",
-                "obfuscator",
+                {
+                    "pattern": "obfuscat(?:e|ed|or|ed|ing)"
+                },
+                "packed",
+                "packer",
                 "packing",
                 "parite",
                 "pecompact",
@@ -52,17 +52,27 @@
                 "zpack"
             ]
         },
+        "certificate": {
+            "match": [
+                "Revoked.Certificate",
+                "Untrusted.Certificate"
+            ]
+        },
+        "hidden": {
+            "description": "Hidden code",
+            "match": [
+                "binder",
+                "patched"
+            ]
+        },
         "code_encryption": {
             "description": "Encryption of the malware instance code.",
             "match": [
+                "PE-Encrypt",
                 "code-encryption",
-                "cryp",
-                "crypt",
-                "crypted",
-                "crypter",
-                "cryptic",
-                "cryptor",
-                "binder"
+                {
+                    "pattern": "crypt(?:ed|er|ic|or)?"
+                }
             ]
         },
         "unpacked": {

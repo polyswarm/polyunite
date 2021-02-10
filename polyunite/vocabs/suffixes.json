@@ -7,13 +7,6 @@
                 "!bit"
             ]
         },
-        "cl": {
-            "description": "an internal category used to refer to some threats",
-            "match": [
-                "!cl",
-                ".Cl"
-            ]
-        },
         "cv": {
             "description": "an internal category used to refer to some threats",
             "match": [
@@ -128,6 +121,11 @@
                 ".pak"
             ]
         },
+        "patched": {
+            "match": [
+                ".Patched"
+            ]
+        },
         "pfn": {
             "description": "an internal category used to refer to some threats",
             "match": [
@@ -180,6 +178,20 @@
             "description": "an internal category used to refer to some threats",
             "match": [
                 ".mue"
+            ]
+        },
+        "server": {
+            "description": "server component",
+            "match": [
+                "!srv",
+                ".srv"
+            ]
+        },
+        "client": {
+            "description": "client component",
+            "match": [
+                "!cl",
+                ".Cl"
             ]
         }
     }

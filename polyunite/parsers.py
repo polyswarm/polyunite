@@ -173,35 +173,32 @@ class Alibaba(Classification):
     (({OBFUSCATIONS}|{LABELS})*[:])?
     ({PLATFORM}[/])?
     (?:
-        ((?P<nonmalware>(?P<NAME>(?P<FAMILY>eicar[.]com))))|
-        {IDENT([r'(?&LANGS)', r'(?&MACROS)', r'[a-z]+', r'[A-Z]{3}', r'[A-Z][a-z]{2}'], [r'[.]ali[0-9a-f]+', '[.]None'])}
+        {IDENT([LANGS, MACROS, r'[a-zA-Z0-9]{3,}'], [r'[.]ali[0-9a-f]+', '[.]None'])}
     )?
     $"""
 
 
 class ClamAV(Classification):
     pattern = rf"""^
-    (?:BC|Clamav)?
-    (?|
-        ((\.|^)(
+    (?:Clamav|Urlhaus)?
+    (?:
+        (?:[.]|^)
+        (?:
             {PLATFORM}
-            | {HEURISTICS}
             | {LABELS}
-            | {OBFUSCATIONS}
-            | Revoked[.]Certificate
-        ))*?
-        | Blacklist[.]CRT
-    )
-    (?P<NAME>
-        (([./]|^){FAMILY_ID(
-                r'[A-Z](?:[[:alnum:]]|_)+',
-                r'Test[.]File',
-                r'[[:alpha:]]+(?=-)',
-                r'[A-Z]{3}',
-                r'[0-9]+[A-Z][[:alpha:]]+',
-            )})?
-        {VARIANT_ID(r'([-.:][[:xdigit:]]+)?-[0-9]+(?:-[0-9])?',
-                    r'/CRDF(?:-[[:alnum:]])?')}
+            | Blacklist[.]CRT
+            | Legacy
+        )
+    )*
+    (?P<VEID>
+        (?:
+            (?:[.]|^)
+            {FAMILY_ID(r'Test[.]File')}
+        )?
+        {VARIANT_ID(r'[:-][0-9]',
+                    r'-[[:xdigit:]]+',
+                    r'/CRDF(?:-[[:alnum:]])?',
+                    r'[.]Extra_Field')}{{,3}}
     )
     $"""
 
@@ -209,40 +206,80 @@ class ClamAV(Classification):
 class DrWeb(Classification):
     pattern = rf"""^
     (?:(?|probably|modification\s of|modification|possible|possibly)\s)?
-    (?:(?:\b|[.])(?:{LABELS}(-?(?&LABELS))?|{PLATFORM}))*
-    (?:(?:\b|[.]) # MulDrop6.38732 can appear alone or in front of another `.`
-        {IDENT([r"PWS[.][[:alnum:]]+", r"[A-Z][a-z]{2}"], [r'[.]Log'])}
-    )?
+    (?:
+        (?:^|\b|[.-])
+        (?: {LABELS}
+          | {PLATFORM}
+          | MGen
+          | Ear
+        )
+    )*
+    (?P<VEID>
+        (?:
+            (?:[.]|\b|^)
+            {FAMILY_ID(
+                r'PWS[.][[:alnum:]]+',
+                r'^[[:alnum:]]{2,3}(?=[.])',
+                r'^[[:alnum:]][a-zA-Z0-9-_.]+[A-Z][[:alnum:]]$',
+            )}
+        )?
+        {VARIANT_ID(r'[.]Log')}{{,2}}
+    )
     $"""
 
 
 class Ikarus(Classification):
     pattern = rf"""^
-    (?p)
     (
         (?:[.:-]|^)
         (?:
-            {LABELS}(-?(?&LABELS))?
-            | {PLATFORM}
-            | AD
-            | Patched
+            {LABELS}*
+            | (BehavesLike)?{PLATFORM}
+            | AIT
+            | ALS
+            | BDC
+            | Click
+            | (?:Client|Server)-[[:alpha:]]+
+            | Conduit
+            | Damaged
+            | DongleHack
+            | Fraud
             | FTP
-            | Server-FTP
+            | MalwareScope
+            | Optional
+            | Patch
+            | PCK
+            | SPR
+            | ToolKit
+            | Troja
+            | WordPress
+            | WScr
             | X2000M
         )
     )*
-    (?P<NAME>
-        (?:
-            (?:^|[.:])
+    (?P<VEID>
+      (?:
+          (?:^|[.:])
             {FAMILY_ID(
-                r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
-            )}
-        )?
-        {VARIANT_ID(
-            r'[.][A-Z][a-z]{2}',
-            r'[.]Gen[0-9]*',
-        )}{{,2}}
+            r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
+            r'(?<=Exploit[.]).*',
+          )}
+       )?
+       {VARIANT_ID(
+                r'20[0-9]{2}-[0-9]{1,6}',
+                r'[A-Z][[:alpha:]]+-(?:[A-Z][[:alpha:]]*|[0-9]+)',
+                r'[-][A-Z]',
+                r'[-][0-9]+$',
+                r'[.](?|Dm|Ra)',
+                r'[.]gen[0-9]x',
+                r'[.][A-Z]{2,3}',
+                r'[.][A-Z][a-z]{2}',
+                r'[.][A-Z]{1,2}[0-9]*',
+                r'[.][A-Z][a-z0-9]$',
+                r'[:][[:alpha:]]+',
+       )}{{,2}}
     )?
+    (?:[.](?:(?&OPERATING_SYSTEMS)|(?&LANGS)|(?&MACROS)|(?&OBFUSCATIONS)))?
     $"""
 
 
@@ -259,8 +296,11 @@ class Jiangmin(Classification):
             | {PLATFORM}
         )
     )*
-    (?P<NAME>
-        (([./]|^){FAMILY_ID(r'cnPeace')})?
+    (?P<VEID>
+        (([./]|^){FAMILY_ID(
+                r'[A-Z][a-z]+-[0-9]',
+                r'Test[.]File',
+        )})?
         {VARIANT_ID(r'[.][[:alnum:]]+$')}{{,2}})
     $"""
 
@@ -290,7 +330,7 @@ class Lionic(Classification):
         | HTTP
         | {LABELS}(-?(?&LABELS))?
     )*
-    (?P<NAME>
+    (?P<VEID>
         (?:
             (?:[.]|^)
             {FAMILY_ID(
@@ -304,7 +344,7 @@ class Lionic(Classification):
         {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]')}{{,2}}
     )
     $""",
-        r"(?P<NAME>(?P<FAMILY>(?:[0-9]+|[A-Z])\w{3,}))",
+        r"(?P<VEID>(?P<FAMILY>(?:[0-9]+|[A-Z])\w{3,}))",
     )
 
 
@@ -318,10 +358,12 @@ class NanoAV(Classification):
             | {OBFUSCATIONS}
         )
     )*
-    (?P<NAME>
+    (?P<VEID>
         (([./]|^){FAMILY_ID(r'hidIFrame',
                             r'(?i:Iframe-scroll)',
-                            r'[A-Z][[:alnum:]]+')})?
+                            r'[A-Z][[:alnum:]]+',
+                            r'[0-9]+[a-z]{2,}[0-9]*',
+    )})?
         {VARIANT_ID()}{{,2}}
     )
     $"""
@@ -343,8 +385,11 @@ class Qihoo360(Classification):
             | (QVM\d+([.]\d+)?([.]\p{{Hex_Digit}}+)?) # QVM40.1.BB16 or QVM9
         )
     )*
-    (?P<NAME>
-        (?:[./]{FAMILY_ID(r'[0-9]{2}[A-Z][[:alnum:]]+')})?
+    (?P<VEID>
+        (?:
+            (?:[./]|^)
+            {FAMILY_ID()}?
+        )?
         {VARIANT_ID()}{{,2}}
     )
     $"""
@@ -355,17 +400,21 @@ class QuickHeal(Classification):
     (?:
         (?:[./]|^)
         (?:{PLATFORM}|{LABELS}(?&LABELS)?|Cmd|PIF)
-    )*?
-    (?P<NAME>
+    )*
+    (?P<VEID>
+        (?![.]S[[:xdigit:]]+\b)
         (?:
             (?:[./]|^)
-            {FAMILY_ID(r'VirXXX-[A-Z]')}
+            {FAMILY_ID(
+                r'[0-9]+[A-Z][a-z]+',
+                r'[A-Z][a-z]+[0-9]+',
+            )}
         )?
         {VARIANT_ID(
+            r'[-][A-Z]',
             r'[.]S[[:xdigit:]]+',
-            r'[.][A-Z]{3}',
-            r'[.][A-Z]+[0-9]+',
-            r'[.][[:xdigit:]]+'
+            r'[.][A-Z]{1,2}[0-9]{1,2}',
+            r'[.][a-z0-9]{2,3}+'
             )}{{,2}}
     )
     $"""
@@ -383,7 +432,7 @@ class Rising(Classification):
             | Junk
         )
     )*
-    (?P<NAME>
+    (?P<VEID>
         (?:
             (?:[./-]|^)
             {FAMILY_ID(
@@ -402,6 +451,7 @@ class Rising(Classification):
             r'[#][A-Z][A-Z0-9]+',
             r'[/][[:alpha:]][[:alnum:]]+',
             r'[#][0-9]{1,3}%',
+            r'[@](?|CV|EP|URL|VE)',
         )}{{,3}}
     )
     $"""
@@ -410,10 +460,14 @@ class Rising(Classification):
 class Tachyon(Classification):
     # https://tachyonlab.com/en/main_name/main_name.html
     pattern = rf"""^
-    (?:{PLATFORM}|{LABELS}([-]?(?&LABELS))?)[/]{PLATFORM}
-    (?P<NAME>
+    (?:
+        (?:^|[-])
+        (?|{PLATFORM}|{LABELS})
+    )+
+    (?:/{PLATFORM})
+    (?P<VEID>
         (?:
-            (?:[.]|^)
+            [.]
             {FAMILY_ID(r'[A-Z]{2}[-][A-Z][[:alpha:]]+')}
         )
         {VARIANT_ID(r'[.][0-9]+')}{{,2}}
@@ -422,12 +476,15 @@ class Tachyon(Classification):
 
 class Virusdie(Classification):
     pattern = rf"""^
-    (?:(?:^|[.])(?:{PLATFORM}|{LABELS}([-]?(?&LABELS))?))*
-    (?P<NAME>
+    (?:
+        (?:^|[.-])
+        {PLATFORM}|{LABELS}
+    )*
+    (?P<VEID>
         (?:
             (^|[.])
-            {FAMILY_ID(r'Exec[.]Stdio', r'Iframe[.]dnnViewState')}
-        )?
+            (?:{FAMILY_ID()}|.+?)
+        )
         {VARIANT_ID()}{{,2}}
     )
     $"""

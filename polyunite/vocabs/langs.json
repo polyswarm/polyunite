@@ -138,7 +138,9 @@
         "Java": {
             "description": "Java binaries (classes)",
             "match": [
-                "Java"
+                "Java",
+                "J2ME",
+                "J2EE"
             ]
         },
         "LOGO": {
@@ -163,8 +165,7 @@
             "description": "Component Object Model",
             "match": [
                 "COM",
-                "ComObj",
-                "COM.EXE"
+                "ComObj"
             ]
         },
         "MSIL": {
@@ -205,7 +206,14 @@
         "Python": {
             "description": "Python scripts",
             "match": [
+                "Py2Exe",
                 "Python"
+            ]
+        },
+        "Ruby": {
+            "description": "Ruby scripts",
+            "match": [
+                "Ruby"
             ]
         },
         "SAP": {

@@ -5,6 +5,7 @@
             "description": "Uses the AutoCAD application",
             "match": [
                 "AutoCAD",
+                "AutoLisp",
                 "ACAD"
             ]
         },
