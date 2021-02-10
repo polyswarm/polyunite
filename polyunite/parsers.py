@@ -218,6 +218,7 @@ class DrWeb(Classification):
 
 class Ikarus(Classification):
     pattern = rf"""^
+    (?p)
     (
         (?:[.:-]|^)
         (?:
