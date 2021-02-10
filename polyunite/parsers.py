@@ -42,7 +42,7 @@ class Classification(Mapping):
                 timeout=1,
                 concurrent=True,
             )
-            self._groups = {k for k, v in self.match.capturesdict().items() if v}
+            self._groups = {k: None for k, v in self.match.capturesdict().items() if v}.keys()
         except (AttributeError, TypeError):
             raise MatchError(name, self.registration_name())
 
@@ -60,7 +60,7 @@ class Classification(Mapping):
         EngineRegistry.register(cls, cls.__name__)
 
     def __getitem__(self, k):
-        if k in self._groups:
+        if k in self:
             return self.match[k]
         raise KeyError
 
