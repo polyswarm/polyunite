@@ -221,7 +221,7 @@ class Ikarus(Classification):
     (
         (?:[.:-]|^)
         (?:
-            {LABELS}(-?(?&LABELS)|[a-zA-Z0-9]+)?
+            {LABELS}(-?(?&LABELS))?
             | {PLATFORM}
             | AD
             | Patched
@@ -232,20 +232,17 @@ class Ikarus(Classification):
     )*
     (?P<NAME>
         (?:
-            (?:
-                (?:^|[.:])
-                   {FAMILY_ID(
-                        r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
-                        r'[A-Z0-9a-z_-]{2,}[.][A-Z0-9a-z_-]{2,}$',
-                    )}
-            )
-            {VARIANT_ID(
-                r'[.][A-Z]{3}',
-                r'[.][A-Z][a-z][a-z]',
-                r'[.]Gen[0-9]*',
-                r'[:][[:alpha:]]{2}',
-            )}{{,2}}
-        )
+            (?:^|[.:])
+            {FAMILY_ID(
+                r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
+                r'[A-Z][A-Z0-9a-z_-]+[.][A-Z][A-Z0-9a-z_-]+$',
+            )}
+        )?
+        {VARIANT_ID(
+            r'[.][A-Z][a-z]{2}',
+            r'[.]Gen[0-9]*',
+            r'[:][[:alpha:]]{2}',
+        )}{{,2}}
     )?
     $"""
 
@@ -287,16 +284,24 @@ class K7(Classification):
 class Lionic(Classification):
     pattern = group(
         rf"""^
-    ((?:^|[.]){PLATFORM}|Email|HTTP|{LABELS}(-?(?&LABELS))?)*
+    (?:
+        (?:^|[.])
+        {PLATFORM}
+        | Email
+        | HTTP
+        | {LABELS}(-?(?&LABELS))?
+    )*
     (?P<NAME>
         (?:
             (?:[.]|^)
             {FAMILY_ID(
                 r"[0-9A-Z][a-zA-Z0-9]_[0-9]",
                 r'([0-9]{,3})[A-Z][A-Za-z][0-9]{4}',
-                r'[A-Z]{3}',
-                )}
-        )?
+                r'[A-Z][a-z]',
+                r'(?&LANGS)',
+                r'(?&MACROS)',
+             )}
+        )
         {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]')}{{,2}}
     )
     $""",
