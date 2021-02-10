@@ -71,6 +71,7 @@
         "ddos": {
             "description": "A tool used to perform a distributed denial of service attack.",
             "match": [
+                "im-flooder",
                 "flooder",
                 "ddoser",
                 "DoS",
@@ -356,6 +357,7 @@
                     "pattern": "porn\\W?dialer"
                 },
                 "dialer",
+                "premium-sms",
                 "premium_dialer_smser"
             ]
         },
@@ -377,6 +379,7 @@
                 "filecryptor",
                 "ransm",
                 "ransom",
+                "ransomx",
                 "ransomcrypt",
                 "ransomlock",
                 "ransomware",
@@ -526,12 +529,10 @@
         "worm": {
             "description": "Self-replicating malware that propagates across a network either with or without human interaction.",
             "match": [
-                {
-                    "pattern": "(i-)?worm[./-](?:im|net|i|p2p|smtp)"
-                },
-                {
-                    "pattern": "(?:im|net|I|p2p|smtp)[-./]?worm"
-                },
+                {"pattern": "(?|I|IM|Net|P2P)[-.]?Worm"},
+                "Worm.P2p",
+                "Worm/P2p",
+                "i-worm/p2p",
                 "hllw",
                 "worm"
             ]

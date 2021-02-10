@@ -197,7 +197,7 @@ class ClamAV(Classification):
                 r'[A-Z](?:[[:alnum:]]|_)+',
                 r'Test[.]File',
                 r'[[:alpha:]]+(?=-)',
-                r'[A-Z]{{3}}',
+                r'[A-Z]{3}',
                 r'[0-9]+[A-Z][[:alpha:]]+',
             )})?
         {VARIANT_ID(r'([-.:][[:xdigit:]]+)?-[0-9]+(?:-[0-9])?',
@@ -211,7 +211,7 @@ class DrWeb(Classification):
     (?:(?|probably|modification\s of|modification|possible|possibly)\s)?
     (?:(?:\b|[.])(?:{LABELS}(-?(?&LABELS))?|{PLATFORM}))*
     (?:(?:\b|[.]) # MulDrop6.38732 can appear alone or in front of another `.`
-        {IDENT([r"PWS[.][[:alnum:]]+", r"[A-Z][a-z]{{2}}"], [r'[.]Log'])}
+        {IDENT([r"PWS[.][[:alnum:]]+", r"[A-Z][a-z]{2}"], [r'[.]Log'])}
     )?
     $"""
 
@@ -233,20 +233,20 @@ class Ikarus(Classification):
     (?P<NAME>
         (?:
             (?:
-                (?:^|[.])
+                (?:^|[.:])
                    {FAMILY_ID(
                         r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
-                        r'(?&LANGS)',
-                        r'[A-Z0-9a-z_-]{{2,}}[.][A-Z0-9a-z_-]{{2,}}$',
+                        r'[A-Z0-9a-z_-]{2,}[.][A-Z0-9a-z_-]{2,}$',
                     )}
-            )?
+            )
             {VARIANT_ID(
-                r'[A-Z]{{3}}',
+                r'[.][A-Z]{3}',
                 r'[.][A-Z][a-z][a-z]',
                 r'[.]Gen[0-9]*',
+                r'[:][[:alpha:]]{2}',
             )}{{,2}}
         )
-    )
+    )?
     $"""
 
 
@@ -293,8 +293,8 @@ class Lionic(Classification):
             (?:[.]|^)
             {FAMILY_ID(
                 r"[0-9A-Z][a-zA-Z0-9]_[0-9]",
-                r'([0-9]{{,3}})[A-Z][A-Za-z][0-9]{{4}}',
-                r'[A-Z]{{3}}',
+                r'([0-9]{,3})[A-Z][A-Za-z][0-9]{4}',
+                r'[A-Z]{3}',
                 )}
         )?
         {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]')}{{,2}}
@@ -340,7 +340,7 @@ class Qihoo360(Classification):
         )
     )*
     (?P<NAME>
-        (?:[./]{FAMILY_ID(r'[0-9]{{2}}[A-Z][[:alnum:]]+')})?
+        (?:[./]{FAMILY_ID(r'[0-9]{2}[A-Z][[:alnum:]]+')})?
         {VARIANT_ID()}{{,2}}
     )
     $"""
@@ -350,18 +350,17 @@ class QuickHeal(Classification):
     pattern = rf"""^
     (?:
         (?:[./]|^)
-        (?:{PLATFORM}|{LABELS}(?&LABELS)?|Cmd)
-    )*
+        (?:{PLATFORM}|{LABELS}(?&LABELS)?|Cmd|PIF)
+    )*?
     (?P<NAME>
         (?:
             (?:[./]|^)
-            {FAMILY_ID(r'VirXXX-[A-Z]',
-                       rf'(?P<{HEURISTICS.name}>Agent[.][[:alnum:]]+)')}
+            {FAMILY_ID(r'VirXXX-[A-Z]')}
         )?
         {VARIANT_ID(
             r'[.]S[[:xdigit:]]+',
             r'[.]GEN[0-9]+',
-            r'[.][A-Z]{{3}}',
+            r'[.][A-Z]{3}',
             r'[.][A-Z]+[0-9]+',
             r'[.][[:xdigit:]]+'
             )}{{,2}}
@@ -398,9 +397,12 @@ class Rising(Classification):
 class Tachyon(Classification):
     # https://tachyonlab.com/en/main_name/main_name.html
     pattern = rf"""^
-    (?:{PLATFORM}|{LABELS}([-]?(?&LABELS))?)[/]{PLATFORM}[.]
+    (?:{PLATFORM}|{LABELS}([-]?(?&LABELS))?)[/]{PLATFORM}
     (?P<NAME>
-        {FAMILY_ID('[A-Z][A-Z]-[A-Z][[:alpha]]+')}
+        (?:
+            (?:[.]|^)
+            {FAMILY_ID(r'[A-Z]{2}[-][A-Z][[:alpha:]]+')}
+        )
         {VARIANT_ID(r'[.][0-9]+')}{{,2}}
     )$"""
 

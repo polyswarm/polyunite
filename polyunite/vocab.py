@@ -90,7 +90,7 @@ def VARIANT_ID(*extra):
         r'[!]ET',
         r'[.!@#](?-i:[A-Z]+|[a-z]+|[A-F0-9]+|[a-f0-9]+)',
         r'[.](?-i:[A-Z]{,3}|[a-z]{,3}|[0-9]{,3})',
-        r'[.!][[:alnum:]]',
+        r'[.][[:alnum:]]',
         name='VARIANT'
     )
 
@@ -105,7 +105,6 @@ def FAMILY_ID(*extra, heuristics=True):
             *extra,
             r'MS\d{2}-\d{,6}',
             r'[A-Z][[:alpha:]]{2}',
-            r'[A-Z][[:alpha:]]+-[A-Z][[:alpha:]]+',
             r'[a-z0-9]?[A-Z]\w{3,}',
         )
     )
