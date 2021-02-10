@@ -261,8 +261,8 @@ class Ikarus(Classification):
       (?:
           (?:^|[.:])
             {FAMILY_ID(
+            r'(?<=Exploit[.]).*$',
             r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
-            r'(?<=Exploit[.]).*',
           )}
        )?
        {VARIANT_ID(
@@ -436,12 +436,9 @@ class Rising(Classification):
         (?:
             (?:[./-]|^)
             {FAMILY_ID(
-                r'[a-z]{3,}[A-Z]',
                 r'[0-9]+[A-Z][[:alpha:]]+',
                 r'[A-Z][[:alpha:]]+-(?:[A-Z][[:alpha:]]*|[0-9]+)',
-                r'[a-z]+-[[:alnum:]]+',
                 r'[A-Z][[:alnum:]]+[(][[:alnum:]]+[)]',
-                r'[a-z]{2,}[0-9]*[a-z]+'
             )}
         )?
         (?:/(?:(?&LABELS)|(?&PLATFORM)))?
