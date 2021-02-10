@@ -433,6 +433,7 @@ class Rising(Classification):
             {LABELS}
             | (?&PLATFORM)
             | BL
+            | KL
             | Junk
         )
     )*
@@ -442,10 +443,18 @@ class Rising(Classification):
             {FAMILY_ID(
                 r'[0-9]+[A-Z][[:alpha:]]+',
                 r'[A-Z][[:alpha:]]+-([A-Z][[:alpha:]]*|[0-9]+)',
+
+                r'(?# [XXX] e.x `Trojan.Win32.fedoN.cf`)'
+                r'fedoN',
+
+                r'(?# e.x `Malware.Generic[Thunder]!1.A1C4`)'
                 r'[A-Z][[:alnum:]]+[(][[:alnum:]]+[)]',
+
+                r'(?# e.x `Worm.Nuj!8.2AD` & `Worm.Oji/Android!8.10B72`)'
+                r'[A-Z][[:alpha:]]{1,2}(?=[/!.])',
             )}
         )?
-        (/((?&LABELS)|(?&PLATFORM)))?
+        (/((?&LABELS)|(?&PLATFORM)|Source|AllInOne|SLT|APT))?
         {VARIANT_ID(
             r'[!][A-Z0-9][.][A-Z0-9]+',
             re.escape('[HT]'),
@@ -453,7 +462,8 @@ class Rising(Classification):
             r'[!]ET',
             r'[!][[:xdigit:]][.][[:xdigit:]]+',
             r'[#][A-Z][A-Z0-9]+',
-            r'[/][[:alpha:]][[:alnum:]]+',
+            r'/[A-Z][A-Z0-9]',
+            r'[!]tfe',
             r'[@](?|CV|EP|URL|VE)',
         )}{{,3}}
     )
