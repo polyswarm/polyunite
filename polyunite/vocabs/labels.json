@@ -162,7 +162,6 @@
                 {
                     "pattern": "fraud-?tool"
                 },
-                "VirusConstructor",
                 "SoftwareBndlr",
                 "SoftwareBundle",
                 "SoftwareBundler",
@@ -436,8 +435,11 @@
         "security_assessment_tool": {
             "description": "A program that can be used to gather information for unauthorized access to computer systems.",
             "match": [
+                "virtool",
                 "hack",
                 "hack-tool",
+                "VirusConstructor",
+                "Constructor",
                 "psw",
                 "pswtool",
                 "hacktool",

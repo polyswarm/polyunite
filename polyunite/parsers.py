@@ -363,7 +363,6 @@ class QuickHeal(Classification):
         )?
         {VARIANT_ID(
             r'[.]S[[:xdigit:]]+',
-            r'[.]GEN[0-9]+',
             r'[.][A-Z]{3}',
             r'[.][A-Z]+[0-9]+',
             r'[.][[:xdigit:]]+'
@@ -390,7 +389,8 @@ class Rising(Classification):
             {FAMILY_ID(
                 r'[a-z]{3,}[A-Z]',
                 r'[0-9]+[A-Z][[:alpha:]]+',
-                r'[A-Z][[:alpha:]]+-[[:alnum:]]+',
+                r'[A-Z][[:alpha:]]+-(?:[A-Z][[:alpha:]]*|[0-9]+)',
+                r'[a-z]+-[[:alnum:]]+',
                 r'[A-Z][[:alnum:]]+[(][[:alnum:]]+[)]',
                 r'[a-z]{2,}[0-9]*[a-z]+'
             )}

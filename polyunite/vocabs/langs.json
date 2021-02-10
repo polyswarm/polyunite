@@ -163,7 +163,8 @@
             "description": "Component Object Model",
             "match": [
                 "COM",
-                "ComObj"
+                "ComObj",
+                "COM.EXE"
             ]
         },
         "MSIL": {

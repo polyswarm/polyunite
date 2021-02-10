@@ -4,6 +4,7 @@
         "ACAD": {
             "description": "Uses the AutoCAD application",
             "match": [
+                "AutoCAD",
                 "ACAD"
             ]
         },
@@ -75,7 +76,8 @@
                     "description": "Office 97, 2000, XP, 2003, 2007, and 2010 macros - those that affect Word, Excel, and Powerpoint",
                     "match": [
                         "O97",
-                        "O97M"
+                        "O97M",
+                        "Office2k"
                     ]
                 },
                 "OM": {
