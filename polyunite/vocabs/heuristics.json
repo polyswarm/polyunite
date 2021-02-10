@@ -7,7 +7,7 @@
             "match": [{
                     "pattern": "heuristics?"
                 },
-                      "Gen",
+                "Gen",
                 "advml",
                 "attribute",
                 "behaveslike",
@@ -31,8 +31,7 @@
         },
         "family": {
             "description": "Contains characteristics usual of a particular class of viruses",
-            "match": [
-                {
+            "match": [{
                     "pattern": "Agent[0-9]+"
                 },
                 "agent",
@@ -46,8 +45,7 @@
         },
         "suspicious": {
             "description": "Suspicious behavior without signature match",
-            "match": [
-                {
+            "match": [{
                     "pattern": "\\bSusp?\\b"
                 },
                 "Abuse-Worry",

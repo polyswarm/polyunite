@@ -10,6 +10,11 @@ except:
     sys.path.append(str(Path(__file__).parent.joinpath('../tests')))
     from conftest import format_match, match_iter
 
+import cProfile
+
+profile = cProfile.Profile()
+profile.enable()
+
 @contextmanager
 def section(name):
     print("{:-^150}".format(name))
@@ -28,3 +33,5 @@ with section('MISSING') as pr:
 with section('FAILURES') as pr:
     for engine, label, err in errors:
         pr("{:<15}: {:85} : {}".format(engine, label, err))
+
+profile.dump_stats('/tmp/polyunite.stats')

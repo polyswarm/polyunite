@@ -374,27 +374,36 @@ class QuickHeal(Classification):
 
 class Rising(Classification):
     pattern = rf"""^
-    (?(DEFINE)
-        (?P<FAMILY>{CVE_PATTERN}|[iA-Z][-\w]+?)
-        (?P<PLATFORM>{PLATFORM}))
-    # -----------------------------
-    ((?:[.]|^){LABELS}(?:[-]?(?&LABELS))?)*
-    ((\A|[.])(?&PLATFORM))*
-    (?|
-        [.](?&FAMILY) |
-        [.](?&PLATFORM)/(?&FAMILY) |
-        ([.](?&FAMILY))?/(?&PLATFORM)
-    )?
-    (?P<VARIANT>
-        (?|
-           [!]   ET\#\d\d\% |
-           [@]   [A-Z]+ |
-           [!#.] [a-z0-9]+ |
-           [.]   [A-Z]+ |
-           (?i:\L<suffixes>)
-        ){{,2}}
-        ({antecedent:([!][0-9]+)}?[.][A-F0-9]+)?
-    )?
+    (?(DEFINE) (?P<PLATFORM>{PLATFORM}))
+    (?:
+        (?:[./-]|^)
+        (?:
+            {LABELS}
+            | (?&PLATFORM)
+            | BL
+            | Junk
+        )
+    )*
+    (?P<NAME>
+        (?:
+            (?:[./-]|^)
+            {FAMILY_ID(
+                r'[a-z]{3,}[A-Z]',
+                r'[0-9]+[A-Z][[:alpha:]]+',
+                r'[A-Z][[:alpha:]]+-[[:alnum:]]+',
+                r'[A-Z][[:alnum:]]+[(][[:alnum:]]+[)]',
+                r'[a-z]{2,}[0-9]*[a-z]+'
+            )}
+        )?
+        (?:/(?:(?&LABELS)|(?&PLATFORM)))?
+        {VARIANT_ID(
+            re.escape('[HT]'),
+            r'[!][[:xdigit:]][.][[:xdigit:]]+',
+            r'[#][A-Z][A-Z0-9]+',
+            r'[/][[:alpha:]][[:alnum:]]+',
+            r'[#][0-9]{1,3}%',
+        )}{{,3}}
+    )
     $"""
 
 

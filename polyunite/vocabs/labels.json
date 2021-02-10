@@ -80,8 +80,7 @@
         },
         "downloader": {
             "description": "Malware programmed to download and execute other files, usually more complex malware.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "\\bDL\\b"
                 },
                 "dldr",
@@ -154,8 +153,7 @@
         },
         "greyware": {
             "description": "Software that, while not definitely malicious, has a suspicious or potentially unwanted aspect.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "(?<=\\W)tool(?=\\W)"
                 },
                 {
@@ -198,8 +196,9 @@
         },
         "implant": {
             "description": "Code inserted into an existing program using a code patcher or other tool.",
-            "match": [
-                {"pattern": "\\bPOS\\b"},
+            "match": [{
+                    "pattern": "\\bPOS\\b"
+                },
                 "behavior",
                 "implant"
             ]
@@ -232,8 +231,7 @@
         },
         "mass_mailer": {
             "description": "A worm that uses email to propagate across the internet.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "Client-?SMTP"
                 },
                 "email",
@@ -274,8 +272,7 @@
         },
         "nonmalware": {
             "description": "Not a virus",
-            "match": [
-                {
+            "match": [{
                     "pattern": "(?i:eicar(?>[^a-z]?test(?>[^a-z]?file)?)?(?:[.]com)?)"
                 },
                 "not-a-virus",
@@ -297,8 +294,7 @@
         },
         "banker": {
             "description": "A type of trojan designed to perform banking fraud.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "banker(\\d)?"
                 },
                 "banker"
@@ -306,8 +302,7 @@
         },
         "password_stealer": {
             "description": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "(?:pws|psw|password)[-_]?(?|steal(?:er)?|thief)"
                 },
                 "PWS",
@@ -320,8 +315,7 @@
         },
         "injector": {
             "description": "A type of trojan that injects itself into other processes or files.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "(vb|cee|aut|autoit|crypt(o)?|delf)?inject(\\d|or)?"
                 },
                 "injector",
@@ -330,8 +324,7 @@
         },
         "infector": {
             "description": "A type of trojan that spreads by attaching its code to other files.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "infect(or)?"
                 },
                 "infector"
@@ -352,8 +345,7 @@
         },
         "premium_dialer_smser": {
             "description": "A type of malware whose primary aim is to dial (or send SMS messages to) premium rate numbers.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "porn\\W?dialer"
                 },
                 "dialer",
@@ -370,8 +362,7 @@
         },
         "ransomware": {
             "description": "Malware that encrypts files on a victim's system, demanding payment of ransom in return for the access codes required to unlock files.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "ransom-?encoder"
                 },
                 "ansom",
@@ -389,8 +380,7 @@
         },
         "remote_access_trojan": {
             "description": "A remote access trojan program (or RAT), is a trojan horse capable of controlling a machine through commands issued by a remote attacker.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "remote\\W?admin"
                 },
                 "rat",
@@ -408,15 +398,12 @@
         },
         "cryptominer": {
             "description": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner, to use them for cryptocurrency mining without user permission.",
-            "match": [
-                {
-                    "pattern": "(bitcoin|bit|crypto|btc|eth)?coinminer"
+            "match": [{
+                    "pattern": "(?|bitcoin|bit|crypto|btc|eth|xmr)?(?:coin)?[-]?miner"
                 },
                 "btcmine",
                 "coinhive",
-                "coinminer",
-                "cryptominer",
-                "miner"
+                "cryptominer"
             ]
         },
         "rogue_security_software": {
@@ -465,8 +452,7 @@
         },
         "exploit": {
             "description": "Either a small piece of code that activates a command-line interface to a system that can be used to disable security measures, open a backdoor, or download further malicious code; or a small piece of code that opens a system up for exploitation, sometimes by not necessarily involving a command-line shell.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "exp\\b"
                 },
                 "exploit",
@@ -476,8 +462,7 @@
         },
         "spyware": {
             "description": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "Spy(?![[:alnum:]])"
                 },
                 "Monitor",
@@ -494,8 +479,7 @@
         },
         "trojan": {
             "description": "Malware disguised as something inert or benign.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "\\bTr\\b"
                 },
                 "trjn",
@@ -507,8 +491,7 @@
         },
         "virus": {
             "description": "Self-replicating malware that requires human interaction to spread; also, self-replicating malware that runs and spreads by modifying and inserting itself into other programs or files.",
-            "match": [
-                {
+            "match": [{
                     "pattern": "HLL[CO]"
                 },
                 "Mal",
@@ -528,8 +511,9 @@
         },
         "worm": {
             "description": "Self-replicating malware that propagates across a network either with or without human interaction.",
-            "match": [
-                {"pattern": "(?|I|IM|Net|P2P)[-.]?Worm"},
+            "match": [{
+                    "pattern": "(?|I|IM|Net|P2P)[-.]?Worm"
+                },
                 "Worm.P2p",
                 "Worm/P2p",
                 "i-worm/p2p",

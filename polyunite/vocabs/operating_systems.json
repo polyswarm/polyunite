@@ -1,190 +1,191 @@
 {
-  "group": "operating_systems",
-  "children": {
-    "Android": {
-      "description": "Android Phone OS",
-      "match": [
-        "Andr",
-        "Android",
-        "AndroidOS"
-      ]
-    },
-    "Boot": {
-      "description": "Uses or resides in the Master Boot Record (MBR) or DOS Boot Sector of an operating system",
-      "match": [
-        "Boot",
-        "Boot-DOS"
-      ]
-    },
-    "DOS": {
-      "description": "MS-DOS",
-      "match": [
-        "DOS"
-      ]
-    },
-    "EPOC": {
-      "description": "Psion devices",
-      "match": [
-        "EPOC"
-      ]
-    },
-    "FreeBSD": {
-      "description": "FreeBSD platform",
-      "match": [
-        "FreeBSD"
-      ]
-    },
-    "Multi": {
-      "match": [
-        "Any",
-        "Application",
-        "Legacy",
-        "Multi",
-        "System",
-        "multios"
-      ]
-    },
-    "Linux": {
-      "description": "Linux platform",
-      "match": [
-        {
-          "pattern": "(?i:ELF.?(Linux|ARM|x)?\\d*)"
+    "group": "operating_systems",
+    "children": {
+        "Android": {
+            "description": "Android Phone OS",
+            "match": [
+                "Andr",
+                "Android",
+                "AndroidOS"
+            ]
         },
-        "Linux"
-      ]
-    },
-    "MacOSX": {
-      "description": "MACOSX 10.0 or later",
-      "match": [
-        {
-          "pattern": "Mac(?:\\_|\\s|\\.)?OS(?:\\_|\\s|\\.)?X?"
+        "Boot": {
+            "description": "Uses or resides in the Master Boot Record (MBR) or DOS Boot Sector of an operating system",
+            "match": [
+                "Boot",
+                "Boot-DOS"
+            ]
         },
-        "Mac",
-        "MacOS",
-        "MacOSX",
-        "OSX"
-      ]
-    },
-    "OS2": {
-      "description": "OS2 platform",
-      "match": [
-        "OS2"
-      ]
-    },
-    "Palm": {
-      "description": "Palm operating system",
-      "match": [
-        "Palm"
-      ]
-    },
-    "Symbian": {
-        "description": "Symbian",
-        "match": [
-            "Symbian"
-        ]
-    },
-    "Script": {
-      "description": "Interpreted",
-      "match": [
-        "Script"
-      ]
-    },
-    "Solaris": {
-      "description": "System V-based Unix platforms",
-      "match": [
-        "Solaris"
-      ]
-    },
-    "SunOS": {
-      "description": "Unix platforms 4.1.3 or lower",
-      "match": [
-        "SunOS"
-      ]
-    },
-    "SymbOS": {
-      "description": "Symbian operating system",
-      "match": [
-        "SymbOS"
-      ]
-    },
-    "UKP": {
-      "match": [
-        "UKP"
-      ]
-    },
-    "UNIX": {
-      "description": "general Unix platforms",
-      "match": [
-        "UNIX"
-      ]
-    },
-    "Windows": {
-      "description": "Microsoft windows",
-      "match": [
-        "Win",
-        "Win32.64",
-        "Windows"
-      ],
-      "children": {
-        "Win16": {
-          "description": "Win16 (3.1) platform",
-          "match": [
-            "Win16"
-          ]
+        "DOS": {
+            "description": "MS-DOS",
+            "match": [
+                "MSDOS",
+                "DOSCOM",
+                "DOS"
+            ]
         },
-        "Win2K": {
-          "description": "Windows 2000 platform",
-          "match": [
-            "Win2K"
-          ]
+        "EPOC": {
+            "description": "Psion devices",
+            "match": [
+                "EPOC"
+            ]
         },
-        "Win32": {
-          "description": "Windows 32-bit platform",
-          "match": [
-            "W32",
-            "Win32"
-          ]
+        "FreeBSD": {
+            "description": "FreeBSD platform",
+            "match": [
+                "FreeBSD"
+            ]
         },
-        "Win64": {
-          "description": "Windows 64-bit platform",
-          "match": [
-            "W64",
-            "Win64"
-          ]
+        "Multi": {
+            "match": [
+                "Any",
+                "Application",
+                "Legacy",
+                "Multi",
+                "System",
+                "multios"
+            ]
         },
-        "Win95": {
-          "description": "Windows 95, 98 and ME platforms",
-          "match": [
-            "Win95"
-          ]
+        "Linux": {
+            "description": "Linux platform",
+            "match": [{
+                    "pattern": "(?i:ELF.?(Linux|ARM|x)?\\d*)"
+                },
+                "Linux"
+            ]
         },
-        "Win98": {
-          "description": "Windows 98 platform only",
-          "match": [
-            "Win9x",
-            "Win98"
-          ]
+        "MacOSX": {
+            "description": "MACOSX 10.0 or later",
+            "match": [{
+                    "pattern": "Mac(?:\\_|\\s|\\.)?OS(?:\\_|\\s|\\.)?X?"
+                },
+                "Mac",
+                "MacOS",
+                "MacOSX",
+                "OSX"
+            ]
         },
-        "WinCE": {
-          "description": "Windows CE platform",
-          "match": [
-            "WinCE"
-          ]
+        "OS2": {
+            "description": "OS2 platform",
+            "match": [
+                "OS2"
+            ]
         },
-        "WinNT": {
-          "description": "WinNT",
-          "match": [
-            "WinNT"
-          ]
+        "Palm": {
+            "description": "Palm operating system",
+            "match": [
+                "Palm"
+            ]
+        },
+        "Symbian": {
+            "description": "Symbian",
+            "match": [
+                "Symbian"
+            ]
+        },
+        "Script": {
+            "description": "Interpreted",
+            "match": [
+                "Script"
+            ]
+        },
+        "Solaris": {
+            "description": "System V-based Unix platforms",
+            "match": [
+                "Solaris"
+            ]
+        },
+        "SunOS": {
+            "description": "Unix platforms 4.1.3 or lower",
+            "match": [
+                "SunOS"
+            ]
+        },
+        "SymbOS": {
+            "description": "Symbian operating system",
+            "match": [
+                "SymbOS"
+            ]
+        },
+        "UKP": {
+            "match": [
+                "UKP"
+            ]
+        },
+        "UNIX": {
+            "description": "general Unix platforms",
+            "match": [
+                "UNIX"
+            ]
+        },
+        "Windows": {
+            "description": "Microsoft windows",
+            "match": [
+                "Win",
+                "Win32.64",
+                "Win32/64",
+                "Windows"
+            ],
+            "children": {
+                "Win16": {
+                    "description": "Win16 (3.1) platform",
+                    "match": [
+                        "Win16"
+                    ]
+                },
+                "Win2K": {
+                    "description": "Windows 2000 platform",
+                    "match": [
+                        "Win2K"
+                    ]
+                },
+                "Win32": {
+                    "description": "Windows 32-bit platform",
+                    "match": [
+                        "W32",
+                        "Win32"
+                    ]
+                },
+                "Win64": {
+                    "description": "Windows 64-bit platform",
+                    "match": [
+                        "W64",
+                        "Win64"
+                    ]
+                },
+                "Win95": {
+                    "description": "Windows 95, 98 and ME platforms",
+                    "match": [
+                        "Win95"
+                    ]
+                },
+                "Win98": {
+                    "description": "Windows 98 platform only",
+                    "match": [
+                        "Win9x",
+                        "Win98"
+                    ]
+                },
+                "WinCE": {
+                    "description": "Windows CE platform",
+                    "match": [
+                        "WinCE"
+                    ]
+                },
+                "WinNT": {
+                    "description": "WinNT",
+                    "match": [
+                        "WinNT"
+                    ]
+                }
+            }
+        },
+        "iPhoneOS": {
+            "description": "IPhone",
+            "match": [
+                "IOS",
+                "iPhoneOS"
+            ]
         }
-      }
-    },
-    "iPhoneOS": {
-      "description": "IPhone",
-      "match": [
-        "IOS",
-        "iPhoneOS"
-      ]
     }
-  }
 }

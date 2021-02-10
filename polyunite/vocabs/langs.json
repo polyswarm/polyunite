@@ -1,7 +1,7 @@
 {
     "group": "langs",
     "children": {
-        "AutoHotKey":{
+        "AutoHotKey": {
             "match": [
                 "AutohotKey",
                 "AHK"
@@ -83,8 +83,7 @@
         },
         "IMAGE": {
             "description": "Image files",
-            "match": [
-                {
+            "match": [{
                     "pattern": "JPE?G"
                 },
                 {
@@ -112,8 +111,9 @@
         },
         "INF": {
             "description": "Uses Windows INF files",
-            "match": [
-                {"pattern": "AutoRun[.-_]?INF"},
+            "match": [{
+                    "pattern": "AutoRun[.-_]?INF"
+                },
                 "INF"
             ]
         },
