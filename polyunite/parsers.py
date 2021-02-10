@@ -236,13 +236,11 @@ class Ikarus(Classification):
             (?:^|[.:])
             {FAMILY_ID(
                 r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
-                r'[A-Z][A-Z0-9a-z_-]+[.][A-Z][A-Z0-9a-z_-]+$',
             )}
         )?
         {VARIANT_ID(
             r'[.][A-Z][a-z]{2}',
             r'[.]Gen[0-9]*',
-            r'[:][[:alpha:]]{2}',
         )}{{,2}}
     )?
     $"""
