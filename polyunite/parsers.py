@@ -201,7 +201,7 @@ class ClamAV(Classification):
         {VARIANT_ID(r'[:-][0-9]',
                     r'-[[:xdigit:]]+',
                     r'/CRDF(-[[:alnum:]])?',
-                    r'[.]Extra_Field')}{{,3}}
+                    r'[.]Extra_Field')}{{,3}}?
     )
     $"""
 
