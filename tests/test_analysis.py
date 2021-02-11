@@ -64,7 +64,7 @@ TEST_BOUNTIES = [
         }
     ),
     (
-        'BtcMine', ['cryptominer', 'trojan'], {
+        'Trojan.BtcMine', ['cryptominer', 'trojan'], {
             'DrWeb': 'Trojan.BtcMine.3368',
             'Ikarus': 'Trojan.Win64.CoinMiner',
         }

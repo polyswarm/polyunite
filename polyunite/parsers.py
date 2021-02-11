@@ -37,11 +37,7 @@ class Classification(Mapping):
 
     def __init__(self, name: str):
         try:
-            self.match = self.regex.fullmatch(
-                name,
-                timeout=1,
-                concurrent=True,
-            )
+            self.match = self.regex.fullmatch(name, timeout=1)
             self._groups = {k: None for k, v in self.match.capturesdict().items() if v}.keys()
         except (AttributeError, TypeError):
             raise MatchError(name, self.registration_name())
@@ -93,11 +89,17 @@ class Classification(Mapping):
         return labels
 
     @property
-    def name(
-        self,
-        name_pattern=re.compile(r'(?r)[A-Z][-\w]{2,}([.-][A-Z]+)?'),
-    ) -> str:
+    def name(self) -> str:
         """'name' of the virus"""
+        family = self.family
+
+        if family is not None:
+            return family
+
+        return self.taxon
+
+    @property
+    def family(self):
         if self.is_EICAR:
             return 'EICAR'
 
@@ -107,10 +109,12 @@ class Classification(Mapping):
         if 'FAMILY' in self:
             return self['FAMILY']
 
-        # Return the longest leftmost word if we haven't matched anything
-        endpos = self.match.start('VARIANT') if 'VARIANT' in self else None
-        match = name_pattern.search(self.source, endpos=endpos)
-        return match[0] if match else self.source
+    @property
+    def taxon(self):
+        if 'VARIANT' in self:
+            return self.source[0:self.match.start('VARIANT')]
+        else:
+            return self.source
 
     @classmethod
     def registration_name(cls):
@@ -192,16 +196,17 @@ class ClamAV(Classification):
             | {LABELS}
             | Legacy
         )
-    )*?
+    )*
     (?P<VEID>
         (
             ([.]|^)
-            {FAMILY_ID(r'Blacklist[.]CRT[.][[:xdigit:]]+', PLATFORM, LABELS)}
-        )
-        {VARIANT_ID(r'[:-][0-9]',
-                    r'-[[:xdigit:]]+',
+            {FAMILY_ID(r'Blacklist[.]CRT[.][[:xdigit:]]+', '[A-Z][[:alpha:]]+', r'[A-Z0-9][[:alnum:]]+(?=-)')}
+        )?
+        {VARIANT_ID(r'-[0-9]+',
+                    r':[0-9]',
+                    r'[.][0-9]+(?=-[0-9])',
                     r'/CRDF(-[[:alnum:]])?',
-                    r'[.]Extra_Field')}{{,3}}?
+                    r'[.]Extra_Field')}*
     )
     $"""
 
@@ -222,8 +227,8 @@ class DrWeb(Classification):
             ([.]|\b|^)
             {FAMILY_ID(
                 r'PWS[.][[:alnum:]]+',
-                r'^[[:alnum:]]{2,3}(?=[.])',
-                r'^[[:alnum:]][a-zA-Z0-9-_.]+[A-Z][[:alnum:]]$',
+                r'^[A-Z][[:alnum:]]{1,2}(?=[.])',
+                r'^[A-Z][[:alnum:]][a-zA-Z0-9-_.]+[A-Z][[:alnum:]]$',
             )}
         )?
         {VARIANT_ID(r'[.]Log')}{{,2}}
@@ -247,6 +252,7 @@ class Ikarus(Classification):
             | Damaged
             | DongleHack
             | Fraud
+            | Fake
             | FTP
             | MalwareScope
             | Optional
@@ -258,6 +264,7 @@ class Ikarus(Classification):
             | WordPress
             | WScr
             | X2000M
+            | Equation
         )
     )*
     (?P<VEID>
@@ -265,10 +272,12 @@ class Ikarus(Classification):
           (^|[.:])
           {FAMILY_ID(
             r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
-            r'(?<=Exploit[.])[a-zA-Z0-9-_.]+$',
+            r'^[A-Z][a-zA-Z0-9_-]+$',
+            r'PDF-[[:alnum:]]+',
            )}
        )?
        {VARIANT_ID(
+                r'[.]SuspectCRC',
                 r'20[0-9]{2}-[0-9]{1,6}',
                 r'[-][A-Z]',
                 r'[-][0-9]+$',
@@ -279,7 +288,7 @@ class Ikarus(Classification):
                 r'[.][A-Z]{1,2}[0-9]*',
                 r'[.][A-Z][a-z0-9]$',
                 r'[:][[:alpha:]]+',
-       )}{{,2}}
+       )}{{,3}}
        ([.]((?&OPERATING_SYSTEMS)|(?&LANGS)|(?&MACROS)|(?&OBFUSCATIONS)))?
     )?
     $"""
@@ -293,17 +302,15 @@ class Jiangmin(Classification):
             {HEURISTICS}
             | Intended
             | Garbage
+            | Riot
             | {LABELS}(-?(?&LABELS))?
             | {OBFUSCATIONS}
             | {PLATFORM}
         )
     )*
     (?P<VEID>
-        (([./]|^){FAMILY_ID(
-                r'[A-Z][a-z]+-[0-9]',
-                r'Test[.]File',
-        )})?
-        {VARIANT_ID(r'[.][[:alnum:]]+$')}{{,2}})
+        (([./]|^){FAMILY_ID(r'[A-Z][a-z]+-[0-9]')})?
+        {VARIANT_ID(r'[.][[:alnum:]]+$', '[.][A-Z][a-z]$')}{{,2}})
     $"""
 
 
@@ -323,31 +330,34 @@ class K7(Classification):
 
 
 class Lionic(Classification):
-    pattern = group(
-        rf"""^
+    pattern = rf"""^
     (
         (^|[.])
-        {PLATFORM}
-        | Email
-        | HTTP
-        | {LABELS}(-?(?&LABELS))?
+        (
+            {PLATFORM}
+            | Email
+            | W
+            | pcap
+            | HTTP
+            | Shell
+            | {LABELS}(-?(?&LABELS))?
+        )
     )*
     (?P<VEID>
         (
             ([.]|^)
             {FAMILY_ID(
                 r"[0-9A-Z][a-zA-Z0-9]_[0-9]",
+                r'^[a-zA-Z0-9_]+$',
                 r'([0-9]{,3})[A-Z][A-Za-z][0-9]{4}',
                 r'[A-Z][a-z]',
                 r'(?&LANGS)',
                 r'(?&MACROS)',
              )}
-        )
-        {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]')}{{,2}}
+        )?
+        {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]$')}*
     )
-    $""",
-        r"(?P<VEID>(?P<FAMILY>([0-9]+|[A-Z])\w{3,}))",
-    )
+    $"""
 
 
 class NanoAV(Classification):
@@ -361,12 +371,15 @@ class NanoAV(Classification):
         )
     )*
     (?P<VEID>
-        (([./]|^){FAMILY_ID(r'hidIFrame',
-                            r'(?i:Iframe-scroll)',
+        (
+            ([./]|^)
+            {FAMILY_ID(r'hidIFrame',
+                            r'Iframe-scroll',
                             r'[A-Z][[:alnum:]]+',
                             r'[0-9]+[a-z]{2,}[0-9]*',
-    )})?
-        {VARIANT_ID()}{{,2}}
+            )}
+        )?
+        {VARIANT_ID(r'[.][a-z]{3,7}')}*
     )
     $"""
 
@@ -415,7 +428,7 @@ class QuickHeal(Classification):
         {VARIANT_ID(
             r'[.]HTML[.][A-Z]',
             r'[-][A-Z]',
-            r'[.]S[[:xdigit:]]+',
+            r'[.][A-Z][[:xdigit:]]+$',
             r'[.][A-Z]{1,2}[0-9]{1,2}',
             r'[.][a-z0-9]{2,3}+'
             )}{{,2}}
@@ -425,12 +438,11 @@ class QuickHeal(Classification):
 
 class Rising(Classification):
     pattern = rf"""^
-    (?(DEFINE) (?P<PLATFORM>{PLATFORM}))
     (
         ([./-]|^)
         (
             {LABELS}
-            | (?&PLATFORM)
+            | {PLATFORM}
             | BL
             | KL
             | Junk
@@ -442,29 +454,43 @@ class Rising(Classification):
             {FAMILY_ID(
                 r'[0-9]+[A-Z][[:alpha:]]+',
                 r'[A-Z][[:alpha:]]+-([A-Z][[:alpha:]]*|[0-9]+)',
-
                 r'(?# [XXX] e.x `Trojan.Win32.fedoN.cf`)'
                 r'fedoN',
-
                 r'(?# e.x `Malware.Generic[Thunder]!1.A1C4`)'
                 r'[A-Z][[:alnum:]]+[(][[:alnum:]]+[)]',
-
                 r'(?# e.x `Worm.Nuj!8.2AD` & `Worm.Oji/Android!8.10B72`)'
-                r'[A-Z][[:alpha:]]{1,2}(?=[/!.])',
+                r'[A-Z][[:alpha:]]{1,2}(?=[/!.-])',
+                r'(?# e.x `Malware.n!8.FB62`)'
+                r'(?<=[.])[a-z](?=!)',
             )}
         )?
-        (/((?&LABELS)|(?&PLATFORM)|Source|AllInOne|SLT|APT))?
+        ([/]
+            (
+                (?&LABELS)
+                | (?&LANGS)
+                | (?&ARCHIVES)
+                | (?&HEURISTICS)
+                | (?&MACROS)
+                | (?&OPERATING_SYSTEMS)
+                | Source
+                | AllInOne
+                | SLT
+                | APT
+            )
+        )?
         {VARIANT_ID(
-            r'[!][A-Z0-9][.][A-Z0-9]+',
+            r'[!][[:alnum:]][.][[:xdigit:]]+',
+            r'[.][[:alnum:]][!][[:xdigit:]]+',
+            r'[!][[:xdigit:]]{1,5}$',
+            r'[.][A-F0-9]{4,}$',
             re.escape('[HT]'),
             r'[#][0-9]{1,3}%',
             r'[!]ET',
-            r'[!][[:xdigit:]][.][[:xdigit:]]+',
             r'[#][A-Z][A-Z0-9]+',
             r'/[A-Z][A-Z0-9]',
             r'[!]tfe',
-            r'[@](?|CV|EP|URL|VE)',
-        )}{{,3}}
+            r'[@](CV|EP|URL|VE)',
+        )}*
     )
     $"""
 

@@ -162,11 +162,16 @@ class EngineRegistry:
 
         def weighted_names(elts):
             for engine, clf in elts:
-                name = clf.name
+                weight = 1
+                name = clf.family
+
+                if name is None:
+                    name = clf.taxon
+                    weight = 0.35
 
                 # Only consider strings longer than 2 chars
                 if isinstance(name, str) and len(name) > 2:
-                    weight = self.weights.get(engine, 1.0)
+                    weight *= self.weights.get(engine, 1.0)
 
                     for predicate, adjustment in name_weights:
                         if predicate(name):

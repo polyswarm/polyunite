@@ -99,11 +99,10 @@ CVE_PATTERN = r'(?P<CVE>(CVE|Cve|cve)([-_]?(?P<CVEYEAR>[0-9]{4})([-_]?((?P<CVENT
 
 def VARIANT_ID(*extra):
     return group(
-        format(SUFFIXES, '-g'),
+        format(SUFFIXES, '-g:-i'),
         *extra,
-        r'[.][A-Z]{1,3}',
-        r'[.][a-z]{1,8}',
-        r'[.!][[:xdigit:]]+',
+        r'[.][A-Z]{,3}',
+        r'[.][a-z0-9]{,8}',
         r'[.][A-Z][a-z]{2}',
         name='VARIANT'
     )

@@ -140,6 +140,7 @@
             "match": [
                 "Java",
                 "J2ME",
+                "OLE-JAR",
                 "J2EE"
             ]
         },

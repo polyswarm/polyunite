@@ -289,10 +289,7 @@
                 "not-a-virus",
                 "notavirus",
                 "not-virus",
-                "test",
-                "test.file",
-                "testfile",
-                "testvirus"
+                {"pattern": "test([.-]?file)?"}
             ]
         },
         "parental_control": {
