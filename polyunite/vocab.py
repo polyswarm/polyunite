@@ -101,9 +101,9 @@ def VARIANT_ID(*extra):
     return group(
         format(SUFFIXES, '-g:-i'),
         *extra,
-        r'[.][A-Z]{,3}',
-        r'[.][a-z0-9]{,8}',
-        r'[.][A-Z][a-z]{2}',
+        r'[.][A-Z]{1,3}',
+        r'[.][a-z0-9]{1,8}',
+        r'[.][A-Z][a-z][a-z]',
         name='VARIANT'
     )
 
@@ -111,7 +111,7 @@ def VARIANT_ID(*extra):
 def FAMILY_ID(*extra):
     return '(?P<FAMILY>{}|{}|{})'.format(
         CVE_PATTERN,
-        r'MS[0-9]{2}-[0-9]{,6}',
+        r'MS[0-9][0-9]-[0-9]{1,6}',
         group(
             *extra,
             format(HEURISTICS['family'], '-g'),

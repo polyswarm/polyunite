@@ -37,7 +37,7 @@ class Classification(Mapping):
 
     def __init__(self, name: str):
         try:
-            self.match = self.regex.fullmatch(name, timeout=1)
+            self.match = self.regex.fullmatch(name, timeout=1, concurrent=False)
             self._groups = {k: None for k, v in self.match.capturesdict().items() if v}.keys()
         except (AttributeError, TypeError):
             raise MatchError(name, self.registration_name())
@@ -111,8 +111,8 @@ class Classification(Mapping):
 
     @property
     def taxon(self):
-        if 'VARIANT' in self:
-            return self.source[0:self.match.start('VARIANT')]
+        if 'VEID' in self:
+            return self.source[0:self.match.start('VEID')]
         else:
             return self.source
 
@@ -164,16 +164,6 @@ class Classification(Mapping):
                 continue
 
         return ''.join(markers) + colors.RESET
-
-
-class Generic(Classification):
-    """
-    Generic parser, may be applied as a fallback or if the engine is unknown
-    """
-    pattern = rf"""^
-    ((\A|\s|\b|[^A-Za-z0-9])({LABELS}|{OBFUSCATIONS}|{PLATFORM}))*?
-    {IDENT()}
-    $"""
 
 
 class Alibaba(Classification):
@@ -379,7 +369,7 @@ class NanoAV(Classification):
                             r'[0-9]+[a-z]{2,}[0-9]*',
             )}
         )?
-        {VARIANT_ID(r'[.][a-z]{3,7}')}*
+        {VARIANT_ID()}{{,2}}
     )
     $"""
 
@@ -531,5 +521,5 @@ class Virusdie(Classification):
 class URLHaus(Classification):
     pattern = rf"""^
     (({LABELS})(\.|$))?
-    (?P<FAMILY>[\s\w]+)?
+    (?P<VEID>(?P<FAMILY>[\s\w]+)?)
     $"""
