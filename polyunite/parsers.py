@@ -190,15 +190,14 @@ class ClamAV(Classification):
         (
             {PLATFORM}
             | {LABELS}
-            | Blacklist[.]CRT
             | Legacy
         )
-    )*
+    )*?
     (?P<VEID>
         (
             ([.]|^)
-            {FAMILY_ID()}
-        )?
+            {FAMILY_ID(r'Blacklist[.]CRT[.][[:xdigit:]]+', PLATFORM, LABELS)}
+        )
         {VARIANT_ID(r'[:-][0-9]',
                     r'-[[:xdigit:]]+',
                     r'/CRDF(-[[:alnum:]])?',
@@ -265,12 +264,12 @@ class Ikarus(Classification):
       (
           (^|[.:])
           {FAMILY_ID(
-            r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)'
+            r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
+            r'(?<=Exploit[.])[a-zA-Z0-9-_.]+$',
            )}
        )?
        {VARIANT_ID(
                 r'20[0-9]{2}-[0-9]{1,6}',
-                r'[A-Z][[:alpha:]]+-([A-Z][[:alpha:]]*|[0-9]+)',
                 r'[-][A-Z]',
                 r'[-][0-9]+$',
                 r'[.](?|Dm|Ra)',
@@ -281,8 +280,8 @@ class Ikarus(Classification):
                 r'[.][A-Z][a-z0-9]$',
                 r'[:][[:alpha:]]+',
        )}{{,2}}
-        ([.]((?&OPERATING_SYSTEMS)|(?&LANGS)|(?&MACROS)|(?&OBFUSCATIONS)))?
-    )
+       ([.]((?&OPERATING_SYSTEMS)|(?&LANGS)|(?&MACROS)|(?&OBFUSCATIONS)))?
+    )?
     $"""
 
 

@@ -78,11 +78,12 @@
         },
         "ddos": {
             "description": "A tool used to perform a distributed denial of service attack.",
-            "match": [
+            "match": [{
+                    "pattern": "(?-i:DoS)"
+                },
                 "im-flooder",
                 "flooder",
                 "ddoser",
-                "DoS",
                 "ddos"
             ]
         },
@@ -193,6 +194,7 @@
                 "puf",
                 "pup",
                 "riskware",
+                "risktool",
                 "settings-modifier",
                 "toolbar"
             ]
@@ -448,7 +450,6 @@
                     "pattern": "(?<=[.])Tool(?=[.])"
                 },
                 "virtool",
-                "hack",
                 "hack-tool",
                 "VirusConstructor",
                 "MalMaker",
@@ -459,7 +460,6 @@
                 "security-tool",
                 "securitytool",
                 "gamehack",
-                "risktool",
                 "hktl",
                 "security_assessment_tool",
                 "securitytool",
@@ -470,6 +470,9 @@
             "description": "Either a small piece of code that activates a command-line interface to a system that can be used to disable security measures, open a backdoor, or download further malicious code; or a small piece of code that opens a system up for exploitation, sometimes by not necessarily involving a command-line shell.",
             "match": [{
                     "pattern": "exp\\b"
+                },
+                {
+                    "pattern": "\\bhack\\b"
                 },
                 "exploit",
                 "shellcode",
