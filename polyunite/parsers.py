@@ -106,15 +106,16 @@ class Classification(Mapping):
         if self.is_CVE:
             return self.extract_CVE()
 
-        if 'FAMILY' in self:
-            return self['FAMILY']
+        return self.get('FAMILY', None)
 
     @property
     def taxon(self):
-        if 'VEID' in self:
-            return self.source[0:self.match.start('VEID')]
-        else:
-            return self.source
+        try:
+            start = min(self.match.starts('VARIANT'), default=None)
+        except IndexError:
+            start = None
+
+        return self.source[0:start]
 
     @classmethod
     def registration_name(cls):
@@ -511,15 +512,24 @@ class Virusdie(Classification):
     (?P<VEID>
         (
             (^|[.])
-            ({FAMILY_ID()}|.+?)
-        )
-        {VARIANT_ID()}{{,2}}
+            (
+                {FAMILY_ID()}
+                | .+
+            )
+        )?
+        {VARIANT_ID()}*
     )
     $"""
 
 
 class URLHaus(Classification):
     pattern = rf"""^
-    (({LABELS})(\.|$))?
-    (?P<VEID>(?P<FAMILY>[\s\w]+)?)
+    {LABELS}?
+    (?P<VEID>
+        (
+            (^|[.])
+            {FAMILY_ID()}
+        )?
+        {VARIANT_ID()}*
+    )
     $"""
