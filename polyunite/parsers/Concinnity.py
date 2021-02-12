@@ -15,3 +15,7 @@ class Concinnity(Classification):
      )
     )*
     $"""
+
+    @property
+    def name(self):
+        return self.taxon
