@@ -1,5 +1,6 @@
 from .Alibaba import Alibaba
 from .ClamAV import ClamAV
+from .Concinnity import Concinnity
 from .DrWeb import DrWeb
 from .Ikarus import Ikarus
 from .Jiangmin import Jiangmin
