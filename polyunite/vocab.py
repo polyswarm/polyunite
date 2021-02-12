@@ -82,6 +82,10 @@ class VocabRegex:
     def from_resource(cls, name: 'str') -> 'VocabRegex':
         return cls(name, json.load(resource_stream(__name__, 'vocabs/%s.json' % name.lower())))
 
+    def iteraliases(self):
+        for v in self.iter():
+            yield from v.aliases
+
 
 # regular expressions which match 'vocabularies' of classification components
 LABELS = VocabRegex.from_resource('LABELS')

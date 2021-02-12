@@ -10,6 +10,7 @@ from polyunite.vocab import (
     FAMILY_ID,
     HEURISTICS,
     LABELS,
+    SUFFIXES,
     LANGS,
     MACROS,
     OBFUSCATIONS,
@@ -433,10 +434,11 @@ class Rising(Classification):
         (
             ([./-]|^)
             {FAMILY_ID(
+                r'(?# e.x `Trojan.RA-based!8.80`)'
+                rf'[[:alpha:]]+(?!{"|".join(filter(lambda s: not s.startswith("-"), SUFFIXES.iteraliases()))})-[[:alpha:]]+',
+                r'[a-z][[:alpha:]]{4,}(?=[.])',
                 r'[0-9]+[A-Z][[:alpha:]]+',
                 r'[A-Z][[:alpha:]]+-([A-Z][[:alpha:]]*|[0-9]+)',
-                r'(?# [XXX] e.x `Trojan.Win32.fedoN.cf`)'
-                r'fedoN',
                 r'(?# e.x `Malware.Generic[Thunder]!1.A1C4`)'
                 r'[A-Z][[:alnum:]]+[(][[:alnum:]]+[)]',
                 r'(?# e.x `Worm.Nuj!8.2AD` & `Worm.Oji/Android!8.10B72`)'
