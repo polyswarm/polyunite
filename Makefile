@@ -55,6 +55,9 @@ format:  ## format code in Polyswarm style
 test: ## run tests
 	python3 setup.py test
 
+test-quick:
+	pytest tests/quicktest.py
+
 .PHONY: patterns-report
 report:  ## Show colorized results report
 	@$(SCRIPTS_DIR)/colorize

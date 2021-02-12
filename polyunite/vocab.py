@@ -82,6 +82,10 @@ class VocabRegex:
     def from_resource(cls, name: 'str') -> 'VocabRegex':
         return cls(name, json.load(resource_stream(__name__, 'vocabs/%s.json' % name.lower())))
 
+    def iteraliases(self):
+        for v in self.iter():
+            yield from v.aliases
+
 
 # regular expressions which match 'vocabularies' of classification components
 LABELS = VocabRegex.from_resource('LABELS')
@@ -99,31 +103,24 @@ CVE_PATTERN = r'(?P<CVE>(CVE|Cve|cve)([-_]?(?P<CVEYEAR>[0-9]{4})([-_]?((?P<CVENT
 
 def VARIANT_ID(*extra):
     return group(
-        format(SUFFIXES, '-g'),
+        format(SUFFIXES, '-g:-i'),
         *extra,
         r'[.][A-Z]{1,3}',
-        r'[.][a-z]{1,8}',
-        r'[.!][[:xdigit:]]+',
-        r'[.][A-Z][a-z]{2}',
+        r'[.][a-z0-9]{1,8}',
+        r'[.][A-Z][a-z][a-z]',
         name='VARIANT'
     )
 
 
 def FAMILY_ID(*extra):
-    return '(?P<FAMILY>{}|{}|{})'.format(
+    return group(
         CVE_PATTERN,
-        r'MS[0-9]{2}-[0-9]{,6}',
-        group(
-            *extra,
-            format(HEURISTICS['family'], '-g'),
-            format(OBFUSCATIONS, '-g'),
-            r'CVE(-[0-9]{4})?(?![0-9.-_])',
-            r'[0-9a-z]{1,2}[A-Z][a-zA-Z]{2,}',
-            r'[A-Z][a-zA-Z0-9_]{3,}',
-        ),
+        r'MS[0-9][0-9]-[0-9]{1,6}',  # Microsoft exploit
+        format(HEURISTICS),
+        format(OBFUSCATIONS),
+        *extra,
+        r'CVE(-[0-9]{4})?(?![0-9.-_])',
+        r'[0-9a-z]{1,2}[A-Z][a-zA-Z]{2,}',
+        r'[A-Z][a-zA-Z0-9_]{3,}',
+        name='FAMILY'
     )
-
-
-def IDENT(extra_families=[], extra_variants=[]):
-    """Build a family & variant subpattern"""
-    return rf'(?P<VEID>{FAMILY_ID(*extra_families)}?({VARIANT_ID(*extra_variants)}{{,2}}?)?)'

@@ -9,8 +9,8 @@ from polyunite.vocab import (
     ARCHIVES,
     FAMILY_ID,
     HEURISTICS,
-    IDENT,
     LABELS,
+    SUFFIXES,
     LANGS,
     MACROS,
     OBFUSCATIONS,
@@ -37,12 +37,8 @@ class Classification(Mapping):
 
     def __init__(self, name: str):
         try:
-            self.match = self.regex.fullmatch(
-                name,
-                timeout=1,
-                concurrent=True,
-            )
-            self._groups = {k: None for k, v in self.match.capturesdict().items() if v}.keys()
+            self.match = self.regex.fullmatch(name, timeout=1, concurrent=False)
+            self._groups = {k for k, v in self.match.capturesdict().items() if any(v)}
         except (AttributeError, TypeError):
             raise MatchError(name, self.registration_name())
 
@@ -52,12 +48,13 @@ class Classification(Mapping):
 
     @classmethod
     def __init_subclass__(cls):
-        pat = '{}|{}'.format(
-            r'(^.*(?P<EICAR>(?i:eicar)).*$)',
-            cls.pattern,
-        )
-        cls.regex = re.compile(pat, re.ASCII | re.VERBOSE)
-        EngineRegistry.register(cls, cls.__name__)
+        cls.regex = cls._compile_pattern()
+        EngineRegistry.register(cls, cls.registration_name())
+
+    @classmethod
+    def _compile_pattern(cls):
+        pat = group(r'.*(?P<EICAR>(?i:EICAR)).*', cls.pattern)
+        return re.compile(pat, re.ASCII | re.VERBOSE | re.V1)
 
     def __getitem__(self, k):
         if k in self:
@@ -86,31 +83,32 @@ class Classification(Mapping):
     def labels(self):
         if self.is_EICAR:
             return {'nonmalware'}
-        labels = set(label for label in LABELS.sublabels if label in self)
+        labels = set(LABELS.sublabels) & set(self._groups)
         if self.is_CVE:
-            labels.add('exploit')
-            labels.add('CVE')
+            return labels | {'exploit', 'CVE'}
         return labels
 
     @property
-    def name(
-        self,
-        name_pattern=re.compile(r'(?r)[A-Z][-\w]{2,}([.-][A-Z]+)?'),
-    ) -> str:
+    def name(self) -> str:
         """'name' of the virus"""
+        return self.family or self.taxon
+
+    @property
+    def family(self):
         if self.is_EICAR:
             return 'EICAR'
-
-        if self.is_CVE:
+        elif self.is_CVE:
             return self.extract_CVE()
+        return self.get('FAMILY', None)
 
-        if 'FAMILY' in self:
-            return self['FAMILY']
+    @property
+    def taxon(self):
+        try:
+            start = min(self.match.starts('VARIANT'), default=None)
+        except IndexError:
+            return self.source
 
-        # Return the longest leftmost word if we haven't matched anything
-        endpos = self.match.start('VARIANT') if 'VARIANT' in self else None
-        match = name_pattern.search(self.source, endpos=endpos)
-        return match[0] if match else self.source
+        return self.source[0:start]
 
     @classmethod
     def registration_name(cls):
@@ -126,13 +124,12 @@ class Classification(Mapping):
         return 'CVE' in self
 
     def extract_CVE(self):
-        return self.match.expandf("CVE-{CVEYEAR[0]}-{CVENTH[0]}").rstrip('-')
+        return self.match.expandf("CVE-{CVEYEAR[0]}-{CVENTH[0]}")
 
     @property
     def is_heuristic(self) -> bool:
         """Check if we've parsed this classification as a heuristic-detection"""
-        last_matches = map(self.get, (HEURISTICS.name, LABELS.name, 'VARIANT', 'FAMILY'))
-        return any(map(HEURISTICS.compile(1, 1).fullmatch, filter(None, last_matches)))
+        return 'HEURISTICS' in self
 
     def colorize(
         self,
@@ -162,23 +159,14 @@ class Classification(Mapping):
         return ''.join(markers) + colors.RESET
 
 
-class Generic(Classification):
-    """
-    Generic parser, may be applied as a fallback or if the engine is unknown
-    """
-    pattern = rf"""^
-    ((\A|\s|\b|[^A-Za-z0-9])({LABELS}|{OBFUSCATIONS}|{PLATFORM}))*?
-    {IDENT()}
-    $"""
-
-
 class Alibaba(Classification):
     pattern = rf"""^
-    (({OBFUSCATIONS}|{LABELS})*[:])?
-    ({PLATFORM}[/])?
-    (
-        {IDENT([LANGS, MACROS, r'[a-zA-Z0-9]{3,}'], [r'[.]ali[0-9a-f]+', '[.]None'])}
-    )?
+    (({PLATFORM}|{LABELS}([-]?(?&LABELS))?|[^:]*)([:]|$))?
+    {PLATFORM}[/]
+    (?P<VEID>
+        {FAMILY_ID('(?&LABELS)', r'[[:alnum:]]+')}
+        {VARIANT_ID(r'[.][[:xdigit:]]{1,10}', r'[.]None', r'[.]ali[[:xdigit:]]+')}{{,3}}
+    )
     $"""
 
 
@@ -192,41 +180,43 @@ class ClamAV(Classification):
             | {LABELS}
             | Legacy
         )
-    )*?
+    )*
     (?P<VEID>
         (
             ([.]|^)
-            {FAMILY_ID(r'Blacklist[.]CRT[.][[:xdigit:]]+', PLATFORM, LABELS)}
-        )
-        {VARIANT_ID(r'[:-][0-9]',
-                    r'-[[:xdigit:]]+',
+            {FAMILY_ID(r'Blacklist[.]CRT[.][[:xdigit:]]+', '[A-Z][[:alpha:]]+', r'[A-Z0-9][[:alnum:]]+(?=-)')}
+        )?
+        {VARIANT_ID(r'-[0-9]+',
+                    r':[0-9]',
+                    r'[.][0-9]+(?=-[0-9])',
                     r'/CRDF(-[[:alnum:]])?',
-                    r'[.]Extra_Field')}{{,3}}
+                    r'[.]Extra_Field')}*
     )
     $"""
 
 
 class DrWeb(Classification):
     pattern = rf"""^
-    ((?|probably|modification\s of|modification|possible|possibly)\s)?
+    ((probabl[ey]|modification(\ of)?|possibl[ey]))?
     (
-        (^|\b|[.-])
-        ( {LABELS}
+        (^|[.-]|\ )
+        (
+          (?!PWS[.]){LABELS}(?&LABELS)?
           | {PLATFORM}
+          | Sector
           | MGen
           | Ear
         )
     )*
     (?P<VEID>
         (
-            ([.]|\b|^)
-            {FAMILY_ID(
-                r'PWS[.][[:alnum:]]+',
-                r'^[[:alnum:]]{2,3}(?=[.])',
-                r'^[[:alnum:]][a-zA-Z0-9-_.]+[A-Z][[:alnum:]]$',
-            )}
+            ([.]|^)
+            (
+                (?P<FAMILY>(?P<password_stealer>PWS[.][A-Z][[:alnum:]]+))
+                | {FAMILY_ID(r'[A-Z][[:alnum:]]{1,2}(?=[.]|$)')}
+            )
         )?
-        {VARIANT_ID(r'[.]Log')}{{,2}}
+        {VARIANT_ID(r'[.]Log')}*
     )
     $"""
 
@@ -236,7 +226,7 @@ class Ikarus(Classification):
     (
         ([.:-]|^)
         (
-            {LABELS}*
+            {LABELS}(-?(?&LABELS))?
             | (BehavesLike)?{PLATFORM}
             | AIT
             | ALS
@@ -247,6 +237,7 @@ class Ikarus(Classification):
             | Damaged
             | DongleHack
             | Fraud
+            | Fake
             | FTP
             | MalwareScope
             | Optional
@@ -256,8 +247,8 @@ class Ikarus(Classification):
             | ToolKit
             | Troja
             | WordPress
-            | WScr
             | X2000M
+            | Equation
         )
     )*
     (?P<VEID>
@@ -265,10 +256,12 @@ class Ikarus(Classification):
           (^|[.:])
           {FAMILY_ID(
             r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
-            r'(?<=Exploit[.])[a-zA-Z0-9-_.]+$',
+            r'^[A-Z][a-zA-Z0-9_-]+$',
+            r'PDF-[[:alnum:]]+',
            )}
        )?
        {VARIANT_ID(
+                r'[.]SuspectCRC',
                 r'20[0-9]{2}-[0-9]{1,6}',
                 r'[-][A-Z]',
                 r'[-][0-9]+$',
@@ -279,8 +272,8 @@ class Ikarus(Classification):
                 r'[.][A-Z]{1,2}[0-9]*',
                 r'[.][A-Z][a-z0-9]$',
                 r'[:][[:alpha:]]+',
-       )}{{,2}}
-       ([.]((?&OPERATING_SYSTEMS)|(?&LANGS)|(?&MACROS)|(?&OBFUSCATIONS)))?
+       )}{{,3}}
+       ([.]{PLATFORM})?
     )?
     $"""
 
@@ -293,17 +286,15 @@ class Jiangmin(Classification):
             {HEURISTICS}
             | Intended
             | Garbage
+            | Riot
             | {LABELS}(-?(?&LABELS))?
             | {OBFUSCATIONS}
             | {PLATFORM}
         )
     )*
     (?P<VEID>
-        (([./]|^){FAMILY_ID(
-                r'[A-Z][a-z]+-[0-9]',
-                r'Test[.]File',
-        )})?
-        {VARIANT_ID(r'[.][[:alnum:]]+$')}{{,2}})
+        (([./]|^){FAMILY_ID(r'[A-Z][a-z]+-[0-9]')})?
+        {VARIANT_ID(r'[.][[:alnum:]]+$', '[.][A-Z][a-z]$')}{{,2}})
     $"""
 
 
@@ -323,31 +314,32 @@ class K7(Classification):
 
 
 class Lionic(Classification):
-    pattern = group(
-        rf"""^
+    pattern = rf"""^
     (
         (^|[.])
-        {PLATFORM}
-        | Email
-        | HTTP
-        | {LABELS}(-?(?&LABELS))?
+        (
+            {PLATFORM}
+            | Email
+            | W
+            | pcap
+            | HTTP
+            | Shell
+            | {LABELS}(-?(?&LABELS))?
+        )
     )*
     (?P<VEID>
         (
             ([.]|^)
             {FAMILY_ID(
                 r"[0-9A-Z][a-zA-Z0-9]_[0-9]",
+                r'^[a-zA-Z0-9_]+$',
                 r'([0-9]{,3})[A-Z][A-Za-z][0-9]{4}',
-                r'[A-Z][a-z]',
-                r'(?&LANGS)',
-                r'(?&MACROS)',
+                r'[A-Z][a-z]'
              )}
-        )
-        {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]')}{{,2}}
+        )?
+        {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]$')}*
     )
-    $""",
-        r"(?P<VEID>(?P<FAMILY>([0-9]+|[A-Z])\w{3,}))",
-    )
+    $"""
 
 
 class NanoAV(Classification):
@@ -361,11 +353,14 @@ class NanoAV(Classification):
         )
     )*
     (?P<VEID>
-        (([./]|^){FAMILY_ID(r'hidIFrame',
-                            r'(?i:Iframe-scroll)',
+        (
+            ([./]|^)
+            {FAMILY_ID(r'hidIFrame',
+                            r'Iframe-scroll',
                             r'[A-Z][[:alnum:]]+',
                             r'[0-9]+[a-z]{2,}[0-9]*',
-    )})?
+            )}
+        )?
         {VARIANT_ID()}{{,2}}
     )
     $"""
@@ -373,7 +368,7 @@ class NanoAV(Classification):
 
 class Qihoo360(Classification):
     pattern = rf"""^
-    (?=[a-z](?i))
+    (?i)
     {HEURISTICS}?
     (
         ([./-]|^)
@@ -384,13 +379,13 @@ class Qihoo360(Classification):
             | (?<HEURISTICS>AutoVirus)
             | {PLATFORM}
             | {LABELS}
-            | (QVM\d+([.]\d+)?([.]\p{{Hex_Digit}}+)?) # QVM40.1.BB16 or QVM9
+            | (QVM\d+([.]\d+)?([.][[:xdigit:]]+)?) # QVM40.1.BB16 or QVM9
         )
     )*
     (?P<VEID>
         (
             ([./]|^)
-            {FAMILY_ID()}?
+            {FAMILY_ID(r'(?-i:[A-Z][a-z]{1,2})')}?
         )?
         {VARIANT_ID()}{{,2}}
     )
@@ -415,7 +410,7 @@ class QuickHeal(Classification):
         {VARIANT_ID(
             r'[.]HTML[.][A-Z]',
             r'[-][A-Z]',
-            r'[.]S[[:xdigit:]]+',
+            r'[.][A-Z][[:xdigit:]]+$',
             r'[.][A-Z]{1,2}[0-9]{1,2}',
             r'[.][a-z0-9]{2,3}+'
             )}{{,2}}
@@ -425,12 +420,11 @@ class QuickHeal(Classification):
 
 class Rising(Classification):
     pattern = rf"""^
-    (?(DEFINE) (?P<PLATFORM>{PLATFORM}))
     (
         ([./-]|^)
         (
             {LABELS}
-            | (?&PLATFORM)
+            | {PLATFORM}
             | BL
             | KL
             | Junk
@@ -440,31 +434,42 @@ class Rising(Classification):
         (
             ([./-]|^)
             {FAMILY_ID(
+                r'(?# e.x `Trojan.RA-based!8.80`)'
+                rf'[[:alpha:]]+(?!{"|".join(filter(lambda s: not s.startswith("-"), SUFFIXES.iteraliases()))})-[[:alpha:]]+',
+                r'[a-z][[:alpha:]]{4,}(?=[.])',
                 r'[0-9]+[A-Z][[:alpha:]]+',
                 r'[A-Z][[:alpha:]]+-([A-Z][[:alpha:]]*|[0-9]+)',
-
-                r'(?# [XXX] e.x `Trojan.Win32.fedoN.cf`)'
-                r'fedoN',
-
                 r'(?# e.x `Malware.Generic[Thunder]!1.A1C4`)'
                 r'[A-Z][[:alnum:]]+[(][[:alnum:]]+[)]',
-
                 r'(?# e.x `Worm.Nuj!8.2AD` & `Worm.Oji/Android!8.10B72`)'
-                r'[A-Z][[:alpha:]]{1,2}(?=[/!.])',
+                r'[A-Z][[:alpha:]]{1,2}(?=[/!.-])',
+                r'(?# e.x `Malware.n!8.FB62`)'
+                r'(?<=[.])[a-z](?=!)',
             )}
         )?
-        (/((?&LABELS)|(?&PLATFORM)|Source|AllInOne|SLT|APT))?
+        ([/]
+            (
+                (?&LABELS)
+                | {PLATFORM}
+                | Source
+                | AllInOne
+                | SLT
+                | APT
+            )
+        )?
         {VARIANT_ID(
-            r'[!][A-Z0-9][.][A-Z0-9]+',
+            r'[!][[:alnum:]][.][[:xdigit:]]+',
+            r'[.][[:alnum:]][!][[:xdigit:]]+',
+            r'[!][[:xdigit:]]{1,5}$',
+            r'[.][A-F0-9]{4,}$',
             re.escape('[HT]'),
             r'[#][0-9]{1,3}%',
             r'[!]ET',
-            r'[!][[:xdigit:]][.][[:xdigit:]]+',
             r'[#][A-Z][A-Z0-9]+',
             r'/[A-Z][A-Z0-9]',
             r'[!]tfe',
-            r'[@](?|CV|EP|URL|VE)',
-        )}{{,3}}
+            r'[@](CV|EP|URL|VE)',
+        )}*
     )
     $"""
 
@@ -474,7 +479,7 @@ class Tachyon(Classification):
     pattern = rf"""^
     (
         (^|[-])
-        (?|{PLATFORM}|{LABELS})
+        ({PLATFORM}|{LABELS})
     )+
     (/{PLATFORM})
     (?P<VEID>
@@ -495,15 +500,24 @@ class Virusdie(Classification):
     (?P<VEID>
         (
             (^|[.])
-            ({FAMILY_ID()}|.+?)
-        )
-        {VARIANT_ID()}{{,2}}
+            (
+                {FAMILY_ID()}
+                | .+
+            )
+        )?
+        {VARIANT_ID()}*
     )
     $"""
 
 
 class URLHaus(Classification):
     pattern = rf"""^
-    (({LABELS})(\.|$))?
-    (?P<FAMILY>[\s\w]+)?
+    {LABELS}?
+    (?P<VEID>
+        (
+            (^|[.])
+            {FAMILY_ID()}
+        )?
+        {VARIANT_ID()}*
+    )
     $"""

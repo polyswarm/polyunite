@@ -22,7 +22,7 @@
                 "undefined"
             ]
         },
-        "family": {
+        "heurfamily": {
             "description": "Contains characteristics usual of a particular class of viruses",
             "match": [{
                     "pattern": "Agent[0-9]+"

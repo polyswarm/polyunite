@@ -21,18 +21,7 @@ class colors:
 def group(*choices, fmt='(?:{})', name: 'Optional[str]' = None):
     """Group a regular expression"""
     spec = '(?P<%s>{})' % name if name else fmt
-    return spec.format('|'.join(set(map(format, filter(None, choices)))))
-
-
-class format_template(str):
-    """A template string parameterized by it's format specification directly"""
-    __format__ = str.format  # type: ignore
-
-
-# consume `{0}` if matches *AND* ensures this match is preceeded by `{0}`.
-# This may seem redundant but is useful in regular expressions where the
-# prior match may have already consumed by another regular expression.
-antecedent = format_template(r'({0}?(?<={0}))')
+    return spec.format('|'.join(map(format, filter(None, choices))))
 
 
 def flatmap(fn, seqs):

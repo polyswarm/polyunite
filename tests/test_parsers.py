@@ -7,15 +7,17 @@ from .conftest import open_fixture
 
 
 @pytest.mark.parametrize(
-    'report_results',
-    json.loads(open_fixture('report_results.json')),
-    ids='{engine}/{source}'.format_map,
+    'engine,source,name,labels', [
+        pytest.param(
+            d['engine'],
+            d['source'],
+            d['name'],
+            d.get('labels', []),
+            id='{engine}/{source}'.format_map(d),
+        ) for d in json.loads(open_fixture('report_results.json'))
+    ]
 )
-def test_parsers(report_results):
-    actual = polyunite.parse(report_results['engine'], report_results['source'])
-
-    if 'name' in report_results:
-        assert report_results['name'] == actual.name
-
-    if 'labels' in report_results:
-        assert set(report_results['labels']) == set(actual.labels)
+def test_parsers(engine, source, name, labels):
+    actual = polyunite.parse(engine, source)
+    assert name == actual.name
+    assert set(labels) == actual.labels

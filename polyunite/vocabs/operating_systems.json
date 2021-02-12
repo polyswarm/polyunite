@@ -129,6 +129,7 @@
                 "Win",
                 "Win32.64",
                 "Win32/64",
+                {"pattern": "\\bWScr\\b"},
                 "Windows"
             ],
             "children": {
