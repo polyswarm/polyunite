@@ -128,8 +128,7 @@ class Classification(Mapping):
     @property
     def is_heuristic(self) -> bool:
         """Check if we've parsed this classification as a heuristic-detection"""
-        last_matches = map(self.get, (HEURISTICS.name, LABELS.name, 'VARIANT', 'FAMILY'))
-        return any(map(HEURISTICS.compile(1, 1).fullmatch, filter(None, last_matches)))
+        return 'HEURISTICS' in self
 
     def colorize(
         self,
