@@ -61,10 +61,12 @@ class EngineRegistry:
             ARCHIVES.compile(1, 0).fullmatch: 0.20,
             MACROS.compile(1, 0).fullmatch: 0.20,
             OSES.compile(1, 0).fullmatch: 0.20,
-        }
+        },
+        taxon_weight=0.35,
     ):
         self.weights = {self._normalize(k): v for k, v in weights.items()}
         self.name_weights = name_weights
+        self.taxon_weight = taxon_weight
         super().__init__()
 
     @classmethod
@@ -163,11 +165,12 @@ class EngineRegistry:
         def weighted_names(elts):
             for engine, clf in elts:
                 weight = 1
+
                 name = clf.family
 
                 if name is None:
                     name = clf.taxon
-                    weight = 0.35
+                    weight *= self.taxon_weight
 
                 # Only consider strings longer than 2 chars
                 if isinstance(name, str) and len(name) > 2:
