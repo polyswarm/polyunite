@@ -207,7 +207,7 @@ class DrWeb(Classification):
     ((?|probably|modification\s of|modification|possible|possibly)\s)?
     (
         (^|\b|[.-])
-        ( {LABELS}
+        ( (?!PWS){LABELS}
           | {PLATFORM}
           | MGen
           | Ear
@@ -217,8 +217,8 @@ class DrWeb(Classification):
         (
             ([.]|\b|^)
             {FAMILY_ID(
-                r'PWS[.][[:alnum:]]+',
-                r'^[A-Z][[:alnum:]]{1,2}(?=[.])',
+                r'(?P<password_stealer>PWS[.][A-Z][[:alnum:]]+)',
+                r'[A-Z][[:alnum:]]{1,2}',
                 r'^[A-Z][[:alnum:]][a-zA-Z0-9-_.]+[A-Z][[:alnum:]]$',
             )}
         )?
