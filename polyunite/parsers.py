@@ -9,7 +9,6 @@ from polyunite.vocab import (
     ARCHIVES,
     FAMILY_ID,
     HEURISTICS,
-    IDENT,
     LABELS,
     LANGS,
     MACROS,
@@ -38,7 +37,7 @@ class Classification(Mapping):
     def __init__(self, name: str):
         try:
             self.match = self.regex.fullmatch(name, timeout=1, concurrent=False)
-            self._groups = {k: None for k, v in self.match.capturesdict().items() if v}.keys()
+            self._groups = {k for k, v in self.match.capturesdict().items() if any(v)}
         except (AttributeError, TypeError):
             raise MatchError(name, self.registration_name())
 
@@ -48,12 +47,13 @@ class Classification(Mapping):
 
     @classmethod
     def __init_subclass__(cls):
-        pat = '{}|{}'.format(
-            r'(^.*(?P<EICAR>(?i:eicar)).*$)',
-            cls.pattern,
-        )
-        cls.regex = re.compile(pat, re.ASCII | re.VERBOSE)
-        EngineRegistry.register(cls, cls.__name__)
+        cls.regex = cls._compile_pattern()
+        EngineRegistry.register(cls, cls.registration_name())
+
+    @classmethod
+    def _compile_pattern(cls):
+        pat = group(r'.*(?P<EICAR>(?i:EICAR)).*', cls.pattern)
+        return re.compile(pat, re.ASCII | re.VERBOSE | re.V1)
 
     def __getitem__(self, k):
         if k in self:
@@ -82,30 +82,22 @@ class Classification(Mapping):
     def labels(self):
         if self.is_EICAR:
             return {'nonmalware'}
-        labels = set(label for label in LABELS.sublabels if label in self)
+        labels = set(LABELS.sublabels) & set(self._groups)
         if self.is_CVE:
-            labels.add('exploit')
-            labels.add('CVE')
+            return labels | {'exploit', 'CVE'}
         return labels
 
     @property
     def name(self) -> str:
         """'name' of the virus"""
-        family = self.family
-
-        if family is not None:
-            return family
-
-        return self.taxon
+        return self.family or self.taxon
 
     @property
     def family(self):
         if self.is_EICAR:
             return 'EICAR'
-
-        if self.is_CVE:
+        elif self.is_CVE:
             return self.extract_CVE()
-
         return self.get('FAMILY', None)
 
     @property
@@ -113,7 +105,7 @@ class Classification(Mapping):
         try:
             start = min(self.match.starts('VARIANT'), default=None)
         except IndexError:
-            start = None
+            return self.source
 
         return self.source[0:start]
 
@@ -131,7 +123,7 @@ class Classification(Mapping):
         return 'CVE' in self
 
     def extract_CVE(self):
-        return self.match.expandf("CVE-{CVEYEAR[0]}-{CVENTH[0]}").rstrip('-')
+        return self.match.expandf("CVE-{CVEYEAR[0]}-{CVENTH[0]}")
 
     @property
     def is_heuristic(self) -> bool:
@@ -169,11 +161,12 @@ class Classification(Mapping):
 
 class Alibaba(Classification):
     pattern = rf"""^
-    (({OBFUSCATIONS}|{LABELS})*[:])?
-    ({PLATFORM}[/])?
-    (
-        {IDENT([LANGS, MACROS, r'[a-zA-Z0-9]{3,}'], [r'[.]ali[0-9a-f]+', '[.]None'])}
-    )?
+    (({PLATFORM}|{LABELS}([-]?(?&LABELS))?|[^:]*)([:]|$))?
+    {PLATFORM}[/]
+    (?P<VEID>
+        {FAMILY_ID('(?&LABELS)', r'[[:alnum:]]+')}
+        {VARIANT_ID(r'[.][[:xdigit:]]{1,10}', r'[.]None', r'[.]ali[[:xdigit:]]+')}{{,3}}
+    )
     $"""
 
 
@@ -204,25 +197,26 @@ class ClamAV(Classification):
 
 class DrWeb(Classification):
     pattern = rf"""^
-    ((?|probably|modification\s of|modification|possible|possibly)\s)?
+    ((probabl[ey]|modification(\ of)?|possibl[ey]))?
     (
-        (^|\b|[.-])
-        ( (?!PWS){LABELS}
+        (^|[.-]|\ )
+        (
+          (?!PWS[.]){LABELS}(?&LABELS)?
           | {PLATFORM}
+          | Sector
           | MGen
           | Ear
         )
     )*
     (?P<VEID>
         (
-            ([.]|\b|^)
-            {FAMILY_ID(
-                r'(?P<password_stealer>PWS[.][A-Z][[:alnum:]]+)',
-                r'[A-Z][[:alnum:]]{1,2}',
-                r'^[A-Z][[:alnum:]][a-zA-Z0-9-_.]+[A-Z][[:alnum:]]$',
-            )}
+            ([.]|^)
+            (
+                (?P<FAMILY>(?P<password_stealer>PWS[.][A-Z][[:alnum:]]+))
+                | {FAMILY_ID(r'[A-Z][[:alnum:]]{1,2}(?=[.]|$)')}
+            )
         )?
-        {VARIANT_ID(r'[.]Log')}{{,2}}
+        {VARIANT_ID(r'[.]Log')}*
     )
     $"""
 
@@ -232,7 +226,7 @@ class Ikarus(Classification):
     (
         ([.:-]|^)
         (
-            {LABELS}*
+            {LABELS}(-?(?&LABELS))?
             | (BehavesLike)?{PLATFORM}
             | AIT
             | ALS
@@ -253,7 +247,6 @@ class Ikarus(Classification):
             | ToolKit
             | Troja
             | WordPress
-            | WScr
             | X2000M
             | Equation
         )
@@ -280,7 +273,7 @@ class Ikarus(Classification):
                 r'[.][A-Z][a-z0-9]$',
                 r'[:][[:alpha:]]+',
        )}{{,3}}
-       ([.]((?&OPERATING_SYSTEMS)|(?&LANGS)|(?&MACROS)|(?&OBFUSCATIONS)))?
+       ([.]{PLATFORM})?
     )?
     $"""
 
@@ -341,9 +334,7 @@ class Lionic(Classification):
                 r"[0-9A-Z][a-zA-Z0-9]_[0-9]",
                 r'^[a-zA-Z0-9_]+$',
                 r'([0-9]{,3})[A-Z][A-Za-z][0-9]{4}',
-                r'[A-Z][a-z]',
-                r'(?&LANGS)',
-                r'(?&MACROS)',
+                r'[A-Z][a-z]'
              )}
         )?
         {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]$')}*
@@ -377,7 +368,7 @@ class NanoAV(Classification):
 
 class Qihoo360(Classification):
     pattern = rf"""^
-    (?=[a-z](?i))
+    (?i)
     {HEURISTICS}?
     (
         ([./-]|^)
@@ -388,13 +379,13 @@ class Qihoo360(Classification):
             | (?<HEURISTICS>AutoVirus)
             | {PLATFORM}
             | {LABELS}
-            | (QVM\d+([.]\d+)?([.]\p{{Hex_Digit}}+)?) # QVM40.1.BB16 or QVM9
+            | (QVM\d+([.]\d+)?([.][[:xdigit:]]+)?) # QVM40.1.BB16 or QVM9
         )
     )*
     (?P<VEID>
         (
             ([./]|^)
-            {FAMILY_ID()}?
+            {FAMILY_ID(r'(?-i:[A-Z][a-z]{1,2})')}?
         )?
         {VARIANT_ID()}{{,2}}
     )
@@ -458,11 +449,7 @@ class Rising(Classification):
         ([/]
             (
                 (?&LABELS)
-                | (?&LANGS)
-                | (?&ARCHIVES)
-                | (?&HEURISTICS)
-                | (?&MACROS)
-                | (?&OPERATING_SYSTEMS)
+                | {PLATFORM}
                 | Source
                 | AllInOne
                 | SLT
@@ -491,7 +478,7 @@ class Tachyon(Classification):
     pattern = rf"""^
     (
         (^|[-])
-        (?|{PLATFORM}|{LABELS})
+        ({PLATFORM}|{LABELS})
     )+
     (/{PLATFORM})
     (?P<VEID>

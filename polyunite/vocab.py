@@ -109,20 +109,14 @@ def VARIANT_ID(*extra):
 
 
 def FAMILY_ID(*extra):
-    return '(?P<FAMILY>{}|{}|{})'.format(
+    return group(
         CVE_PATTERN,
-        r'MS[0-9][0-9]-[0-9]{1,6}',
-        group(
-            *extra,
-            format(HEURISTICS['family'], '-g'),
-            format(OBFUSCATIONS, '-g'),
-            r'CVE(-[0-9]{4})?(?![0-9.-_])',
-            r'[0-9a-z]{1,2}[A-Z][a-zA-Z]{2,}',
-            r'[A-Z][a-zA-Z0-9_]{3,}',
-        ),
+        r'MS[0-9][0-9]-[0-9]{1,6}',  # Microsoft exploit
+        format(HEURISTICS),
+        format(OBFUSCATIONS),
+        *extra,
+        r'CVE(-[0-9]{4})?(?![0-9.-_])',
+        r'[0-9a-z]{1,2}[A-Z][a-zA-Z]{2,}',
+        r'[A-Z][a-zA-Z0-9_]{3,}',
+        name='FAMILY'
     )
-
-
-def IDENT(extra_families=[], extra_variants=[]):
-    """Build a family & variant subpattern"""
-    return rf'(?P<VEID>{FAMILY_ID(*extra_families)}?({VARIANT_ID(*extra_variants)}{{,2}}?)?)'

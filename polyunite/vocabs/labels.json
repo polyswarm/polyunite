@@ -135,7 +135,6 @@
                 "droppr",
                 "exedrop",
                 "mdropper",
-                "muldrop",
                 "tjndropper",
                 "TjnDroppr"
             ]
@@ -247,6 +246,8 @@
                 "phishing",
                 "smtp",
                 "spam",
+                "malspam",
+                "spammalware",
                 "spam-tool",
                 "spamtool",
                 "spammer"
@@ -312,7 +313,7 @@
         "password_stealer": {
             "description": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system.",
             "match": [{
-                    "pattern": "(?:PWS|pws|psw|password)[-_]?(?|steal(?:er)?|thief|tool)"
+                    "pattern": "(?:PWS|pws|psw|password)[-_]?(?:steal(?:er)?|thief|tool)"
                 },
                 "PWS",
                 "PSW",
@@ -409,7 +410,7 @@
         "cryptominer": {
             "description": "A type of malware that steals a system's resources (e.g., CPU cycles), such as a bitcoin miner, to use them for cryptocurrency mining without user permission.",
             "match": [{
-                    "pattern": "(?|bitcoin|bit|crypto|btc|eth|xmr)?(?:coin)?[-]?miner"
+                    "pattern": "(?:bitcoin|bit|crypto|btc|eth|xmr)?(?:coin)?[-]?miner"
                 },
                 "btcmine",
                 "coinhive",
@@ -510,15 +511,14 @@
         "virus": {
             "description": "Self-replicating malware that requires human interaction to spread; also, self-replicating malware that runs and spreads by modifying and inserting itself into other programs or files.",
             "match": [
-                "HLL",
-                "HLLC",
-                "Mal",
                 "VirusOrg",
-                "malware",
+                {
+                    "pattern": "\\bHLLC?\\b"
+                },
+                {"pattern": "\\bmal(?:ware)?\\b"},
                 "spoofer",
-                "virus",
+                {"pattern": "\\bvirus\\b"},
                 "Trivial"
-
             ]
         },
         "web_bug": {
@@ -530,7 +530,7 @@
         "worm": {
             "description": "Self-replicating malware that propagates across a network either with or without human interaction.",
             "match": [{
-                    "pattern": "(?|I|IM|Net|P2P)[-.]?Worm"
+                    "pattern": "(?:I|IM|Net|P2P)[-.]?Worm"
                 },
                 "Worm.P2p",
                 "Worm/P2p",
