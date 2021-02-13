@@ -34,7 +34,7 @@ class Classification(Mapping):
             self.match = self.regex.fullmatch(name, timeout=1, concurrent=False)
             self._groups = {k for k, v in self.match.capturesdict().items() if any(v)}
         except (AttributeError, TypeError):
-            raise MatchError(name, self.registration_name())
+            raise MatchError(name, self.__class__.__name__)
 
     @property
     def source(self) -> 'str':
@@ -43,7 +43,7 @@ class Classification(Mapping):
     @classmethod
     def __init_subclass__(cls):
         cls.regex = cls._compile_pattern()
-        EngineRegistry.register(cls, cls.registration_name())
+        cls.registration = EngineRegistry.register(cls, cls.__name__)
 
     @classmethod
     def _compile_pattern(cls):
@@ -103,11 +103,6 @@ class Classification(Mapping):
             return self.source
 
         return self.source[0:start]
-
-    @classmethod
-    def registration_name(cls):
-        """Engine / AV vendor's name"""
-        return cls.__name__
 
     @property
     def is_EICAR(self):

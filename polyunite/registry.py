@@ -117,7 +117,9 @@ class EngineRegistry:
     @classmethod
     def register(cls, parser: 'Type[Classification]', name: 'str'):
         """Register `self` as the specialized class for handling parse requests """
-        cls._registry[cls._normalize(name)] = parser
+        registration = cls._normalize(name)
+        cls._registry[registration] = parser
+        return registration
 
     def each(self, results: EngineResults) -> Iterable[Tuple[EngineName, 'Classification']]:
         """
@@ -127,7 +129,7 @@ class EngineRegistry:
             if isinstance(family, str):
                 try:
                     clf = self.decode(engine, family)
-                    yield clf.registration_name(), clf
+                    yield clf.registration, clf
                 except PolyuniteError:
                     continue
 
@@ -164,7 +166,7 @@ class EngineRegistry:
 
         def weighted_names(elts):
             for engine, clf in elts:
-                weight = self.weights.get(self._normalize(engine), 1.0)
+                weight = self.weights.get(engine, 1.0)
 
                 name = clf.family
 
