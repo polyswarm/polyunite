@@ -30,8 +30,9 @@
                 {
                     "pattern": "obfuscat(?:e|ed|or|ed|ing)"
                 },
-                "packed",
-                "packer",
+                {
+                    "pattern": "[pP]acke[dr][0-9]*"
+                },
                 "packing",
                 "parite",
                 "pecompact",
