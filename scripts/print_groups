@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import polyunite
+import argparse
 from pathlib import Path
 import collections
 import sys
@@ -10,6 +11,13 @@ except:
     sys.path.append(str(Path(__file__).parent.joinpath('../tests')))
     from conftest import read_families
 
+BOLD = '\033[1m'
+RESET = '\033[0m'
+
+parser = argparse.ArgumentParser("Print the polyunite inferred name and colorized ouput, grouped by scan")
+parser.add_argument("--min", default=3, help="minimum number of group entries")
+args = parser.parse_args()
+
 groups = collections.defaultdict(list)
 
 for engine, group, classification in read_families():
@@ -18,19 +26,25 @@ for engine, group, classification in read_families():
 for group, assertions in groups.items():
     parsed = []
     assertions = dict(sorted(assertions, key=lambda a: a[0]))
+    min_parsed = int(args.min)
 
+    fmtstr = '[{0:^15}]  {2:<100.100}'
     for engine, label in assertions.items():
         try:
             vr = polyunite.parse(engine, label)
-        except (polyunite.errors.RegistryKeyError, polyunite.errors.MatchError):
-            continue
+        except polyunite.errors.RegistryKeyError:
+            parsed.append(fmtstr.format(engine, 'Could not parse: No Parser for Engine', label))
+        except polyunite.errors.MatchError:
+            parsed.append(fmtstr.format(engine, 'Could not parse: Error Parsing', label))
         else:
-            parsed.append('[{:<10}] {:55} {}'.format(engine, vr.name, vr.colorize()))
+            parsed.append(fmtstr.format(engine, vr.name, vr.colorize().strip()))
 
-    if parsed and len(parsed) >= 3:
-        print(
-            '{:-^150}\n{}\n'.format(
-                ' {} [{}]'.format(group, polyunite.infer_name(assertions)),
-                '\n'.join(parsed),
-            )
+    if parsed and len(parsed) >= min_parsed:
+        header = '{}{:^15}{} [{:^20}]'.format(
+            polyunite.utils.colors.BOLD,
+            polyunite.infer_name(assertions),
+            polyunite.utils.colors.RESET,
+            group,
         )
+        print('{:-^150}'.format(header))
+        print('\n'.join(parsed))

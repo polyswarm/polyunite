@@ -36,6 +36,16 @@ correct before pushing):
 $ make result-fixtures
 ```
 
+#### `print_groups`
+
+```console
+$ $(PWD)/scripts/print_groups
+```
+
+Group polyunite output by scan and output group-only information, such as the inferred name (`polyunite.infer_name`).
+
+![`print_groups`](images/print_groups.png)
+
 ## Supported Engines
 
 - Alibaba

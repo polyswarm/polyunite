@@ -14,6 +14,7 @@ class colors:
     WHITE_FG = '\033[37m'
     ORANGE_FG = '\033[91m'
     PINK_FG = '\033[95m'
+    BOLD = '\033[1m'
     RESET = '\033[0m'
     UNDERLINE = '\033[4m'
 
