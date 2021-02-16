@@ -2,6 +2,7 @@ from typing import ClassVar, Set
 
 from collections.abc import Mapping
 import regex as re
+from sys import intern
 
 from ..errors import MatchError
 from ..registry import EngineRegistry
@@ -19,8 +20,11 @@ from ..vocab import (
 
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     """Call `recieve` with a generator of all `vocab`'s matching label names"""
-    sublabels = list(vocab.sublabels)
-    return property(lambda self: recieve(label for label in sublabels if label in self))
+    sublabels = frozenset(vocab.sublabels)
+    return property(lambda self: recieve(iter(sublabels.intersection(self._groups))))
+
+
+STANDARD_EICAR_NAME = intern('EICAR')
 
 
 class Classification(Mapping):
@@ -32,7 +36,7 @@ class Classification(Mapping):
     def __init__(self, name: str):
         try:
             self.match = self.regex.fullmatch(name, timeout=1, concurrent=False)
-            self._groups = {k for k, v in self.match.capturesdict().items() if any(v)}
+            self._groups = frozenset(k for k, v in self.match.capturesdict().items() if any(v))
         except (AttributeError, TypeError):
             raise MatchError(name, self.__class__.__name__)
 
@@ -47,7 +51,7 @@ class Classification(Mapping):
 
     @classmethod
     def _compile_pattern(cls):
-        pat = group(r'.*(?P<EICAR>(?i:EICAR)).*', cls.pattern)
+        pat = group(r'(?P<nonmalware>.*(?P<EICAR>(?i:EICAR)).*)', cls.pattern)
         return re.compile(pat, re.ASCII | re.VERBOSE | re.V1)
 
     def __getitem__(self, k):
@@ -72,15 +76,7 @@ class Classification(Mapping):
     operating_system = extract_vocabulary(OSES)
     language = extract_vocabulary(LANGS)
     macro = extract_vocabulary(MACROS)
-
-    @property
-    def labels(self):
-        if self.is_EICAR:
-            return {'nonmalware'}
-        labels = set(LABELS.sublabels) & set(self._groups)
-        if self.is_CVE:
-            return labels | {'exploit', 'CVE'}
-        return labels
+    labels = extract_vocabulary(LABELS, recieve=set)
 
     @property
     def name(self) -> str:
@@ -90,10 +86,11 @@ class Classification(Mapping):
     @property
     def family(self):
         if self.is_EICAR:
-            return 'EICAR'
-        elif self.is_CVE:
-            return self.extract_CVE()
-        return self.get('FAMILY', None)
+            return STANDARD_EICAR_NAME
+
+        return self.vulnerability_id_cve() or \
+                self.vulnerability_id_microsoft() or \
+                self.get('FAMILY')
 
     @property
     def taxon(self):
@@ -108,12 +105,16 @@ class Classification(Mapping):
     def is_EICAR(self):
         return 'EICAR' in self
 
-    @property
-    def is_CVE(self):
-        return 'CVE' in self
+    def vulnerability_id_cve(self):
+        if 'CVE' in self:
+            try:
+                return 'CVE-{CVEYEAR}-{CVENTH}'.format_map(self)
+            except KeyError:
+                return self.source
 
-    def extract_CVE(self):
-        return self.match.expandf("CVE-{CVEYEAR[0]}-{CVENTH[0]}")
+    def vulnerability_id_microsoft(self):
+        if 'microsoft_security_bulletin' in self:
+            return 'MS{MSSEC_YEAR}-{MSSECNTH}'.format_map(self)
 
     @property
     def is_heuristic(self) -> bool:

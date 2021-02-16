@@ -515,9 +515,13 @@
                 {
                     "pattern": "\\bHLLC?\\b"
                 },
-                {"pattern": "\\bmal(?:ware)?\\b"},
+                {
+                    "pattern": "\\bmal(?:ware)?\\b"
+                },
                 "spoofer",
-                {"pattern": "\\bvirus\\b"},
+                {
+                    "pattern": "\\bvirus\\b"
+                },
                 "Trivial"
             ]
         },
@@ -538,6 +542,12 @@
                 "hllw",
                 "worm"
             ]
+        },
+        "CVE": {
+            "description": "Common Vulnerabilities and Exposured"
+        },
+        "microsoft_security_bulletin": {
+            "description": "MS Security Bulletin"
         }
     }
 }
