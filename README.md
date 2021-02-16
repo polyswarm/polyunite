@@ -39,7 +39,7 @@ $ make result-fixtures
 #### `print_groups`
 
 ```console
-$ $(PWD)/scripts/print_groups
+$ ./scripts/print_groups
 ```
 
 Group polyunite output by scan and output group-only information, such as the inferred name (`polyunite.infer_name`).
