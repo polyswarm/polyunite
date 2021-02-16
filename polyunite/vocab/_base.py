@@ -30,10 +30,12 @@ class VocabRegex:
 
     @property
     def aliases(self):
+        """All identifying case-insensitive strings"""
         return map(re.escape, filter(None, (m.get('const') for m in self.match)))
 
     @property
     def patterns(self):
+        """All identifying regular expressions"""
         return filter(None, (m.get('pattern') for m in self.match))
 
     @lru_cache(typed=True)

@@ -42,6 +42,7 @@ class Classification(Mapping):
 
     @property
     def source(self) -> 'str':
+        """Source name"""
         return self.match.string
 
     @classmethod
@@ -85,6 +86,9 @@ class Classification(Mapping):
 
     @property
     def family(self):
+        """
+        Captures the *named* malware family.
+        """
         if self.is_EICAR:
             return STANDARD_EICAR_NAME
 
@@ -94,6 +98,9 @@ class Classification(Mapping):
 
     @property
     def taxon(self):
+        """
+        Capture the common characteristics identified by this vendor (may include family)
+        """
         try:
             start = min(self.match.starts('VARIANT'), default=None)
         except IndexError:
@@ -103,18 +110,8 @@ class Classification(Mapping):
 
     @property
     def is_EICAR(self):
+        """Check if the EICAR test file was reported"""
         return 'EICAR' in self
-
-    def vulnerability_id_cve(self):
-        if 'CVE' in self:
-            try:
-                return 'CVE-{CVEYEAR}-{CVENTH}'.format_map(self)
-            except KeyError:
-                return self.source
-
-    def vulnerability_id_microsoft(self):
-        if 'microsoft_security_bulletin' in self:
-            return 'MS{MSSEC_YEAR}-{MSSECNTH}'.format_map(self)
 
     @property
     def is_heuristic(self) -> bool:
@@ -150,6 +147,35 @@ class Classification(Mapping):
                 continue
 
         return ''.join(markers) + colors.RESET
+
+    def vulnerability_id_cve(self):
+        """
+        Captures any Common Vulnerabilities and Exposures (CVE) vulnerability identifier being referenced.
+
+        .. seealso::
+
+            `CVE Homepage <https://cve.mitre.org/>`_
+        """
+        if 'CVE' in self:
+            try:
+                return 'CVE-{CVEYEAR}-{CVENTH}'.format_map(self)
+            except KeyError:
+                return self.source
+
+    def vulnerability_id_microsoft(self):
+        """
+        Captures any Microsoft Security Bulletin identifier being referenced.
+
+        .. seealso::
+
+            `MS Security Bulletin Homepage
+            <https://docs.microsoft.com/en-us/security-updates/securitybulletins/securitybulletins>`_
+        """
+        if 'microsoft_security_bulletin' in self:
+            try:
+                return 'MS{MSSEC_YEAR}-{MSSECNTH}'.format_map(self)
+            except KeyError:
+                return self.source
 
 
 __all__ = ['Classification']
