@@ -11,7 +11,7 @@ from typing import (
 
 from collections import Counter
 import logging
-from rapidfuzz import process
+import rapidfuzz
 import string
 
 from polyunite.errors import (
@@ -117,7 +117,9 @@ class EngineRegistry:
     @classmethod
     def register(cls, parser: 'Type[Classification]', name: 'str'):
         """Register `self` as the specialized class for handling parse requests """
-        cls._registry[cls._normalize(name)] = parser
+        registration = cls._normalize(name)
+        cls._registry[registration] = parser
+        return registration
 
     def each(self, results: EngineResults) -> Iterable[Tuple[EngineName, 'Classification']]:
         """
@@ -127,7 +129,7 @@ class EngineRegistry:
             if isinstance(family, str):
                 try:
                     clf = self.decode(engine, family)
-                    yield clf.registration_name(), clf
+                    yield clf.registration, clf
                 except PolyuniteError:
                     continue
 
@@ -164,7 +166,7 @@ class EngineRegistry:
 
         def weighted_names(elts):
             for engine, clf in elts:
-                weight = 1
+                weight = self.weights.get(engine, 1.0)
 
                 name = clf.family
 
@@ -172,27 +174,25 @@ class EngineRegistry:
                     name = clf.taxon
                     weight *= self.taxon_weight
 
-                # Only consider strings longer than 2 chars
-                if isinstance(name, str) and len(name) > 2:
-                    weight *= self.weights.get(engine, 1.0)
 
+                # Only consider strings longer than 2 chars
+                if isinstance(name, str):
                     for predicate, adjustment in name_weights:
                         if predicate(name):
-                            weight = weight * adjustment
+                            weight *= adjustment
                             break
 
-                    if weight >= 0:
-                        yield name, weight
+                    yield name, weight
 
         return self._weighted_name_inference(weighted_names(self.each(families)))
 
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
-        items = tuple((n, w) for n, w in names)
+        items = tuple((n, w) for n, w in names if w > 0 and len(n) > 2)
         names = tuple(n for n, w in items)
         weights = dict(items)
 
         def edit_distance(name):
-            matches = process.extract(name, names, score_cutoff=0.25)
+            matches = rapidfuzz.process.extract(name, names, scorer=rapidfuzz.fuzz.QRatio)
             return sum(score * weights[name] for _, score, _ in matches)
 
         if weights:
