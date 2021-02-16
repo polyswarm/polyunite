@@ -22,7 +22,7 @@ def seen():
         yield row['engine'], row['classification']
 
 
-def format_match(engine, label, vr):
+def format_match(engine, label, vr, colorized=True):
     return ' | '.join((
         '{:<10}',
         '{:1}',
@@ -40,7 +40,7 @@ def format_match(engine, label, vr):
         vr.macro or '',
         ', '.join(vr.labels),
         vr.name,
-        vr.colorize(),
+        vr.colorize() if colorized else vr.source,
     )
 
 
