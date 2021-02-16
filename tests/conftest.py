@@ -16,20 +16,25 @@ def open_fixture(filename):
     return zipimporter(path).get_data(filename)
 
 
-def seen():
+def read_families():
     fixtures = open_fixture('engine_families.csv')
     for row in csv.DictReader(fixtures.decode('utf-8').splitlines()):
-        yield row['engine'], row['classification']
+        yield row['engine'], row['instance_id'], row['classification']
 
 
-def format_match(engine, label, vr):
+def seen():
+    for engine, _, classification in read_families():
+        yield engine, classification
+
+
+def format_match(engine, label, vr, colorized=True):
     return ' | '.join((
         '{:<10}',
         '{:1}',
         '{:<10.10}',
         '{:<9.9}',
         '{:<10.10}',
-        '{:30}',
+        '{:55}',
         '{:>15.15}',
         '{}',
     )).format(
@@ -40,7 +45,7 @@ def format_match(engine, label, vr):
         vr.macro or '',
         ', '.join(vr.labels),
         vr.name,
-        vr.colorize(),
+        vr.colorize() if colorized else vr.source,
     )
 
 

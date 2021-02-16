@@ -36,11 +36,23 @@ correct before pushing):
 $ make result-fixtures
 ```
 
+#### `print_groups`
+
+```console
+$ ./scripts/print_groups
+```
+
+Group polyunite output by scan and output group-only information, such as the inferred name (`polyunite.infer_name`).
+
+![`print_groups`](images/print_groups.png)
+
 ## Supported Engines
 
 - Alibaba
 - ClamAV
+- Concinnity
 - DrWeb
+- FilSecLab
 - Ikarus
 - Jiangmin
 - K7
@@ -49,5 +61,6 @@ $ make result-fixtures
 - Qihoo360
 - QuickHeal
 - Rising
-- Virusdie
+- Tachyon
 - URLHaus
+- Virusdie

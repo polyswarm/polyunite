@@ -17,6 +17,7 @@
             "description": "an internal category used to refer to some threats",
             "match": [
                 ".cur",
+                ".Cur",
                 ".Cur1"
             ]
         },
@@ -71,40 +72,34 @@
                 ".Dr"
             ]
         },
+        "heuristic": {
+            "match": [{
+                "pattern": "(?P<HEURISTICS>[-.][Hh]eur)"
+            }]
+        },
         "gen": {
             "description": "malware that is detected using a generic signature",
             "match": [
                 ".gen",
                 ".Gen",
+                ".Siggen",
+                ".siggen",
                 {
                     "pattern": ".(gen|Gen|GEN)[0-9]+"
-                },
-                {
-                    "pattern": ".Heur$"
                 },
                 {
                     "pattern": ".Generic$"
                 },
                 "-gen",
                 "-Gen",
-                ".heur",
                 ".generic"
-            ]
-        },
-        "siggen": {
-            "tags": [
-                "heuristic"
-            ],
-            "description": "malware that is detected using a generic signature",
-            "match": [
-                ".Siggen",
-                ".siggen"
             ]
         },
         "Zen": {
             "description": "ALibaba specific field",
             "match": [
-                ".zen"
+                ".zen",
+                ".Zen"
             ]
         },
         "MUE": {
@@ -205,6 +200,7 @@
             "description": "server component",
             "match": [
                 "!srv",
+                ".Srv",
                 ".srv"
             ]
         },
@@ -212,6 +208,7 @@
             "description": "client component",
             "match": [
                 "!cl",
+                ".Client",
                 ".Cl"
             ]
         }

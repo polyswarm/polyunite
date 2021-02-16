@@ -39,6 +39,14 @@
                 "CRX"
             ]
         },
+        "MSControlPanel": {
+            "description": "Microsoft Control Panel File",
+            "match": [
+                "Cpl"
+
+            ]
+
+        },
         "MSOffice": {
             "description": "Microsoft Office files",
             "match": [{
@@ -179,6 +187,12 @@
             "description": "Novell Netware files",
             "match": [
                 "Netware"
+            ]
+        },
+        "PASSWD": {
+            "description": "Unix PASSWD",
+            "match": [
+                "PASSWD"
             ]
         },
         "PDF": {

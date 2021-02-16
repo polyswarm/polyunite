@@ -59,8 +59,10 @@
         },
         "clicker": {
             "description": "A trojan that makes a system visit a specific web page, often very frequently and usually with the aim of increasing the traffic recorded by the site and thus increasing revenue from advertising. Clickers may also be used to carry out DDoS attacks.",
-            "match": [
-                "clicker",
+            "match": [{
+                    "pattern": "Click(er)?[0-9]*"
+
+                },
                 "cliqker"
             ]
         },
@@ -92,6 +94,13 @@
             "match": [{
                     "pattern": "\\bDL\\b"
                 },
+                {
+                    "pattern": "Download(er)?[0-9]*"
+                },
+                "Downlaoder",
+                "Downlder",
+                "TjnDownldr",
+                "TrjnDwnlder",
                 "dldr",
                 "dload",
                 "dloade",
@@ -100,21 +109,16 @@
                 "dloadware",
                 "docdl",
                 "downagent",
-                "Downlaoder",
-                "Downlder",
+                "downexec",
                 "downldexe",
                 "downldr",
-                "download",
-                "downloader",
                 "downloadguide",
                 "downloadware",
                 "downware",
                 "dwnldr",
                 "exedown",
                 "macrodown",
-                "malware_download",
-                "TjnDownldr",
-                "TrjnDwnlder"
+                "malware_download"
             ]
         },
         "dropper": {
@@ -183,6 +187,10 @@
                 "Harm",
                 "hoax",
                 "joke",
+                {
+                    "const": "KMS",
+                    "description": "Tool to enable illegal use of Microsoft Products"
+                },
                 "keygen",
                 "misleading",
                 "nettool",
@@ -476,7 +484,15 @@
                 "exploit",
                 "shellcode",
                 "shellkode"
-            ]
+            ],
+            "children": {
+                "CVE": {
+                    "description": "Common Vulnerabilities and Exposured"
+                },
+                "microsoft_security_bulletin": {
+                    "description": "MS Security Bulletin"
+                }
+            }
         },
         "spyware": {
             "description": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner.",
@@ -515,9 +531,13 @@
                 {
                     "pattern": "\\bHLLC?\\b"
                 },
-                {"pattern": "\\bmal(?:ware)?\\b"},
+                {
+                    "pattern": "\\bmal(?:ware)?\\b"
+                },
                 "spoofer",
-                {"pattern": "\\bvirus\\b"},
+                {
+                    "pattern": "\\bvirus\\b"
+                },
                 "Trivial"
             ]
         },

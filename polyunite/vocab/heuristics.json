@@ -16,7 +16,11 @@
                 "generic",
                 "genetic",
                 "genmalicious",
-                "heur",
+                {
+                    "pattern": "[hH]eur[0-9]*"
+                },
+                "NewHeur",
+                "MaliciousHeuristic",
                 "score",
                 "static",
                 "undefined"
@@ -30,11 +34,9 @@
                 "agent",
                 "agentad",
                 "agentb",
-                "agentpmf",
                 "Delf",
                 "family",
                 "foreign",
-                "genericnrv",
                 "genome",
                 "kcloud",
                 "maltrec",

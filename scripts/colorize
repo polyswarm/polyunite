@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
+import argparse
 from contextlib import contextmanager
 from pathlib import Path
 import sys
-import polyunite
 
 try:
     from conftest import format_match, match_iter
@@ -10,15 +10,32 @@ except:
     sys.path.append(str(Path(__file__).parent.joinpath('../tests')))
     from conftest import format_match, match_iter
 
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--color",
+    default='always',
+    choices=['always', 'never'],
+    help="colorize the output; can be 'always' (default if omitted) or 'never'"
+)
+parser.add_argument(
+    "engine",
+    nargs='*',
+    default=None,
+    help="Restrict output to this engine",
+)
+args = parser.parse_args()
+
+
 @contextmanager
 def section(name):
     print("{:-^150}".format(name))
     yield lambda *a, **kw: print('  ', *a, **kw)
 
+
 try:
-    it = match_iter(sys.argv[1:] or None)
+    it = match_iter(args.engine)
     while True:
-        print(format_match(*next(it)))
+        print(format_match(*next(it), colorized=args.color != 'never'))
 except StopIteration as e:
     missing, errors = e.value
 

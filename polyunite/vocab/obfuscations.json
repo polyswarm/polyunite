@@ -3,9 +3,8 @@
     "children": {
         "packing": {
             "description": "Packing of the malware instance code, not including encryption.",
-            "match": [{
-                    "pattern": "(?<=[.])Pack(?=[.])"
-                },
+            "match": [
+                "Pack",
                 "aspack",
                 "asprotect",
                 "badPE",
