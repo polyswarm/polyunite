@@ -59,8 +59,10 @@
         },
         "clicker": {
             "description": "A trojan that makes a system visit a specific web page, often very frequently and usually with the aim of increasing the traffic recorded by the site and thus increasing revenue from advertising. Clickers may also be used to carry out DDoS attacks.",
-            "match": [
-                "clicker",
+            "match": [{
+                    "pattern": "Click(er)?[0-9]*"
+
+                },
                 "cliqker"
             ]
         },
@@ -92,6 +94,13 @@
             "match": [{
                     "pattern": "\\bDL\\b"
                 },
+                {
+                    "pattern": "Download(er)?[0-9]*"
+                },
+                "Downlaoder",
+                "Downlder",
+                "TjnDownldr",
+                "TrjnDwnlder",
                 "dldr",
                 "dload",
                 "dloade",
@@ -100,21 +109,16 @@
                 "dloadware",
                 "docdl",
                 "downagent",
-                "Downlaoder",
-                "Downlder",
+                "downexec",
                 "downldexe",
                 "downldr",
-                "download",
-                "downloader",
                 "downloadguide",
                 "downloadware",
                 "downware",
                 "dwnldr",
                 "exedown",
                 "macrodown",
-                "malware_download",
-                "TjnDownldr",
-                "TrjnDwnlder"
+                "malware_download"
             ]
         },
         "dropper": {
@@ -183,6 +187,10 @@
                 "Harm",
                 "hoax",
                 "joke",
+                {
+                    "const": "KMS",
+                    "description": "Tool to enable illegal use of Microsoft Products"
+                },
                 "keygen",
                 "misleading",
                 "nettool",

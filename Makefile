@@ -56,7 +56,7 @@ test: ## run tests
 	python3 setup.py test
 
 test-quick:
-	pytest tests/quicktest.py
+	pytest --cache-clear tests/quicktest.py
 
 .PHONY: patterns-report
 report:  ## Show colorized results report

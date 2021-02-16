@@ -1,6 +1,13 @@
 {
     "group": "LANGS",
     "children": {
+        "AutoIt": {
+            "description": "AutoIt automation language",
+            "match": [
+                "AutoIt",
+                "AutoIT"
+            ]
+        },
         "AutoHotKey": {
             "match": [
                 "AutohotKey",

@@ -14,16 +14,21 @@ class Jiangmin(Classification):
     (
         ([./:]|^)
         (
-            {HEURISTICS}
+            {PLATFORM}
             | Intended
             | Garbage
             | Riot
             | {LABELS}(-?(?&LABELS))?
-            | {OBFUSCATIONS}
-            | {PLATFORM}
         )
     )*
     (?P<VEID>
-        (([./]|^){FAMILY_ID(r'[A-Z][a-z]+-[0-9]')})?
-        {VARIANT_ID(r'[.][[:alnum:]]+$', '[.][A-Z][a-z]$')}{{,2}})
+        (
+            ([./]|^)
+            (
+                {FAMILY_ID(r'[A-Z][a-z]+-[0-9]')}
+                | [A-Z][a-z]{{1,2}}(?=[.])
+            )
+        )?
+        {VARIANT_ID()}{{,2}}
+    )?
     $"""

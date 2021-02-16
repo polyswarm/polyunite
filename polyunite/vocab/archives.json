@@ -2,164 +2,162 @@
     "group": "ARCHIVES",
     "children": {
         "SEVENZIP": {
-            "description": "7zip",
+            "archive_type": "7Zip",
             "match": [
                 "7Z",
                 "7zip"
             ]
         },
         "APM": {
-            "description": "APM",
+            "archive_type": "APM",
             "match": [
                 "APM"
             ]
         },
         "ARJ": {
-            "description": "ARJ",
+            "archive_type": "ARJ",
             "match": [
                 "ARJ"
             ]
         },
-        "AutoIt": {
-            "description": "AutoIT scripts",
-            "match": [
-                "AutoIt"
-            ]
-        },
         "BINHEX": {
-            "description": "BINHEX",
+            "archive_type": "BINHEX",
             "match": [
                 "BINHEX"
             ]
         },
         "BZIP": {
-            "description": "BZIP",
+            "archive_type": "BZIP",
             "match": [
                 "BZIP"
             ]
         },
         "CAB": {
-            "description": "CAB",
+            "archive_type": "CAB",
             "match": [
                 "CAB"
             ]
         },
         "CHM": {
-            "description": "CHM",
+            "archive_type": "CHM",
             "match": [
                 "CHM"
             ]
         },
         "CPIO": {
-            "description": "CPIO",
+            "archive_type": "CPIO",
             "match": [
                 "CPIO"
             ]
         },
         "DMG": {
-            "description": "DMG",
+            "archive_type": "DMG",
             "match": [
                 "DMG"
             ]
         },
         "EGG": {
             "description": "EGG archive",
+            "archive_type": "EGG",
             "match": [
                 "EGG"
             ]
         },
         "GPT": {
             "description": "Boot GPT",
+            "archive_type": "GPT",
             "match": [
                 "GPT"
             ]
         },
         "GZIP": {
             "description": "GZIP",
+            "archive_type": "GZIP",
             "match": [
                 "GZIP"
             ]
         },
         "HFSPLUS": {
             "description": "HFSPLUS",
+            "archive_type": "HFSPLUS",
             "match": [
                 "HFSPLUS"
             ]
         },
         "ISHIELD": {
             "description": "ISHIELD",
+            "archive_type": "ISHIELD",
             "match": [
                 "ISHIELD"
             ]
         },
         "InnoSetup": {
             "description": "Innosetup",
+            "archive_type": "InnoSetup",
             "match": [
                 "InnoSetup"
             ]
         },
         "ISO9660": {
             "description": "ISO9660",
+            "archive_type": "ISO9660",
             "match": [
                 "ISO9660"
             ]
         },
         "MBR": {
             "description": "Boot MBR",
+            "archive_type": "MBR",
             "match": [
                 "MBR"
             ]
         },
         "NSIS": {
             "description": "Nullsoft Installation Language",
+            "archive_type": "NSIS",
             "match": [
                 "NSIS"
             ]
         },
-        "PASSWD": {
-            "description": "Unix PASSWD",
-            "match": [
-                "PASSWD"
-            ]
-        },
         "RAR": {
-            "description": "RAR",
+            "archive_type": "RAR",
             "match": [
                 "RAR"
             ]
         },
         "SIS": {
-            "description": "SIS",
+            "archive_type": "SIS",
             "match": [
                 "SIS"
             ]
         },
         "SZDD": {
-            "description": "SZDD",
+            "archive_type": "SZDD",
             "match": [
                 "SZDD"
             ]
         },
         "TAR": {
-            "description": "POSIX TAR",
+            "description": "Tarfile",
+            "archive_type": "TAR",
             "match": [
                 "TAR"
             ]
         },
         "XAR": {
-            "description": "XAR",
+            "archive_type": "XAR",
             "match": [
                 "XAR"
             ]
         },
         "XZ": {
-            "description": "XZ",
+            "archive_type": "XZ",
             "match": [
                 "XZ"
             ]
         },
         "ZIP": {
-            "description": "ZIP",
+            "archive_type": "ZIP",
             "match": [
                 "ZIP"
             ]

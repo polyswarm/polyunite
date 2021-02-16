@@ -66,7 +66,7 @@ class VocabRegex:
 
     @property
     def sublabels(self) -> 'Iterator[str]':
-        yield from (v.name for v in self.iter() if v.depth > self.depth and v.name)
+        return (v.name for v in self.iter() if v.depth > self.depth and v.name)
 
     def __format__(self, spec) -> 'str':
         """Format this vocabulary as a regular expression, accepts `-g` to remove groups and `-i` for case-sensitivity"""

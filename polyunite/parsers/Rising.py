@@ -13,6 +13,8 @@ class Rising(Classification):
             | {PLATFORM}
             | BL
             | KL
+            | Privacy
+            | Andorid
             | Junk
         )
     )*
