@@ -16,10 +16,15 @@ def open_fixture(filename):
     return zipimporter(path).get_data(filename)
 
 
-def seen():
+def read_families():
     fixtures = open_fixture('engine_families.csv')
     for row in csv.DictReader(fixtures.decode('utf-8').splitlines()):
-        yield row['engine'], row['classification']
+        yield row['engine'], row['instance_id'], row['classification']
+
+
+def seen():
+    for engine, _, classification in read_families():
+        yield engine, classification
 
 
 def format_match(engine, label, vr, colorized=True):

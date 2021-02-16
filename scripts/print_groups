@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+import polyunite
+from pathlib import Path
+import collections
+import sys
+
+try:
+    from conftest import read_families
+except:
+    sys.path.append(str(Path(__file__).parent.joinpath('../tests')))
+    from conftest import read_families
+
+groups = collections.defaultdict(list)
+
+for engine, group, classification in read_families():
+    groups[group].append((engine, classification))
+
+for group, assertions in groups.items():
+    parsed = []
+    assertions = dict(sorted(assertions, key=lambda a: a[0]))
+
+    for engine, label in assertions.items():
+        try:
+            vr = polyunite.parse(engine, label)
+        except (polyunite.errors.RegistryKeyError, polyunite.errors.MatchError):
+            continue
+        else:
+            parsed.append('[{:<10}] {:55} {}'.format(engine, vr.name, vr.colorize()))
+
+    if parsed and len(parsed) >= 3:
+        print(
+            '{:-^150}\n{}\n'.format(
+                ' {} [{}]'.format(group, polyunite.infer_name(assertions)),
+                '\n'.join(parsed),
+            )
+        )
