@@ -476,7 +476,15 @@
                 "exploit",
                 "shellcode",
                 "shellkode"
-            ]
+            ],
+            "children": {
+                "CVE": {
+                    "description": "Common Vulnerabilities and Exposured"
+                },
+                "microsoft_security_bulletin": {
+                    "description": "MS Security Bulletin"
+                }
+            }
         },
         "spyware": {
             "description": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner.",
@@ -542,12 +550,6 @@
                 "hllw",
                 "worm"
             ]
-        },
-        "CVE": {
-            "description": "Common Vulnerabilities and Exposured"
-        },
-        "microsoft_security_bulletin": {
-            "description": "MS Security Bulletin"
         }
     }
 }
