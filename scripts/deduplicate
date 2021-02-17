@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import json
 import sys
 import csv
 
@@ -9,10 +8,10 @@ from contextlib import contextmanager
 from collections import defaultdict
 
 try:
-    from conftest import open_fixture
+    from utils import open_fixture
 except:
     sys.path.append(str(Path(__file__).parent.joinpath('../tests')))
-    from conftest import open_fixture
+    from tuils import open_fixture
 
 
 @contextmanager
@@ -24,7 +23,7 @@ def build_writer():
         yield writer
 
 
-def match_iter():
+def print_groups():
     existing = defaultdict(set)
     sfx = polyunite.vocab.SUFFIXES.compile()
 
@@ -46,12 +45,11 @@ def match_iter():
                             if sfx.search(var):
                                 pass
                             else:
-                                nlabel = nlabel[0:-len(var)+1]
+                                nlabel = nlabel[0:-len(var) + 1]
 
                 nlabel = (len(label), nlabel)
             except Exception as e:
                 print('Error: ', e, file=sys.stderr)
-                pass
             else:
                 if nlabel in existing[engine]:
                     # print(f'Duplicate: {engine}//{label} [{nlabel}]')
@@ -66,4 +64,4 @@ def match_iter():
             })
 
 
-match_iter()
+print_groups()

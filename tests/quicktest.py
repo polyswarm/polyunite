@@ -3,14 +3,14 @@ import pytest
 
 import polyunite
 
-from .conftest import open_fixture
+from .utils import read_result_fixtures
 
 
 def test_parsers():
     """
     Speedier tests, stops at first error.
     """
-    for report_results in json.loads(open_fixture('report_results.json')):
+    for report_results in read_result_fixtures():
         engine = report_results['engine']
         source = report_results['source']
         actual = polyunite.parse(engine, source)
