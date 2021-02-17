@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
-from contextlib import contextmanager
 import csv
 import os.path
-import pkg_resources
-import zipfile
 from zipimport import zipimporter
 
 import polyunite
@@ -25,28 +22,6 @@ def read_families():
 def seen():
     for engine, _, classification in read_families():
         yield engine, classification
-
-
-def format_match(engine, label, vr, colorized=True):
-    return ' | '.join((
-        '{:<10}',
-        '{:1}',
-        '{:<10.10}',
-        '{:<9.9}',
-        '{:<10.10}',
-        '{:55}',
-        '{:>15.15}',
-        '{}',
-    )).format(
-        engine,
-        vr.is_heuristic and 'H' or '',
-        vr.operating_system or '',
-        vr.language or '',
-        vr.macro or '',
-        ', '.join(vr.labels),
-        vr.name,
-        vr.colorize() if colorized else vr.source,
-    )
 
 
 def match_iter(only=None):
