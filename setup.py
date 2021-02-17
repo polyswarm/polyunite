@@ -27,8 +27,8 @@ setup(
     include_package_data=True,
     keywords='polyunite',
     name='polyunite',
-    packages=find_packages(include=['polyunite']),
-    package_data={'polyunite': ['vocabs/*.json']},
+    packages=find_packages(include=['polyunite', 'polyunite.*']),
+    package_data={'polyunite': ['vocab/*.json']},
     setup_requires=[
         'pytest-runner',
     ],
