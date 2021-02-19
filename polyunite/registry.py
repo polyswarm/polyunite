@@ -2,16 +2,13 @@ from typing import (
     TYPE_CHECKING,
     Callable,
     Iterable,
-    Mapping,
     Optional,
     Tuple,
     Type,
     Union,
 )
 
-from collections import Counter
 import logging
-import rapidfuzz
 import string
 
 from polyunite.errors import (
@@ -20,15 +17,13 @@ from polyunite.errors import (
     RegistryKeyError,
 )
 
-from .utils import flatmap
+from .analysis import Analyses
+from .utils import EngineName, EngineResults
 
 if TYPE_CHECKING:
     from polyunite.parsers import Classification
 
 log = logging.getLogger('polyunite')
-
-EngineName = str
-EngineResults = Mapping[EngineName, str]
 
 _ENGINE_NAME_XLATE = str.maketrans(
     string.ascii_uppercase,
@@ -36,38 +31,9 @@ _ENGINE_NAME_XLATE = str.maketrans(
     string.whitespace + string.punctuation,
 )
 
-from .vocab import (
-    ARCHIVES,
-    HEURISTICS,
-    LABELS,
-    LANGS,
-    MACROS,
-    OBFUSCATIONS,
-    OSES,
-)
-
 
 class EngineRegistry:
     _registry = dict()
-
-    def __init__(
-        self,
-        weights={},
-        name_weights={
-            LABELS.compile(1, 0).fullmatch: 0.80,
-            HEURISTICS.compile(1, 0).fullmatch: 0.55,
-            OBFUSCATIONS.compile(1, 0).fullmatch: 0.55,
-            LANGS.compile(1, 0).fullmatch: 0.20,
-            ARCHIVES.compile(1, 0).fullmatch: 0.20,
-            MACROS.compile(1, 0).fullmatch: 0.20,
-            OSES.compile(1, 0).fullmatch: 0.20,
-        },
-        taxon_weight=0.35,
-    ):
-        self.weights = {self._normalize(k): v for k, v in weights.items()}
-        self.name_weights = name_weights
-        self.taxon_weight = taxon_weight
-        super().__init__()
 
     @classmethod
     def __contains__(cls, engine):
@@ -133,25 +99,22 @@ class EngineRegistry:
                 except PolyuniteError:
                     continue
 
+    def analyze(self, results: EngineResults, **kwargs):
+        return Analyses(self.each(results), **kwargs)
+
     def summarize(
         self,
         results: EngineResults,
         key: Callable[['Classification'], Union[Iterable[str], str]] = None,
-        top_k: int = None,
+        top_k: int = None
     ):
         """
         Return an iterator of unique applications of ``key`` to the decoded malware family of each
         engine in ``results``. ``top_k`` selects only the most common k applications of key.
         """
-        each = tuple(p for _, p in self.each(results))
+        return self.analyze(results).summarize(key=key, top_k=top_k)
 
-        if not each:
-            return []
-
-        ctr = Counter(sorted(filter(None, flatmap(key, each))))
-        return [elt for elt, _ in ctr.most_common(top_k)]
-
-    def infer_name(self, families: Mapping[str, str]):
+    def infer_name(self, results: EngineResults, **kwargs):
         """
         Returns the name with the smallest total distance edit distance from `classifications`
 
@@ -159,44 +122,7 @@ class EngineRegistry:
                                   'Virusdie': 'Zeus-Trojan', 'QuickHeal': 'Agent'})
         Zeus
         """
-        if not families:
-            return
-
-        name_weights = self.name_weights.items()
-
-        def weighted_names(elts):
-            for engine, clf in elts:
-                weight = self.weights.get(engine, 1.0)
-
-                name = clf.family
-
-                if name is None:
-                    name = clf.taxon
-                    weight *= self.taxon_weight
-
-
-                # Only consider strings longer than 2 chars
-                if isinstance(name, str):
-                    for predicate, adjustment in name_weights:
-                        if predicate(name):
-                            weight *= adjustment
-                            break
-
-                    yield name, weight
-
-        return self._weighted_name_inference(weighted_names(self.each(families)))
-
-    def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
-        items = tuple((n, w) for n, w in names if w > 0 and len(n) > 2)
-        names = tuple(n for n, w in items)
-        weights = dict(items)
-
-        def edit_distance(name):
-            matches = rapidfuzz.process.extract(name, names, scorer=rapidfuzz.fuzz.QRatio)
-            return sum(score * weights[name] for _, score, _ in matches)
-
-        if weights:
-            return max(names, key=edit_distance)
+        return self.analyze(results).infer_name(**kwargs)
 
     @staticmethod
     def _normalize(name: 'str'):

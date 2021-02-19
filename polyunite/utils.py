@@ -1,7 +1,9 @@
-from typing import Optional
+from typing import Mapping, Optional
 
 from collections.abc import Iterable
 
+EngineName = str
+EngineResults = Mapping[EngineName, str]
 
 class colors:
     BLACK_FG = '\033[30m'
