@@ -101,3 +101,25 @@ def test_summarize_bad_labels(_family, _labels, results):
     k = 2
 
     assert [] == polyunite.summarize(results, keyfn, top_k=k)
+
+
+@pytest.mark.parametrize(
+    'name, match_expected', [
+        ('emotet', True),
+        ('EmotetRI', True),
+        ('EM', False),
+        ('SubSeven', False),
+    ]
+)
+def test_name_similarity_metric(name, match_expected):
+    families = {
+        'Alibaba': 'TrojanDropper:Win32/EmotetRI.a8d51701',
+        'ClamAV': 'Win.Trojan.EmotetRI-6055402-0',
+    }
+
+    metric = polyunite.analyze(families).name_similarity_metric(name)
+
+    if match_expected:
+        assert metric > 50
+    else:
+        assert metric <= 50
