@@ -119,7 +119,7 @@ class EngineRegistry:
         Returns the name with the smallest total distance edit distance from `classifications`
 
         >>> registry.infer_name({'Ikarus': 'Zeus', 'Rising': 'zeus', 'Qihoo360': 'zbot',
-                                  'Virusdie': 'Zeus-Trojan', 'QuickHeal': 'Agent'})
+                                 'Virusdie': 'Zeus-Trojan', 'QuickHeal': 'Agent'})
         Zeus
         """
         return self.analyze(results).infer_name(**kwargs)
