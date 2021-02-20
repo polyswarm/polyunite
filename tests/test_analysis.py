@@ -113,8 +113,8 @@ def test_summarize_bad_labels(_family, _labels, results):
 )
 def test_name_similarity_metric(name, match_expected):
     families = {
-        'Alibaba': 'TrojanDropper:Win32/EmotetRI.a8d51701',
-        'ClamAV': 'Win.Trojan.EmotetRI-6055402-0',
+        'Alibaba': 'TrojanDropper:Win32/Emotet.a8d51701',
+        'ClamAV': 'Win.Trojan.Emotet-6055402-0',
     }
 
     metric = polyunite.analyze(families).name_similarity_metric(name)
