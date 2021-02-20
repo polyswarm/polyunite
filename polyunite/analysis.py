@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Callable, Iterable, Tuple, Union
 
 from collections import Counter, UserDict
+from functools import lru_cache
 import rapidfuzz
 
 from .utils import flatmap
@@ -19,6 +20,9 @@ if TYPE_CHECKING:
 
 
 class Analyses(UserDict):
+    """
+    Analysis of engines -> family mappings produced by multiple AV analyses on a single file.
+    """
     def __init__(self, results):
         super().__init__(dict(results))
 
@@ -93,7 +97,9 @@ class Analyses(UserDict):
 
                 yield name, weight
 
-    def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
+    @staticmethod
+    @lru_cache(maxsize=256)
+    def _weighted_name_inference(names: Iterable[Tuple[str, float]]) -> str:
         items = tuple((n, w) for n, w in names if w > 0 and len(n) > 2)
         names = tuple(n for n, w in items)
         weights = dict(items)
