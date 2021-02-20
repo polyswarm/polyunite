@@ -35,6 +35,13 @@ class Analyses(UserDict):
         return [elt for elt, _ in ctr.most_common(top_k)]
 
     def labels_summary(self, top_k=None):
+        """
+        Return the labels associated with these analyses:
+
+        >>> families = {'ClamAV': 'Trojan.Upantix', 'Lionic': 'Hacktool.Win32.Upantix'}
+        >>> Analyses(families).labels_summary()
+        ['trojan', 'security_assessment_tool']
+        """
         return self.summarize(lambda o: o.labels, top_k=top_k)
 
     def infer_name(self, **kwargs):
@@ -50,6 +57,10 @@ class Analyses(UserDict):
     def name_similarity_metric(self, name, **kwargs):
         """
         Compares `name` to the inferred name, computing a similarity metric
+
+        >>> families = {'ClamAV': 'Trojan.Emotet', 'QuickHeal': 'Backdoor.Emotet'}
+        >>> polyunite.analyze(families).name_similarity_metric('EmotetRI')
+        85.71
         """
         return rapidfuzz.fuzz.QRatio(self.infer_name(**kwargs), name)
 
