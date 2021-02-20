@@ -47,6 +47,12 @@ class Analyses(UserDict):
         """
         return self._weighted_name_inference(self._weighted_names(**kwargs))
 
+    def name_similarity_metric(self, name, **kwargs):
+        """
+        Compares `name` to the inferred name, computing a similarity metric
+        """
+        return rapidfuzz.fuzz.QRatio(self.infer_name(**kwargs), name)
+
     def _weighted_names(
         self,
         weights={},
