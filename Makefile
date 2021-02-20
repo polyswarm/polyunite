@@ -39,6 +39,7 @@ clean-pyc: ## remove Python file artifacts
 
 clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
+	find . -name '.mypy_cache' -exec rm -fr {} +
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 

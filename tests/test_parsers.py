@@ -1,10 +1,8 @@
-import json
 import pytest
 
 import polyunite
 
-from .conftest import open_fixture
-
+from .utils import read_result_fixtures
 
 @pytest.mark.parametrize(
     'engine,source,name,labels', [
@@ -14,7 +12,7 @@ from .conftest import open_fixture
             d['name'],
             d.get('labels', []),
             id='{engine}/{source}'.format_map(d),
-        ) for d in json.loads(open_fixture('report_results.json'))
+        ) for d in read_result_fixtures()
     ]
 )
 def test_parsers(engine, source, name, labels):

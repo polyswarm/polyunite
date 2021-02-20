@@ -10,9 +10,9 @@ setup(
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     entry_points={
         'console_scripts': [ 'main=polyunite.polyunite:main' ]
@@ -27,8 +27,8 @@ setup(
     include_package_data=True,
     keywords='polyunite',
     name='polyunite',
-    packages=find_packages(include=['polyunite']),
-    package_data={'polyunite': ['vocabs/*.json']},
+    packages=find_packages(include=['polyunite', 'polyunite.*']),
+    package_data={'polyunite': ['vocab/*.json']},
     setup_requires=[
         'pytest-runner',
     ],
@@ -37,6 +37,6 @@ setup(
         'pytest',
     ],
     url='https://github.com/polyscore/polyunite',
-    version='1.2.1',
+    version='1.3.0',
     zip_safe=True,
 )

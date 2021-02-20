@@ -2,9 +2,8 @@ include README.rst
 include Makefile
 include setup.cfg
 
-recursive-include tests *
-exclude tests/fixtures/engine_families.zip
-recursive-include polyunite/vocabs *.json
+recursive-exclude tests *
 
+recursive-exclude * .mypy_cache
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

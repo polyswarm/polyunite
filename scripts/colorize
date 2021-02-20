@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
+
 import argparse
 from contextlib import contextmanager
 from pathlib import Path
 import sys
 
 try:
-    from conftest import format_match, match_iter
+    from utils import match_iter
 except:
     sys.path.append(str(Path(__file__).parent.joinpath('../tests')))
-    from conftest import format_match, match_iter
+    from utils import match_iter
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -32,10 +33,33 @@ def section(name):
     yield lambda *a, **kw: print('  ', *a, **kw)
 
 
+def format_match(vr, colorized=True):
+    return ' | '.join((
+        '{:<10}',
+        '{:1}',
+        '{:<10.10}',
+        '{:<9.9}',
+        '{:<10.10}',
+        '{:55}',
+        '{:>15.15}',
+        '{}',
+    )).format(
+        vr.registration,
+        vr.is_heuristic and 'H' or '',
+        vr.operating_system or '',
+        vr.language or '',
+        vr.macro or '',
+        ', '.join(vr.labels),
+        vr.name,
+        vr.colorize() if colorized else vr.source,
+    )
+
+
 try:
     it = match_iter(args.engine)
+    colorized = args.color != 'never'
     while True:
-        print(format_match(*next(it), colorized=args.color != 'never'))
+        print(format_match(next(it), colorized=colorized))
 except StopIteration as e:
     missing, errors = e.value
 
