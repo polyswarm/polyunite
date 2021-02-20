@@ -190,7 +190,8 @@
         "PHP": {
             "description": "Hypertext Preprocessor scripts",
             "match": [
-                "PHP"
+                "PHP",
+                "WordPress"
             ]
         },
         "PS": {

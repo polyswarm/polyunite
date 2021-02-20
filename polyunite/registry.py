@@ -174,7 +174,6 @@ class EngineRegistry:
                     name = clf.taxon
                     weight *= self.taxon_weight
 
-
                 # Only consider strings longer than 2 chars
                 if isinstance(name, str):
                     for predicate, adjustment in name_weights:

@@ -7,6 +7,10 @@
             "match": [{
                     "pattern": "heuristics?"
                 },
+                {
+                    "pattern": "Siggen[0-9]?"
+                },
+                "VBGeneric",
                 "Gen",
                 "advml",
                 "attribute",
@@ -19,6 +23,7 @@
                 {
                     "pattern": "[hH]eur[0-9]*"
                 },
+                      "Heuri",
                 "NewHeur",
                 "MaliciousHeuristic",
                 "score",
