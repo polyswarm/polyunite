@@ -60,7 +60,7 @@ class Analyses(UserDict):
         """
         Compares `name` to the inferred name, computing a similarity metric
 
-        >>> analyses.analyze(families).name_similarity_metric('EmotetRI')
+        >>> analyses.name_similarity_metric('EmotetRI')
         85.71
         """
         return rapidfuzz.fuzz.QRatio(self.infer_name(**kwargs), name)
