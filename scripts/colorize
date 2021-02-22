@@ -6,10 +6,10 @@ from pathlib import Path
 import sys
 
 try:
-    from conftest import match_iter
+    from utils import match_iter
 except:
     sys.path.append(str(Path(__file__).parent.joinpath('../tests')))
-    from conftest import match_iter
+    from utils import match_iter
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -33,7 +33,7 @@ def section(name):
     yield lambda *a, **kw: print('  ', *a, **kw)
 
 
-def format_match(engine, label, vr, colorized=True):
+def format_match(vr, colorized=True):
     return ' | '.join((
         '{:<10}',
         '{:1}',
@@ -44,7 +44,7 @@ def format_match(engine, label, vr, colorized=True):
         '{:>15.15}',
         '{}',
     )).format(
-        engine,
+        vr.registration,
         vr.is_heuristic and 'H' or '',
         vr.operating_system or '',
         vr.language or '',
@@ -57,8 +57,9 @@ def format_match(engine, label, vr, colorized=True):
 
 try:
     it = match_iter(args.engine)
+    colorized = args.color != 'never'
     while True:
-        print(format_match(*next(it), colorized=args.color != 'never'))
+        print(format_match(next(it), colorized=colorized))
 except StopIteration as e:
     missing, errors = e.value
 

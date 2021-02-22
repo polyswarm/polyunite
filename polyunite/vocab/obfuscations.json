@@ -65,6 +65,22 @@
                 "patched"
             ]
         },
+        "capabilities": {
+            "match": [
+                "AntiVM",
+                "AntiFW",
+                "KillProc",
+                "KillFiles",
+                "KillAV",
+                "AVKill",
+                "Redirector",
+                "Autorun",
+                "KillWin",
+                {
+                    "pattern": "Autorunn?er[0-9]?"
+                }
+            ]
+        },
         "code_encryption": {
             "description": "Encryption of the malware instance code.",
             "match": [

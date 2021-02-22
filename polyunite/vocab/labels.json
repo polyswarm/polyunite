@@ -7,6 +7,7 @@
                     "pattern": "(?<!\\w)AD(?!\\w)"
                 },
                 "adware",
+                "AdLoad",
                 "AdInstaller"
             ]
         },
@@ -63,7 +64,8 @@
                     "pattern": "Click(er)?[0-9]*"
 
                 },
-                "cliqker"
+                      "cliqker",
+                      "Click"
             ]
         },
         "companion_virus": {
@@ -183,6 +185,9 @@
                 "cracktool",
                 "fraud-tool",
                 "fraudtool",
+                {
+                    "pattern": "\\bTool\\b"
+                },
                 "greyware",
                 "Harm",
                 "hoax",
@@ -316,7 +321,17 @@
                     "pattern": "banker(\\d)?"
                 },
                 "banker"
-            ]
+            ],
+            "steal_cryptocurrency_data": {
+                "description": "Steals cryptocurrency data that may be stored on a system (e.g., Bitcoin wallets).",
+                "tags": {
+                    "behavior": "steal-cryptocurrency-data"
+                },
+                "match": [
+                    "CoinThief",
+                    "CoinStealer"
+                ]
+            }
         },
         "password_stealer": {
             "description": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system.",
@@ -518,6 +533,7 @@
                     "pattern": "\\bTr\\b"
                 },
                 "trjn",
+                "TrjGen",
                 "trojan",
                 "trojanapt",
                 "trojanhorse",

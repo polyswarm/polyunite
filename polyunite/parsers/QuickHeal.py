@@ -18,9 +18,13 @@ class QuickHeal(Classification):
 
             {FAMILY_ID(
                 r'(?# e.x `Trojan.2345Cn` )'
-                r'[0-9]+[A-Z][a-z]+',
+                r'[0-9]+[A-Z][a-z]+?',
                 r'(?# e.x `Trojan.Nuj` )'
                 r'[A-Z][a-z]{2}',
+                standard=[
+                    r'[0-9a-z]{1,2}[A-Z][a-zA-Z]{2,}?',
+                    r'[A-Z][a-zA-Z0-9_]{3,}?',
+                ]
             )}
         )?
 

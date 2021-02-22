@@ -1,5 +1,5 @@
-from ._base import VocabRegex
 from ..utils import group
+from ._base import VocabRegex
 
 LABELS = VocabRegex.from_resource('LABELS')
 LANGS = VocabRegex.from_resource('LANGS')
@@ -10,6 +10,8 @@ HEURISTICS = VocabRegex.from_resource('HEURISTICS')
 OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS, OBFUSCATIONS)
+
+TYPES = group(f'{LABELS}(-?(?&LABELS))?', PLATFORM, name='TYPES')
 
 
 def VARIANT_ID(*extra):

@@ -1,12 +1,12 @@
 import regex as re
 
-from ..vocab import LABELS
+from ..vocab import TYPES
 from ._base import Classification
 
 
 class K7(Classification):
     pattern = rf"""^
-    ([-]?{LABELS})*
+    {TYPES}\s*
     (\s*\(\s* (?P<VARIANT>[a-f0-9]+) \s*\))?
     $"""
 
@@ -16,4 +16,5 @@ class K7(Classification):
         if self.is_EICAR:
             return 'EICAR'
 
-        return re.sub(r'^([-_\w]+) \(.*\)', r'\g<1>', self.source)
+        if 'TYPES' in self:
+            return self['TYPES']

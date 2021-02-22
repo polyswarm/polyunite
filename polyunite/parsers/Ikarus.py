@@ -12,7 +12,6 @@ class Ikarus(Classification):
             | AIT
             | ALS
             | BDC
-            | Click
             | (Client|Server)-[[:alpha:]]+
             | Conduit
             | Damaged
@@ -27,9 +26,7 @@ class Ikarus(Classification):
             | SPR
             | ToolKit
             | Troja
-            | WordPress
             | X2000M
-            | Equation
         )
     )*
     (?P<VEID>
@@ -39,6 +36,7 @@ class Ikarus(Classification):
             r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
             r'^[A-Z][a-zA-Z0-9_-]+$',
             r'PDF-[[:alnum:]]+',
+            r'Equation.Eternalblue',
            )}
        )?
        {VARIANT_ID(
