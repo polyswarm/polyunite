@@ -9,3 +9,4 @@ is_heuristic = Registry.is_heuristic
 summarize = Registry.summarize
 infer_name = Registry.infer_name
 analyze = Registry.analyze
+normalize_dict = Registry.normalize_dict

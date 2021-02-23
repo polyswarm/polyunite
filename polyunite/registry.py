@@ -114,7 +114,7 @@ class EngineRegistry:
         """
         return self.analyze(results).summarize(key=key, top_k=top_k)
 
-    def infer_name(self, results: EngineResults, **kwargs):
+    def infer_name(self, results: EngineResults, normalize=True, **kwargs):
         """
         Returns the name with the smallest total distance edit distance from `classifications`
 
@@ -122,6 +122,9 @@ class EngineRegistry:
                                  'Virusdie': 'Zeus-Trojan', 'QuickHeal': 'Agent'})
         Zeus
         """
+        if normalize and 'weights' in kwargs:
+            kwargs['weights'] = self.normalize_dict(kwargs['weights'])
+
         return self.analyze(results).infer_name(**kwargs)
 
     @staticmethod
@@ -131,3 +134,19 @@ class EngineRegistry:
             return name.translate(_ENGINE_NAME_XLATE)
         except AttributeError as e:
             raise EngineNormalizeError(type(name)) from e
+
+    def normalize_dict(self, d, raise_missing=False):
+        """Return a dictionary with normalized keys"""
+        r = dict()
+
+        for k, v in d.items():
+            n = self._normalize(k)
+
+            if n in self:
+                r[n] = v
+            elif raise_missing:
+                raise RegistryKeyError(k)
+            else:
+                continue
+
+        return r
