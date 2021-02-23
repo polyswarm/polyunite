@@ -131,3 +131,19 @@ class EngineRegistry:
             return name.translate(_ENGINE_NAME_XLATE)
         except AttributeError as e:
             raise EngineNormalizeError(type(name)) from e
+
+    def normalize_dict(self, d, raise_missing=False):
+        """Return a dictionary normalize by keys"""
+        r = dict()
+
+        for k, v in d.items():
+            n = self._normalize(k)
+
+            if n in self:
+                r[n] = v
+            elif raise_missing:
+                raise RegistryKeyError(k)
+            else:
+                continue
+
+        return r
