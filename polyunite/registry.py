@@ -136,7 +136,7 @@ class EngineRegistry:
             raise EngineNormalizeError(type(name)) from e
 
     def normalize_dict(self, d, raise_missing=False):
-        """Return a dictionary normalize by keys"""
+        """Return a dictionary with normalized keys"""
         r = dict()
 
         for k, v in d.items():
