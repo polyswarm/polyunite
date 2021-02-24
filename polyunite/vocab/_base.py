@@ -2,7 +2,7 @@ from typing import Iterator, List, Optional
 
 from functools import lru_cache
 import json
-from pkg_resources import resource_stream
+import os.path
 import regex as re
 
 from ..utils import group
@@ -89,7 +89,8 @@ class VocabRegex:
 
     @classmethod
     def from_resource(cls, name: 'str') -> 'VocabRegex':
-        return cls(name, json.load(resource_stream(__name__, '%s.json' % name.lower())))
+        with open(os.path.join(os.path.dirname(__file__), '%.json' % name.lower())) as f:
+            return cls(name, json.load(f))
 
     def iteraliases(self):
         for v in self.iter():
