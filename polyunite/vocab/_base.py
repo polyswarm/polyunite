@@ -89,7 +89,7 @@ class VocabRegex:
 
     @classmethod
     def from_resource(cls, name: 'str') -> 'VocabRegex':
-        with open(os.path.join(os.path.dirname(__file__), '%.json' % name.lower())) as f:
+        with open(os.path.join(os.path.dirname(__file__), '%s.json' % name.lower())) as f:
             return cls(name, json.load(f))
 
     def iteraliases(self):
