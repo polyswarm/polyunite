@@ -13,18 +13,23 @@ BOLD = polyunite.utils.colors.BOLD
 RESET = polyunite.utils.colors.RESET
 
 parser = argparse.ArgumentParser("Print the polyunite inferred name and colorized ouput, grouped by scan")
-parser.add_argument("--min", default=3, help="minimum number of group entries")
+parser.add_argument("--min", default=1, help="minimum number of assertions")
+parser.add_argument("--max", default=None, help="maximum number of assertions")
 args = parser.parse_args()
 
 groups = collections.defaultdict(dict)
 
-for engine, group, classification in read_family_fixtures():
-    groups[group][engine] = classification
+for engine, instance_id, classification in read_family_fixtures():
+    groups[instance_id][engine] = classification
 
-for group, assertions in groups.items():
-    min_group_size = int(args.min)
-    analyses = polyunite.analyze(dict(assertions))
+MIN_GROUP_SIZE = int(args.min)
+MAX_GROUP_SIZE = int(args.max) if args.max else None
 
-    if len(analyses) >= min_group_size:
-        print('{:-^150}'.format(f'{BOLD}{analyses.infer_name():^15}{RESET} [{group:^20}]  '))
-        print('\n'.join(f'[{engine:^15}]  {vr.colorize():<100.100}' for engine, vr in analyses.items()))
+for instance_id, assertions in groups.items():
+    if len(assertions) >= MIN_GROUP_SIZE and (MAX_GROUP_SIZE is None or len(assertions) <= MAX_GROUP_SIZE):
+        analyses = polyunite.analyze(dict(assertions))
+
+        print('{:^150}'.format(f'{BOLD}{analyses.infer_name():^15}{RESET} [{instance_id:^20}]'))
+
+        for engine, vr in analyses.items():
+            print(f'[{engine:^15}]  {vr.colorize():<100.100}')
