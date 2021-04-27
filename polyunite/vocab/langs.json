@@ -141,6 +141,8 @@
     "JS": {
       "description": "Javascript scripts",
       "match": [
+        "JSc",
+        "jsc",
         "JS"
       ]
     },

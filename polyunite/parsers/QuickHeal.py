@@ -6,7 +6,7 @@ class QuickHeal(Classification):
     pattern = rf"""^
     (
         ([./]|^)
-        ({PLATFORM}|{LABELS}(?&LABELS)?|Cmd|PIF|alware|JSc)
+        ({PLATFORM}|{LABELS}(?&LABELS)?|Cmd|PIF|alware)
     )*
     (?P<VEID>
         (
