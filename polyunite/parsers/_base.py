@@ -148,6 +148,8 @@ class Classification(Mapping):
             'security_assessment_tool': colors.WHITE_FG + colors.BLACK_BG,
             'greyware': colors.BLACK_BG,
             'parental_control': colors.YELLOW_FG + colors.BLACK_BG,
+            'microsoft_security_bulletin': colors.BOLD + colors.GREEN_FG,
+            'CVE': colors.BOLD + colors.GREEN_FG,
             'FAMILY': colors.GREEN_FG,
             'VARIANT': colors.WHITE_FG,
         },
