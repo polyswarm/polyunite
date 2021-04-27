@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Callable, Iterable, Tuple, Union
 
 from collections import Counter, UserDict
+import math
 import rapidfuzz
 
 from .utils import flatmap
@@ -77,13 +78,13 @@ class Analyses(UserDict):
         self,
         weights={},
         name_weights={
-            LABELS.compile(1, 0).fullmatch: 0.80,
-            HEURISTICS.compile(1, 0).fullmatch: 0.55,
-            OBFUSCATIONS.compile(1, 0).fullmatch: 0.55,
-            LANGS.compile(1, 0).fullmatch: 0.20,
-            ARCHIVES.compile(1, 0).fullmatch: 0.20,
-            MACROS.compile(1, 0).fullmatch: 0.20,
-            OSES.compile(1, 0).fullmatch: 0.20,
+            LABELS.compile(1, 0).fullmatch: 1/8,
+            HEURISTICS.compile(1, 0).fullmatch: 1/4,
+            OBFUSCATIONS.compile(1, 0).fullmatch: 1/4,
+            LANGS.compile(1, 0).fullmatch: 1/8,
+            ARCHIVES.compile(1, 0).fullmatch: 1/8,
+            MACROS.compile(1, 0).fullmatch: 1/8,
+            OSES.compile(1, 0).fullmatch: 1/8,
         },
         taxon_weight=0.35,
     ):
@@ -96,12 +97,14 @@ class Analyses(UserDict):
                 name = clf.taxon
                 weight *= taxon_weight
 
-            # Only consider strings longer than 2 chars
             if isinstance(name, str):
                 for predicate, adjustment in name_weights.items():
                     if predicate(name):
                         weight *= adjustment
                         break
+
+                # Apply length weights
+                weight /= math.log(max(10, len(name)), 10)
 
                 yield name, weight
 
@@ -110,6 +113,7 @@ class Analyses(UserDict):
         return max(likelihood.keys(), key=likelihood.__getitem__)
 
     def _weighted_name_likelihood(self, names: Iterable[Tuple[str, float]]) -> str:
+        # Only consider strings longer than 2 chars
         items = tuple((n, w) for n, w in names if w > 0 and len(n) > 2)
         names = tuple(n for n, w in items)
         weights = dict(items)
