@@ -21,7 +21,7 @@
       "description": "MS-DOS",
       "match": [
         {
-          "pattern": "(?-i:DOS|Dos|dos)"
+          "pattern": "(?-i:DOS|Dos|dos)(?:[.-](?:vcl|VCL))?"
         },
         "MSDOS",
         "FDOS",
