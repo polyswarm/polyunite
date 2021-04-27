@@ -24,8 +24,7 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     return property(lambda self: recieve(iter(sublabels.intersection(self._groups))))
 
 
-STANDARD_EICAR_NAME = intern('EICAR')
-EICAR_GROUP_NAME = 'EICAR'
+EICAR_GROUP_NAME = intern('EICAR')
 
 
 class Classification(Mapping):
@@ -94,7 +93,7 @@ class Classification(Mapping):
         Captures the *named* malware family.
         """
         if self.is_EICAR:
-            return STANDARD_EICAR_NAME
+            return 'EICAR'
 
         return self.vulnerability_id_cve() or \
                 self.vulnerability_id_microsoft() or \
@@ -129,7 +128,6 @@ class Classification(Mapping):
     @property
     def is_paramalware(self) -> bool:
         return self.is_nonmalware \
-            or self.is_heuristic \
             or 'security_assessment_tool' in self \
             or 'greyware' in self \
             or 'parental_control' in self
