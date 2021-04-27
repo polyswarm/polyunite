@@ -26,7 +26,7 @@ def VARIANT_ID(*extra):
 
 
 CVE_PATTERN = r'(?P<exploit>(?P<CVE>(CVE|Cve|cve)([-_]?(?P<CVEYEAR>[0-9]{4})([-_]?((?P<CVENTH>[0-9]+)[[:alpha:]]*))?)?))'
-MS_BULLETIN_PATTERN = r'(?P<exploit>(?P<microsoft_security_bulletin>MS(?P<MSSEC_YEAR>[0-9]{2})-?(?P<MSSECNTH>[0-9]{1,3})))'
+MS_BULLETIN_PATTERN = r'(?P<exploit>(?P<microsoft_security_bulletin>(?i:MS)(?P<MSSEC_YEAR>[0-9]{2})-?(?P<MSSECNTH>[0-9]{1,3})))'
 
 
 def FAMILY_ID(
