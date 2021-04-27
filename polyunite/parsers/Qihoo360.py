@@ -4,7 +4,6 @@ from ._base import Classification
 
 class Qihoo360(Classification):
     pattern = rf"""^
-    (?i)
     {HEURISTICS}?
     (
         ([./-]|^)
@@ -21,8 +20,8 @@ class Qihoo360(Classification):
     (?P<VEID>
         (
             ([./]|^)
-            {FAMILY_ID(r'(?-i:[A-Z][a-z]{1,2})')}?
+            {FAMILY_ID(r'(?<=[a-z]+[.])[a-z]{4,}', r'qexvmI')}?
         )?
-        {VARIANT_ID()}{{,2}}
+        {VARIANT_ID(r'[.][A-Z]{2}[0-9]?', r'[@][[:alnum:]]+')}{{,3}}
     )
     $"""

@@ -4,25 +4,30 @@ from ._base import Classification
 
 class DrWeb(Classification):
     pattern = rf"""^
-    ((probabl[ey]|modification(\ of)?|possibl[ey]))?
+    ((probabl[ey]|modification(\sof)?|possibl[ey])\s?)?
     (
         (^|[.-]|\ )
         (
-          (?!PWS[.]){LABELS}(?&LABELS)?
-          | {PLATFORM}
-          | Sector
-          | MGen
-          | Ear
+            (?!PWS[.]){LABELS}(?&LABELS)?
+            | {PLATFORM}
+            | STPAGE
         )
     )*
     (?P<VEID>
         (
             ([.]|^)
+            (?!Based)
             (
                 (?P<FAMILY>(?P<password_stealer>PWS[.][A-Z][[:alnum:]]+))
-                | {FAMILY_ID(r'[A-Z][[:alnum:]]{1,2}(?=[.]|$)')}
+                | {
+                    FAMILY_ID(
+                        r"[A-Z]{2,3}",
+                        r"[A-Z][A-Z0-9]{2,}",
+                        r"(?<=^)[A-Z][a-z]+[.][A-Z][a-z]+(?=[.][0-9]+)"
+                    )
+                   }
             )
         )?
-        {VARIANT_ID(r'[.]Log')}*
+        {VARIANT_ID()}{{,2}}
     )
     $"""

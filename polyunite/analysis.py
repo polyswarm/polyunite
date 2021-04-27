@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING, Callable, Iterable, Tuple, Union
 
 from collections import Counter, UserDict
-from functools import lru_cache
 import rapidfuzz
 
 from .utils import flatmap
@@ -56,6 +55,15 @@ class Analyses(UserDict):
         """
         return self._weighted_name_inference(self._weighted_names(**kwargs))
 
+    def edit_distance(self, **kwargs):
+        """
+        Returns a dictionary of names with a number representing their relative similarity to every other name
+
+        >>> analyses.infer_likelihoods()
+        {'Emotet': 0.75, 'Nemucod': 0.35}
+        """
+        return self._weighted_name_likelihood(self._weighted_names(**kwargs))
+
     def name_similarity_metric(self, name, **kwargs):
         """
         Compares `name` to the inferred name, computing a similarity metric
@@ -97,9 +105,11 @@ class Analyses(UserDict):
 
                 yield name, weight
 
-    @staticmethod
-    @lru_cache(maxsize=256)
-    def _weighted_name_inference(names: Iterable[Tuple[str, float]]) -> str:
+    def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
+        likelihood = self._weighted_name_likelihood(names)
+        return max(likelihood.keys(), key=likelihood.__getitem__)
+
+    def _weighted_name_likelihood(self, names: Iterable[Tuple[str, float]]) -> str:
         items = tuple((n, w) for n, w in names if w > 0 and len(n) > 2)
         names = tuple(n for n, w in items)
         weights = dict(items)
@@ -108,5 +118,4 @@ class Analyses(UserDict):
             matches = rapidfuzz.process.extract(name, names, scorer=rapidfuzz.fuzz.QRatio)
             return sum(score * weights[name] for _, score, _ in matches)
 
-        if weights:
-            return max(names, key=edit_distance)
+        return {n: edit_distance(n) for n in names}

@@ -1,268 +1,267 @@
 {
-    "group": "MACROS",
-    "children": {
-        "ACAD": {
-            "description": "Uses the AutoCAD application",
-            "match": [
-                "AutoCAD",
-                "AutoLisp",
-                "ACAD"
-            ]
+  "group": "MACROS",
+  "children": {
+    "ACAD": {
+      "description": "Uses the AutoCAD application",
+      "match": [
+        "AutoCAD",
+        "AutoLisp",
+        "ACAD"
+      ]
+    },
+    "ASX": {
+      "description": "XML metafile of Windows Media .asf files",
+      "match": [
+        "ASX"
+      ]
+    },
+    "HC": {
+      "description": "HyperCard Apple scripts",
+      "match": [
+        "HC"
+      ]
+    },
+    "HE": {
+      "description": "macro scripting",
+      "match": [
+        "HE"
+      ]
+    },
+    "MIME": {
+      "description": "MIME packets",
+      "match": [
+        "MIME"
+      ]
+    },
+    "CRX": {
+      "description": "Chrome extension",
+      "match": [
+        "CRX"
+      ]
+    },
+    "MSControlPanel": {
+      "description": "Microsoft Control Panel File",
+      "match": [
+        "Cpl"
+      ]
+    },
+    "MSOffice": {
+      "description": "Microsoft Office files",
+      "match": [
+        {
+          "pattern": "(?i:MS(Excel|Word|Powerpoint|Outlook)((20)?\\d\\d)?)"
         },
-        "ASX": {
-            "description": "XML metafile of Windows Media .asf files",
-            "match": [
-                "ASX"
-            ]
+        {
+          "pattern": "(?i:Office((20)?\\d\\d)?)"
         },
-        "HC": {
-            "description": "HyperCard Apple scripts",
-            "match": [
-                "HC"
-            ]
+        "Doc",
+        "MSOffice",
+        "SAgent",
+        "macro",
+        "macro.excel",
+        "macro.word"
+      ],
+      "children": {
+        "A97M": {
+          "description": "Access 97, 2000, XP, 2003, 2007, and 2010 macros",
+          "match": [
+            "A97M"
+          ]
         },
-        "HE": {
-            "description": "macro scripting",
-            "match": [
-                "HE"
-            ]
+        "AM": {
+          "description": "Runs as a VBA macro in the Microsoft Access application (version 97 or later)",
+          "match": [
+            "AM"
+          ]
         },
-        "MIME": {
-            "description": "MIME packets",
-            "match": [
-                "MIME"
-            ]
+        "CM": {
+          "description": "Runs as a VBA macro in the Corel Draw! application (version 9.0 or later)",
+          "match": [
+            "CM"
+          ]
         },
-        "CRX": {
-            "description": "Chrome extension",
-            "match": [
-                "CRX"
-            ]
+        "O97M": {
+          "description": "Office 97, 2000, XP, 2003, 2007, and 2010 macros - those that affect Word, Excel, and Powerpoint",
+          "match": [
+            "O97",
+            "O97M",
+            "Office2k"
+          ]
         },
-        "MSControlPanel": {
-            "description": "Microsoft Control Panel File",
-            "match": [
-                "Cpl"
-
-            ]
-
+        "OM": {
+          "description": "Uses or runs in two or more applications in the Office 97 suite or later, including related products (Visio, Projects)",
+          "match": [
+            "OM"
+          ]
         },
-        "MSOffice": {
-            "description": "Microsoft Office files",
-            "match": [{
-                    "pattern": "(?i:MS(Excel|Word|Powerpoint|Outlook)((20)?\\d\\d)?)"
-                },
-                {
-                    "pattern": "(?i:Office((20)?\\d\\d)?)"
-                },
-                "Doc",
-                "MSOffice",
-                "SAgent",
-                "macro",
-                "macro.excel",
-                "macro.word"
-            ],
-            "children": {
-                "A97M": {
-                    "description": "Access 97, 2000, XP, 2003, 2007, and 2010 macros",
-                    "match": [
-                        "A97M"
-                    ]
-                },
-                "AM": {
-                    "description": "Runs as a VBA macro in the Microsoft Access application (version 97 or later)",
-                    "match": [
-                        "AM"
-                    ]
-                },
-                "CM": {
-                    "description": "Runs as a VBA macro in the Corel Draw! application (version 9.0 or later)",
-                    "match": [
-                        "CM"
-                    ]
-                },
-                "O97M": {
-                    "description": "Office 97, 2000, XP, 2003, 2007, and 2010 macros - those that affect Word, Excel, and Powerpoint",
-                    "match": [
-                        "O97",
-                        "O97M",
-                        "Office2k"
-                    ]
-                },
-                "OM": {
-                    "description": "Uses or runs in two or more applications in the Office 97 suite or later, including related products (Visio, Projects)",
-                    "match": [
-                        "OM"
-                    ]
-                },
-                "OLE": {
-                    "description": "Object linking and embedding",
-                    "match": [
-                        "OleNative",
-                        "OLE",
-                        "OLE2"
-                    ]
-                },
-                "PP97M": {
-                    "description": "PowerPoint 97, 2000, XP, 2003, 2007, and 2010 macros",
-                    "match": [
-                        "PP97M"
-                    ]
-                },
-                "PPM": {
-                    "description": "Runs as a VBS macro in Microsoft PowerPoint (version 97 or later)",
-                    "match": [
-                        "PPM"
-                    ]
-                },
-                "PUM": {
-                    "description": "Runs as a VBS macro in Microsoft Publisher (version 97 or later)",
-                    "match": [
-                        "PUM"
-                    ]
-                },
-                "V5M": {
-                    "description": "Visio5 macros",
-                    "match": [
-                        "V5M"
-                    ]
-                },
-                "W1M": {
-                    "description": "Word1Macro",
-                    "match": [
-                        "W1M"
-                    ]
-                },
-                "W2M": {
-                    "description": "Word2Macro",
-                    "match": [
-                        "W2M"
-                    ]
-                },
-                "W42": {
-                    "description": "Word2Macro",
-                    "match": [
-                        "W42"
-                    ]
-                },
-                "W97M": {
-                    "description": "Word 97, 2000, XP, 2003, 2007, and 2010 macros",
-                    "match": [
-                        "Word97",
-                        "W97M"
-                    ]
-                },
-                "WM": {
-                    "description": "Word 95 macros",
-                    "match": [
-                        "WM"
-                    ]
-                },
-                "X97M": {
-                    "description": "Excel 97, 2000, XP, 2003, 2007, and 2010 macros",
-                    "match": [
-                        "X97M"
-                    ]
-                },
-                "XF": {
-                    "description": "Excel formulas",
-                    "match": [
-                        "XF"
-                    ]
-                },
-                "XM": {
-                    "description": "Excel 95 macros",
-                    "match": [
-                        "XM"
-                    ]
-                },
-                "Xls": {
-                    "match": [
-                        "Xls"
-                    ]
-                }
-            }
+        "OLE": {
+          "description": "Object linking and embedding",
+          "match": [
+            "OleNative",
+            "OLE",
+            "OLE2"
+          ]
         },
-        "Netware": {
-            "description": "Novell Netware files",
-            "match": [
-                "Netware"
-            ]
+        "PP97M": {
+          "description": "PowerPoint 97, 2000, XP, 2003, 2007, and 2010 macros",
+          "match": [
+            "PP97M"
+          ]
         },
-        "PASSWD": {
-            "description": "Unix PASSWD",
-            "match": [
-                "PASSWD"
-            ]
+        "PPM": {
+          "description": "Runs as a VBS macro in Microsoft PowerPoint (version 97 or later)",
+          "match": [
+            "PPM"
+          ]
         },
-        "PDF": {
-            "description": "Portable document format",
-            "match": [
-                "PDF",
-                "pdfjs"
-            ]
+        "PUM": {
+          "description": "Runs as a VBS macro in Microsoft Publisher (version 97 or later)",
+          "match": [
+            "PUM"
+          ]
         },
-        "QT": {
-            "description": "Quicktime files",
-            "match": [
-                "QT"
-            ]
+        "V5M": {
+          "description": "Visio5 macros",
+          "match": [
+            "V5M"
+          ]
         },
-        "RTF": {
-            "description": "Rich-text format",
-            "match": [
-                "RTF"
-            ]
+        "W1M": {
+          "description": "Word1Macro",
+          "match": [
+            "W1M"
+          ]
         },
-        "SB": {
-            "description": "StarBasic (Staroffice XML) files",
-            "match": [
-                "SB"
-            ]
+        "W2M": {
+          "description": "Word2Macro",
+          "match": [
+            "W2M"
+          ]
         },
-        "SWF": {
-            "description": "Shockwave Flash files",
-            "match": [
-                "SWF"
-            ]
+        "W42": {
+          "description": "Word2Macro",
+          "match": [
+            "W42"
+          ]
         },
-        "TSQL": {
-            "description": "MS SQL server files",
-            "match": [
-                "TSQL"
-            ]
+        "W97M": {
+          "description": "Word 97, 2000, XP, 2003, 2007, and 2010 macros",
+          "match": [
+            "Word97",
+            "W97M"
+          ]
         },
-        "FONT": {
-            "description": "Font files",
-            "match": [
-                "FONT",
-                "TTF"
-            ]
+        "WM": {
+          "description": "Word 95 macros",
+          "match": [
+            "WM"
+          ]
         },
-        "WMA": {
-            "description": "Runs as a Windows media Audio file (usually disguised as mp3)",
-            "match": [
-                "WMA"
-            ]
+        "X97M": {
+          "description": "Excel 97, 2000, XP, 2003, 2007, and 2010 macros",
+          "match": [
+            "X97M"
+          ]
         },
-        "WMV": {
-            "description": "Runs as a Windows media Video file (usually disguised as avi)",
-            "match": [
-                "WMV"
-            ]
+        "XF": {
+          "description": "Excel formulas",
+          "match": [
+            "XF"
+          ]
         },
-        "WinHEX": {
-            "description": "Uses WinHex",
-            "match": [
-                "WinHEX"
-            ]
+        "XM": {
+          "description": "Excel 95 macros",
+          "match": [
+            "XM"
+          ]
         },
-        "XML": {
-            "description": "XML files",
-            "match": [
-                "XML",
-                "xfa"
-            ]
+        "Xls": {
+          "match": [
+            "Xls"
+          ]
         }
+      }
+    },
+    "Netware": {
+      "description": "Novell Netware files",
+      "match": [
+        "Netware"
+      ]
+    },
+    "PASSWD": {
+      "description": "Unix PASSWD",
+      "match": [
+        "PASSWD"
+      ]
+    },
+    "PDF": {
+      "description": "Portable document format",
+      "match": [
+        "PDF",
+        "pdfjs"
+      ]
+    },
+    "QT": {
+      "description": "Quicktime files",
+      "match": [
+        "QT"
+      ]
+    },
+    "RTF": {
+      "description": "Rich-text format",
+      "match": [
+        "RTF"
+      ]
+    },
+    "SB": {
+      "description": "StarBasic (Staroffice XML) files",
+      "match": [
+        "SB"
+      ]
+    },
+    "SWF": {
+      "description": "Shockwave Flash files",
+      "match": [
+        "SWF"
+      ]
+    },
+    "TSQL": {
+      "description": "MS SQL server files",
+      "match": [
+        "TSQL"
+      ]
+    },
+    "FONT": {
+      "description": "Font files",
+      "match": [
+        "FONT",
+        "TTF"
+      ]
+    },
+    "WMA": {
+      "description": "Runs as a Windows media Audio file (usually disguised as mp3)",
+      "match": [
+        "WMA"
+      ]
+    },
+    "WMV": {
+      "description": "Runs as a Windows media Video file (usually disguised as avi)",
+      "match": [
+        "WMV"
+      ]
+    },
+    "WinHEX": {
+      "description": "Uses WinHex",
+      "match": [
+        "WinHEX"
+      ]
+    },
+    "XML": {
+      "description": "XML files",
+      "match": [
+        "XML",
+        "xfa"
+      ]
     }
+  }
 }

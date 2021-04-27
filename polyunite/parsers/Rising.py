@@ -15,6 +15,7 @@ class Rising(Classification):
             | KL
             | Privacy
             | Andorid
+            | Runonce | Runouce
             | Junk
         )
     )*

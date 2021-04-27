@@ -34,14 +34,15 @@ class Ikarus(Classification):
           (^|[.:])
           {FAMILY_ID(
             r'(?P<HEURISTICS>NewHeur_[a-zA-Z0-9_-]+)',
-            r'^[A-Z][a-zA-Z0-9_-]+$',
             r'PDF-[[:alnum:]]+',
             r'Equation.Eternalblue',
+            r'[0-9]*[A-Z][A-Za-z0-9_]+',
            )}
        )?
        {VARIANT_ID(
                 r'[.]SuspectCRC',
                 r'20[0-9]{2}-[0-9]{1,6}',
+                r'[.][A-Z][a-z][a-z]',
                 r'[-][A-Z]',
                 r'[-][0-9]+$',
                 r'[.](?|Dm|Ra)',

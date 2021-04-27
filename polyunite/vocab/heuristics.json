@@ -1,79 +1,92 @@
 {
-    "group": "HEURISTICS",
-    "tags": ["heuristic"],
-    "children": {
-        "generic": {
-            "description": "Generic virus detection",
-            "match": [{
-                    "pattern": "heuristics?"
-                },
-                {
-                    "pattern": "Siggen[0-9]?"
-                },
-                "VBGeneric",
-                "Gen",
-                "advml",
-                "attribute",
-                "behaveslike",
-                "bloodhound",
-                "cloud",
-                "generic",
-                "genetic",
-                "genmalicious",
-                {
-                    "pattern": "[hH]eur[0-9]*"
-                },
-                      "Heuri",
-                "NewHeur",
-                "MaliciousHeuristic",
-                "score",
-                "static",
-                "undefined"
-            ]
+  "group": "HEURISTICS",
+  "tags": [
+    "heuristic"
+  ],
+  "children": {
+    "generic": {
+      "description": "Generic virus detection",
+      "match": [
+        {
+          "pattern": "heuristics?"
         },
-        "heurfamily": {
-            "description": "Contains characteristics usual of a particular class of viruses",
-            "match": [{
-                    "pattern": "Agent[0-9]+"
-                },
-                "agent",
-                "agentad",
-                "agentb",
-                "Delf",
-                "family",
-                "foreign",
-                "genome",
-                "kcloud",
-                "maltrec",
-                "memscan",
-                "sape",
-                "symvt",
-                "undefined",
-                "vgeneric"
-            ]
+        {
+          "pattern": "Siggen[0-9]?"
         },
-        "suspicious": {
-            "description": "Suspicious behavior without signature match",
-            "match": [{
-                    "pattern": "\\bSusp?\\b"
-                },
-                "Abuse-Worry",
-                "behaveslike",
-                "confidence",
-                "highconfidence",
-                "lookslike",
-                "modification",
-                "possible",
-                "possible-threat",
-                "probably",
-                "reputation",
-                "suspect",
-                "suspected",
-                "suspicious",
-                "threat",
-                "variant",
-                "DangerousObject"
-            ]
-        }
+        "damaged.copy.of",
+        "damaged-copy-of",
+        "damaged copy of",
+        "VBGeneric",
+        "MGen",
+        "Gen",
+        "advml",
+        "attribute",
+        "behaveslike",
+        "bloodhound",
+        "cloud",
+        "genetic",
+        "genmalicious",
+        {
+          "pattern": "[hH]eur[0-9]*"
+        },
+        "generic",
+        {
+          "pattern": "[gG]eneric[0-9]+"
+        },
+        "Heuri",
+        "NewHeur",
+        "MaliciousHeuristic",
+        "score",
+        "static",
+        "undefined"
+      ]
+    },
+    "heurfamily": {
+      "description": "Contains characteristics usual of a particular class of viruses",
+      "match": [
+        {
+          "pattern": "Agent[0-9]+"
+        },
+        "agent",
+        "agent_",
+        "agentad",
+        "agentb",
+        "Delf",
+        "family",
+        "foreign",
+        "genome",
+        "kcloud",
+        "maltrec",
+        "memscan",
+        "sape",
+        "symvt",
+        "undefined",
+        "vgeneric"
+      ]
+    },
+    "suspicious": {
+      "description": "Suspicious behavior without signature match",
+      "match": [
+        {
+          "pattern": "\\bSusp?\\b"
+        },
+        "Abuse-Worry",
+        "behaveslike",
+        "confidence",
+        "highconfidence",
+        "lookslike",
+        "modification",
+        "possible",
+        "possible-threat",
+        "probably",
+        "reputation",
+        "suspect",
+        "suspected",
+        "suspicious",
+        "threat",
+        "variant",
+        "DangerousObject"
+      ]
     }
+  }
 }
