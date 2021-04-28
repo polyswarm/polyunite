@@ -4,9 +4,8 @@ from ._base import Classification
 
 class DrWeb(Classification):
     pattern = rf"""^
-    ((probabl[ey]|modification(\sof)?|possibl[ey])\s?)?
     (
-        (^|[.-]|\ )
+        (^|[.-]|\s)
         (
             (?!PWS[.]){LABELS}(?&LABELS)?
             | {PLATFORM}

@@ -71,17 +71,13 @@
           "pattern": "\\bSusp?\\b"
         },
         "Abuse-Worry",
-        "behaveslike",
         "confidence",
         "highconfidence",
-        "lookslike",
-        "modification",
-        "possible",
         "possible-threat",
-        "probably",
+        {
+          "pattern": "(?:variant\\s?of|looks\\s?like|behaves\\s?like|suspect(?:ed)?|probabl[ey]|modification(?:\\sof)?|possibl[ey])"
+        },
         "reputation",
-        "suspect",
-        "suspected",
         "suspicious",
         "threat",
         "variant",
