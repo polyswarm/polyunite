@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable, Iterable, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Iterable, Optional, Tuple, Union
 
 from collections import Counter, UserDict
 import math
@@ -78,15 +78,15 @@ class Analyses(UserDict):
         self,
         weights={},
         name_weights={
-            LABELS.compile(1, 0).fullmatch: 1/8,
-            HEURISTICS.compile(1, 0).fullmatch: 1/4,
-            OBFUSCATIONS.compile(1, 0).fullmatch: 1/4,
-            LANGS.compile(1, 0).fullmatch: 1/8,
-            ARCHIVES.compile(1, 0).fullmatch: 1/8,
-            MACROS.compile(1, 0).fullmatch: 1/8,
-            OSES.compile(1, 0).fullmatch: 1/8,
+            LABELS.compile(1, 0).fullmatch: 1 / 8,
+            HEURISTICS.compile(1, 0).fullmatch: 1 / 4,
+            OBFUSCATIONS.compile(1, 0).fullmatch: 1 / 4,
+            LANGS.compile(1, 0).fullmatch: 1 / 8,
+            ARCHIVES.compile(1, 0).fullmatch: 1 / 8,
+            MACROS.compile(1, 0).fullmatch: 1 / 8,
+            OSES.compile(1, 0).fullmatch: 1 / 8,
         },
-        taxon_weight=0.35,
+        taxon_weight=1 / 2,
     ):
         for engine, clf in self.items():
             weight = weights.get(engine, 1.0)
@@ -97,24 +97,30 @@ class Analyses(UserDict):
                 name = clf.taxon
                 weight *= taxon_weight
 
-            if isinstance(name, str):
+            if not isinstance(name, str):
+                continue
+
+            if len(name) <= 2:
+                weight = 0
+            elif len(name) >= 10:
+                # Lower the weight of names longer than 10 chars
+                weight /= math.log(len(name), 10)
+
+            # Match `name` against the pattern predicates in `name_weights`, adjusting appropriately
+            if weight > 0:
                 for predicate, adjustment in name_weights.items():
                     if predicate(name):
                         weight *= adjustment
                         break
 
-                # Apply length weights
-                weight /= math.log(max(10, len(name)), 10)
+            yield name, weight
 
-                yield name, weight
-
-    def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> str:
+    def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> Optional[str]:
         likelihood = self._weighted_name_likelihood(names)
-        return max(likelihood.keys(), key=likelihood.__getitem__)
+        return max(likelihood.keys(), default=None, key=likelihood.__getitem__)
 
     def _weighted_name_likelihood(self, names: Iterable[Tuple[str, float]]) -> str:
-        # Only consider strings longer than 2 chars
-        items = tuple((n, w) for n, w in names if w > 0 and len(n) > 2)
+        items = tuple((n, w) for n, w in names if w > 0)
         names = tuple(n for n, w in items)
         weights = dict(items)
 
