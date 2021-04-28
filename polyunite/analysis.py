@@ -102,7 +102,7 @@ class Analyses(UserDict):
 
             if len(name) <= 2:
                 weight = 0
-            elif len(name) >= 10:
+            elif len(name) > 10:
                 # Lower the weight of names longer than 10 chars
                 weight /= math.log(len(name), 10)
 
