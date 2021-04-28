@@ -167,6 +167,19 @@ class Analyses(UserDict):
         return ids
 
     def __repr__(self):
+        """
+        .. example::
+
+            Analyses(
+                name=Gamedrop,
+                total=5,
+                paramalware=1,
+                unique_weights={'Amonetize': 0.8, 'ELTdrop': 1.0},
+                vulnerability_ids={'MS-08-14'},
+                operating_system=['Windows'],
+                labels=['dropper', 'adware', 'trojan']
+            )
+        """
         weighted_names = tuple(self._weighted_names())
         parts = [('name', self._weighted_name_inference(weighted_names))]
         parts.extend(self.describe().items())
