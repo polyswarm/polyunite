@@ -77,6 +77,7 @@ class Classification(Mapping):
     operating_system = extract_vocabulary(OSES)
     language = extract_vocabulary(LANGS)
     macro = extract_vocabulary(MACROS)
+    obfuscations = extract_vocabulary(OBFUSCATIONS, recieve=set)
     labels = extract_vocabulary(LABELS, recieve=set)
 
     @property

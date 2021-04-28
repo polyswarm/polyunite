@@ -41,11 +41,13 @@ for group, assertions in groups.items():
             parsed.append(fmtstr.format(engine, vr.name, vr.colorize().strip()))
 
     if parsed and len(parsed) >= min_parsed:
+        analysis = polyunite.analyze(assertions)
         header = '{}{:^15}{} [{:^20}]'.format(
             polyunite.utils.colors.BOLD,
-            polyunite.infer_name(assertions),
+            analysis.infer_name(),
             polyunite.utils.colors.RESET,
             group,
         )
         print('{:-^150}'.format(header))
+        print(repr(analysis))
         print('\n'.join(parsed))

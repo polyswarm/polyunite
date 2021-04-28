@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Callable, Iterable, Optional, Tuple, Union
 
 from collections import Counter, UserDict
 import math
+from operator import attrgetter
 import rapidfuzz
 
 from .utils import flatmap
@@ -100,8 +101,10 @@ class Analyses(UserDict):
             if not isinstance(name, str):
                 continue
 
-            if len(name) <= 2:
-                weight = 0
+            if len(name) < 2:
+                weight = 0.0
+            elif len(name) < 5:
+                weight *= len(name) / 5
             elif len(name) > 10:
                 # Lower the weight of names longer than 10 chars
                 weight /= math.log(len(name), 10)
@@ -129,3 +132,50 @@ class Analyses(UserDict):
             return sum(score * weights[name] for _, score, _ in matches)
 
         return {n: edit_distance(n) for n in names}
+
+    def describe(self) -> Counter:
+        """
+        Return descriptive statistics
+        """
+        ctr = Counter()
+        for engine, clf in self.items():
+            ctr['total'] += 1
+
+            if clf.is_EICAR:
+                ctr['EICAR'] += 1
+            if clf.is_heuristic:
+                ctr['heuristic'] += 1
+            if clf.is_paramalware:
+                ctr['paramalware'] += 1
+            if clf.is_nonmalware:
+                ctr['nonmalware'] += 1
+
+        return ctr
+
+    def vulnerability_ids(self):
+        """
+        Gather all vulnerability IDs (e.g CVE, Microsoft Security Bulletins, etc.)
+
+        >>> analyses.vulnerability_ids()
+        {'CVE-2012-3127'}
+        """
+        ids = set()
+        for clf in self.values():
+            for vuln in (clf.vulnerability_id_cve(), clf.vulnerability_id_microsoft()):
+                if vuln:
+                    ids.add(vuln)
+        return ids
+
+    def __repr__(self):
+        weighted_names = tuple(self._weighted_names())
+        parts = [('name', self._weighted_name_inference(weighted_names))]
+        parts.extend(self.describe().items())
+        parts.append(('unique_weights', {k: round(v, 5) for k, v in set(weighted_names)}))
+        parts.append(('vulnerability_ids', self.vulnerability_ids()))
+        parts.extend((vocab, self.summarize(attrgetter(vocab)))
+                     for vocab in ('operating_system', 'language', 'macro', 'labels', 'obfuscations'))
+
+        return '{}({})'.format(
+            self.__class__.__name__,
+            ', '.join('{}={}'.format(k, v) for k, v in parts if v),
+        )

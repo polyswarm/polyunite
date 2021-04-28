@@ -104,6 +104,7 @@
         },
         "Downlaoder",
         "Downlder",
+        "Loader",
         "TjnDownldr",
         "TrjnDwnlder",
         "dldr",
@@ -229,6 +230,7 @@
       "description": "A type of program implanted on a system to monitor the keys pressed and thus record any sensitive data, such as passwords, entered by the user.",
       "match": [
         "keylogger",
+        "keylog",
         "monitoring.tool",
         "monitoringtool"
       ]
@@ -335,7 +337,8 @@
         {
           "pattern": "banker(\\d)?"
         },
-        "banker"
+        "banker",
+        "BankFraud"
       ],
       "steal_cryptocurrency_data": {
         "description": "Steals cryptocurrency data that may be stored on a system (e.g., Bitcoin wallets).",
@@ -393,7 +396,10 @@
       "description": "Malware that uses SMS for malicious purpose",
       "match": [
         "sms",
-        "smstheft"
+        "SMSSpy",
+        "SMSBot",
+        "smstheft",
+        "SMSThief"
       ]
     },
     "premium_dialer_smser": {
@@ -403,6 +409,7 @@
           "pattern": "porn\\W?dialer"
         },
         "dialer",
+        "SMSSend",
         "premium-sms",
         "premium_dialer_smser"
       ]
