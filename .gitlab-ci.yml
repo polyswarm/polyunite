@@ -1,7 +1,7 @@
 image: $REPO_URL/stage
 
 services:
-  - docker:dind
+  - $REPO_URL/docker:dind
 
 stages:
   - build
@@ -28,7 +28,7 @@ default:
 dev-pypi:
   tags:
     - kube-small-new
-  image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.7-slim-buster
+  image: $REPO_URL/python:3.7-slim-buster
   stage: build
   script:
     - SHORT_SHA=$(git rev-parse --short HEAD) bumpversion --no-commit --no-tag local
@@ -41,7 +41,7 @@ dev-pypi:
 test-py37:
   tags:
     - kube-small-new
-  image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.7-slim-buster
+  image: $REPO_URL/python:3.7-slim-buster
   stage: test
   before_script:
     - pip install -q --upgrade pip setuptools wheel
