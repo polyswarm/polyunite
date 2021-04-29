@@ -27,7 +27,7 @@ default:
 dev-pypi:
   tags:
     - kube-small-new
-  image: python:3.7
+  image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.8-slim-buster
   stage: build
   before_script:
     - pip3 install -q --upgrade pip setuptools twine wheel bump2version
@@ -40,7 +40,7 @@ dev-pypi:
 # Test Stage
 ###############################################################
 test-py37:
-  image: python:3.7
+  image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.8-slim-buster
   stage: test
   tags:
     - kube-small-new
