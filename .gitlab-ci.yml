@@ -1,7 +1,7 @@
 image: $REPO_URL/stage
 
 services:
-  - docker:dind
+  - $REPO_URL/docker:dind
 
 stages:
   - build
@@ -17,7 +17,8 @@ variables:
 
 default:
   before_script:
-    - pip install -q --upgrade pip
+    - apt-get update -y && apt-get install -y git
+    - pip install -q --upgrade pip setuptools twine wheel bump2version
     - pip install -q $END_TO_END_LIB@$CI_COMMIT_REF_NAME || pip install -q $END_TO_END_LIB
     - e2e init
 
@@ -27,10 +28,8 @@ default:
 dev-pypi:
   tags:
     - kube-small-new
-  image: python:3.7
+  image: $REPO_URL/python:3.7-slim-buster
   stage: build
-  before_script:
-    - pip3 install -q --upgrade pip setuptools twine wheel bump2version
   script:
     - SHORT_SHA=$(git rev-parse --short HEAD) bumpversion --no-commit --no-tag local
     - python setup.py -q bdist_wheel
@@ -40,15 +39,14 @@ dev-pypi:
 # Test Stage
 ###############################################################
 test-py37:
-  image: python:3.7
-  stage: test
   tags:
     - kube-small-new
-  coverage: '/TOTAL.*\s+(\d+%)$/'
+  image: $REPO_URL/python:3.7-slim-buster
+  stage: test
+  before_script:
+    - pip install -q --upgrade pip setuptools wheel
   script:
     - python setup.py test
-  except:
-    - images
 
 ###############################################################
 # Release Stage

@@ -1,282 +1,288 @@
 {
-    "group": "LANGS",
-    "children": {
-        "AutoIt": {
-            "description": "AutoIt automation language",
-            "match": [
-                "AutoIt",
-                "AutoIT"
-            ]
+  "group": "LANGS",
+  "children": {
+    "AutoIt": {
+      "description": "AutoIt automation language",
+      "match": [
+        "AutoIt",
+        "AutoIT"
+      ]
+    },
+    "AutoHotKey": {
+      "match": [
+        "AutohotKey",
+        "AHK"
+      ]
+    },
+    "ABAP": {
+      "description": "Advanced Business Application Programming scripts",
+      "match": [
+        "ABAP"
+      ]
+    },
+    "ALisp": {
+      "description": "ALisp scripts",
+      "match": [
+        "ALisp"
+      ]
+    },
+    "ANSI": {
+      "description": "American National Standards Institute scripts",
+      "match": [
+        "ANSI"
+      ]
+    },
+    "ASP": {
+      "description": "Active Server Pages scripts",
+      "match": [
+        "ASP"
+      ]
+    },
+    "AmiPro": {
+      "description": "AmiPro script",
+      "match": [
+        "AmiPro"
+      ]
+    },
+    "AppleScript": {
+      "description": "compiled Apple scripts",
+      "match": [
+        "AppleScript"
+      ]
+    },
+    "BAS": {
+      "description": "Basic scripts",
+      "match": [
+        "BAS"
+      ]
+    },
+    "BAT": {
+      "description": "Basic scripts",
+      "match": [
+        "BAT"
+      ]
+    },
+    "CS": {
+      "description": "Uses the CorelScript interpreter found in many Corel products",
+      "match": [
+        "CS"
+      ]
+    },
+    "HTA": {
+      "description": "HTML Application scripts",
+      "match": [
+        "HTA"
+      ]
+    },
+    "HTML": {
+      "description": "HTML Application scripts",
+      "match": [
+        "HTML",
+        "iframe",
+        "url"
+      ]
+    },
+    "IDA": {
+      "description": "Uses the IDA Pro application",
+      "match": [
+        "IDA"
+      ]
+    },
+    "IMAGE": {
+      "description": "Image files",
+      "match": [
+        {
+          "pattern": "JPE?G"
         },
-        "AutoHotKey": {
-            "match": [
-                "AutohotKey",
-                "AHK"
-            ]
+        {
+          "pattern": "IMG-[A-Z]+"
         },
-        "ABAP": {
-            "description": "Advanced Business Application Programming scripts",
-            "match": [
-                "ABAP"
-            ]
+        "BMP",
+        "GIF",
+        "IMAGE",
+        "PNG",
+        "TIFF"
+      ]
+    },
+    "TXT": {
+      "description": "Text file",
+      "match": [
+        "TXT",
+        "Text",
+        "Text.File",
+        "Txt.File",
+        "Txt-File",
+        "Text-File",
+        "TxtFile",
+        "TextFile"
+      ]
+    },
+    "INF": {
+      "description": "Uses Windows INF files",
+      "match": [
+        {
+          "pattern": "AutoRun[.-_]?INF"
         },
-        "ALisp": {
-            "description": "ALisp scripts",
-            "match": [
-                "ALisp"
-            ]
-        },
-        "ANSI": {
-            "description": "American National Standards Institute scripts",
-            "match": [
-                "ANSI"
-            ]
-        },
-        "ASP": {
-            "description": "Active Server Pages scripts",
-            "match": [
-                "ASP"
-            ]
-        },
-        "AmiPro": {
-            "description": "AmiPro script",
-            "match": [
-                "AmiPro"
-            ]
-        },
-        "AppleScript": {
-            "description": "compiled Apple scripts",
-            "match": [
-                "AppleScript"
-            ]
-        },
-        "BAS": {
-            "description": "Basic scripts",
-            "match": [
-                "BAS"
-            ]
-        },
-        "BAT": {
-            "description": "Basic scripts",
-            "match": [
-                "BAT"
-            ]
-        },
-        "CS": {
-            "description": "Uses the CorelScript interpreter found in many Corel products",
-            "match": [
-                "CS"
-            ]
-        },
-        "HTA": {
-            "description": "HTML Application scripts",
-            "match": [
-                "HTA"
-            ]
-        },
-        "HTML": {
-            "description": "HTML Application scripts",
-            "match": [
-                "HTML",
-                "iframe",
-                "url"
-            ]
-        },
-        "IDA": {
-            "description": "Uses the IDA Pro application",
-            "match": [
-                "IDA"
-            ]
-        },
-        "IMAGE": {
-            "description": "Image files",
-            "match": [{
-                    "pattern": "JPE?G"
-                },
-                {
-                    "pattern": "IMG-[A-Z]+"
-                },
-                "BMP",
-                "GIF",
-                "IMAGE",
-                "PNG",
-                "TIFF"
-            ]
-        },
-        "TXT": {
-            "description": "Text file",
-            "match": [
-                "TXT",
-                "Text",
-                "Text.File",
-                "Txt.File",
-                "Txt-File",
-                "Text-File",
-                "TxtFile",
-                "TextFile"
-            ]
-        },
-        "INF": {
-            "description": "Uses Windows INF files",
-            "match": [{
-                    "pattern": "AutoRun[.-_]?INF"
-                },
-                "INF"
-            ]
-        },
-        "INI": {
-            "description": "Uses mIRC INI files",
-            "match": [
-                "INI"
-            ]
-        },
-        "IRC": {
-            "description": "mIRC/pIRC scripts",
-            "match": [
-                "IRC"
-            ]
-        },
-        "JS": {
-            "description": "Javascript scripts",
-            "match": [
-                "JS"
-            ]
-        },
-        "Java": {
-            "description": "Java binaries (classes)",
-            "match": [
-                "Java",
-                "J2ME",
-                "OLE-JAR",
-                "J2EE"
-            ]
-        },
-        "LOGO": {
-            "description": "LOGO scripts",
-            "match": [
-                "LOGO"
-            ]
-        },
-        "MPB": {
-            "description": "MapBasic scripts",
-            "match": [
-                "MPB"
-            ]
-        },
-        "MSH": {
-            "description": "Monad shell scripts",
-            "match": [
-                "MSH"
-            ]
-        },
-        "COM": {
-            "description": "Component Object Model",
-            "match": [
-                "COM",
-                "ComObj"
-            ]
-        },
-        "MSIL": {
-            "description": ".Net intermediate language scripts",
-            "match": [
-                "MSIL"
-            ]
-        },
-        "MusicMaker": {
-            "match": [
-                "MMM"
-            ]
-        },
-        "PHP": {
-            "description": "Hypertext Preprocessor scripts",
-            "match": [
-                "PHP",
-                "WordPress"
-            ]
-        },
-        "PS": {
-            "description": "Postscript",
-            "match": [
-                "PS"
-            ]
-        },
-        "Perl": {
-            "description": "Perl scripts",
-            "match": [
-                "Perl"
-            ]
-        },
-        "PowerShell": {
-            "description": "Powershell",
-            "match": [
-                "PowerShell"
-            ]
-        },
-        "Python": {
-            "description": "Python scripts",
-            "match": [
-                "Py2Exe",
-                "Python"
-            ]
-        },
-        "Ruby": {
-            "description": "Ruby scripts",
-            "match": [
-                "Ruby"
-            ]
-        },
-        "SAP": {
-            "description": "SAP platform scripts",
-            "match": [
-                "SAP"
-            ]
-        },
-        "SH": {
-            "description": "Shell scripts",
-            "match": [
-                "SH"
-            ]
-        },
-        "SMS": {
-            "description": "Uses Short Messaging System (SMS) messages",
-            "match": [
-                "SMS"
-            ]
-        },
-        "VBS": {
-            "description": "Visual Basic scripts",
-            "match": [
-                "VB",
-                "VBA",
-                "VBS"
-            ]
-        },
-        "WinBAT": {
-            "description": "Winbatch scripts",
-            "match": [
-                "WinBAT"
-            ]
-        },
-        "WinHlp": {
-            "description": "Windows Help scripts",
-            "match": [
-                "WinHlp",
-                "hlp"
-            ]
-        },
-        "WinLNK": {
-            "description": "Windows shortcut",
-            "match": [
-                "LNK",
-                "WinLNK"
-            ]
-        },
-        "WinREG": {
-            "description": "Windows registry scripts",
-            "match": [
-                "REG",
-                "WinREG"
-            ]
-        }
+        "INF"
+      ]
+    },
+    "INI": {
+      "description": "Uses mIRC INI files",
+      "match": [
+        "INI"
+      ]
+    },
+    "IRC": {
+      "description": "mIRC/pIRC scripts",
+      "match": [
+        "IRC"
+      ]
+    },
+    "JS": {
+      "description": "Javascript scripts",
+      "match": [
+        "JSc",
+        "jsc",
+        "JS"
+      ]
+    },
+    "Java": {
+      "description": "Java binaries (classes)",
+      "match": [
+        "Java",
+        "J2ME",
+        "OLE-JAR",
+        "J2EE"
+      ]
+    },
+    "LOGO": {
+      "description": "LOGO scripts",
+      "match": [
+        "LOGO"
+      ]
+    },
+    "MPB": {
+      "description": "MapBasic scripts",
+      "match": [
+        "MPB"
+      ]
+    },
+    "MSH": {
+      "description": "Monad shell scripts",
+      "match": [
+        "MSH"
+      ]
+    },
+    "COM": {
+      "description": "Component Object Model",
+      "match": [
+        "COM",
+        "COM.EXE",
+        "ComObj"
+      ]
+    },
+    "MSIL": {
+      "description": ".Net intermediate language scripts",
+      "match": [
+        "MSIL"
+      ]
+    },
+    "MusicMaker": {
+      "match": [
+        "MMM"
+      ]
+    },
+    "PHP": {
+      "description": "Hypertext Preprocessor scripts",
+      "match": [
+        "PHP",
+        "WordPress"
+      ]
+    },
+    "PS": {
+      "description": "Postscript",
+      "match": [
+        "PS"
+      ]
+    },
+    "Perl": {
+      "description": "Perl scripts",
+      "match": [
+        "Perl"
+      ]
+    },
+    "PowerShell": {
+      "description": "Powershell",
+      "match": [
+        "PowerShell"
+      ]
+    },
+    "Python": {
+      "description": "Python scripts",
+      "match": [
+        "Py2Exe",
+        "Python"
+      ]
+    },
+    "Ruby": {
+      "description": "Ruby scripts",
+      "match": [
+        "Ruby"
+      ]
+    },
+    "SAP": {
+      "description": "SAP platform scripts",
+      "match": [
+        "SAP"
+      ]
+    },
+    "SH": {
+      "description": "Shell scripts",
+      "match": [
+        "SH"
+      ]
+    },
+    "SMS": {
+      "description": "Uses Short Messaging System (SMS) messages",
+      "match": [
+        "SMS"
+      ]
+    },
+    "VBS": {
+      "description": "Visual Basic scripts",
+      "match": [
+        "VB",
+        "VBA",
+        "VBS"
+      ]
+    },
+    "WinBAT": {
+      "description": "Winbatch scripts",
+      "match": [
+        "WinBAT",
+        "BATCH"
+      ]
+    },
+    "WinHlp": {
+      "description": "Windows Help scripts",
+      "match": [
+        "WinHlp",
+        "hlp"
+      ]
+    },
+    "WinLNK": {
+      "description": "Windows shortcut",
+      "match": [
+        "LNK",
+        "WinLNK"
+      ]
+    },
+    "WinREG": {
+      "description": "Windows registry scripts",
+      "match": [
+        "REG",
+        "WinREG"
+      ]
     }
+  }
 }

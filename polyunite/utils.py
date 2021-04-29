@@ -16,6 +16,16 @@ class colors:
     WHITE_FG = '\033[37m'
     ORANGE_FG = '\033[91m'
     PINK_FG = '\033[95m'
+
+    BLACK_BG = '\033[40m'
+    RED_BG = '\033[41m'
+    GREEN_BG = '\033[42m'
+    YELLOW_BG = '\033[43m'
+    BLUE_BG = '\033[44m'
+    MAGENTA_BG = '\033[45m'
+    CYAN_BG = '\033[46m'
+    WHITE_BG = '\033[47m'
+
     BOLD = '\033[1m'
     RESET = '\033[0m'
     UNDERLINE = '\033[4m'

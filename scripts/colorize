@@ -28,9 +28,9 @@ args = parser.parse_args()
 
 
 @contextmanager
-def section(name):
-    print("{:-^150}".format(name))
-    yield lambda *a, **kw: print('  ', *a, **kw)
+def section(name, file=sys.stdout):
+    print("{:-^150}".format(name), file=file)
+    yield lambda *a, **kw: print('  ', *a, file=file)
 
 
 def format_match(vr, colorized=True):
@@ -40,8 +40,8 @@ def format_match(vr, colorized=True):
         '{:<10.10}',
         '{:<9.9}',
         '{:<10.10}',
-        '{:55}',
-        '{:>15.15}',
+        '{:45}',
+        '{:>25.25}',
         '{}',
     )).format(
         vr.registration,
@@ -63,9 +63,9 @@ try:
 except StopIteration as e:
     missing, errors = e.value
 
-with section('MISSING') as pr:
+with section('MISSING', file=sys.stderr) as pr:
     pr(missing)
 
-with section('FAILURES') as pr:
+with section('FAILURES', file=sys.stderr) as pr:
     for engine, label, err in errors:
         pr("{:<15}: {:85} : {}".format(engine, label, err))

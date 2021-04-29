@@ -25,8 +25,8 @@ def VARIANT_ID(*extra):
     )
 
 
-CVE_PATTERN = r'(?P<exploit>(?P<CVE>(CVE|Cve|cve)(*SKIP)([-_]?(?P<CVEYEAR>[0-9]{4})([-_]?((?P<CVENTH>[0-9]+)[[:alpha:]]*))?)?))'
-MS_BULLETIN_PATTERN = r'(?P<exploit>(?P<microsoft_security_bulletin>MS(?P<MSSEC_YEAR>[0-9]{2})-(?P<MSSECNTH>[0-9]{1,3})))'
+CVE_PATTERN = r'(?P<exploit>(?P<CVE>(CVE|Cve|cve)([-_]?(?P<CVEYEAR>[0-9]{4})([-_]?((?P<CVENTH>[0-9]+)[[:alpha:]]*))?)?))'
+MS_BULLETIN_PATTERN = r'(?P<exploit>(?P<microsoft_security_bulletin>(?i:MS)(?P<MSSEC_YEAR>[0-9]{2})-?(?P<MSSECNTH>[0-9]{1,3})))'
 
 
 def FAMILY_ID(
@@ -35,10 +35,26 @@ def FAMILY_ID(
     MSSEC=MS_BULLETIN_PATTERN,
     named=[HEURISTICS, OBFUSCATIONS],
     standard=[
-        # e.x `iBryte` & `9Fire`
-        r'[0-9a-z]{1,2}[A-Z][a-zA-Z]{2,}',
+        '[A-Z][a-z]{2}',
         # e.x `Hello_World99` & `Emotet`
-        r'[A-Z][a-zA-Z0-9_]{3,}',
+        r'([0-9]{1,3})?[A-Z]{4,8}([0-9]{1,3})?',
+        # Handle common year prefixes, like `2008Virus`
+        r'(?!.{1,3}($|[.!#@]))'
+        r'((?:20[012]\d|19[89]\d)(?=[A-Z]))?'
+        # Handle special prefixes, like `iPhone`, `X-Connect` or `eWorm`
+        r'(?:([a-z]{1,2}|[iIeExX]-)(?=[A-Z]))?'
+        # Handle up to 5 capitalized words, optionally separated by '-' or '_'
+        r'(?:'
+        r'(?:[A-Z]{1,5}|\d{1,2})[a-z]+'
+        r'(?:'
+            r'(?:[A-Z]{1,5}[a-z]+){1,4}'
+            r'|(?:_[A-Z]{1,4}[a-z]+){1,2}'
+            r'|(?:-[A-Z]{1,4}[a-z]+){1,2}'
+        r')?'
+        r'){i<=2:\d}'
+        # Handle upper-case suffixes like `FakeAV`
+        r'((?:[0-9]{1,3}|[A-Z]{1,3})(?![a-zA-Z0-9]))?'
+        r'((?<=[a-zA-Z0-9])_[a-z]+)?',
     ],
 ):
     return group(

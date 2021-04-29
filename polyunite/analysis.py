@@ -1,7 +1,9 @@
-from typing import TYPE_CHECKING, Callable, Iterable, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Iterable, Optional, Tuple, Union
 
 from collections import Counter, UserDict
-from functools import lru_cache
+import math
+import regex as re
+from operator import attrgetter
 import rapidfuzz
 
 from .utils import flatmap
@@ -13,6 +15,8 @@ from .vocab import (
     MACROS,
     OBFUSCATIONS,
     OSES,
+    CVE_PATTERN,
+    MS_BULLETIN_PATTERN,
 )
 
 if TYPE_CHECKING:
@@ -56,6 +60,15 @@ class Analyses(UserDict):
         """
         return self._weighted_name_inference(self._weighted_names(**kwargs))
 
+    def edit_distance(self, **kwargs):
+        """
+        Returns a dictionary of names with a number representing their relative similarity to every other name
+
+        >>> analyses.infer_likelihoods()
+        {'Emotet': 0.75, 'Nemucod': 0.35}
+        """
+        return self._weighted_name_likelihood(self._weighted_names(**kwargs))
+
     def name_similarity_metric(self, name, **kwargs):
         """
         Compares `name` to the inferred name, computing a similarity metric
@@ -69,15 +82,17 @@ class Analyses(UserDict):
         self,
         weights={},
         name_weights={
-            LABELS.compile(1, 0).fullmatch: 0.80,
-            HEURISTICS.compile(1, 0).fullmatch: 0.55,
-            OBFUSCATIONS.compile(1, 0).fullmatch: 0.55,
-            LANGS.compile(1, 0).fullmatch: 0.20,
-            ARCHIVES.compile(1, 0).fullmatch: 0.20,
-            MACROS.compile(1, 0).fullmatch: 0.20,
-            OSES.compile(1, 0).fullmatch: 0.20,
+            LABELS.compile(1, 0).fullmatch: 1 / 8,
+            HEURISTICS.compile(1, 0).fullmatch: 1 / 4,
+            OBFUSCATIONS.compile(1, 0).fullmatch: 1 / 4,
+            LANGS.compile(1, 0).fullmatch: 1 / 8,
+            ARCHIVES.compile(1, 0).fullmatch: 1 / 8,
+            MACROS.compile(1, 0).fullmatch: 1 / 8,
+            OSES.compile(1, 0).fullmatch: 1 / 8,
+            re.compile(CVE_PATTERN, re.I).fullmatch: 1 / 2,
+            re.compile(MS_BULLETIN_PATTERN, re.I).fullmatch: 1 / 2,
         },
-        taxon_weight=0.35,
+        taxon_weight=1 / 2,
     ):
         for engine, clf in self.items():
             weight = weights.get(engine, 1.0)
@@ -88,25 +103,102 @@ class Analyses(UserDict):
                 name = clf.taxon
                 weight *= taxon_weight
 
-            # Only consider strings longer than 2 chars
-            if isinstance(name, str):
+            if not isinstance(name, str):
+                continue
+
+            if len(name) < 2:
+                weight = 0.0
+            elif len(name) < 5:
+                weight *= len(name) / 5
+            elif len(name) > 10:
+                # Lower the weight of names longer than 10 chars
+                weight /= math.log(len(name), 10)
+
+            # Match `name` against the pattern predicates in `name_weights`, adjusting appropriately
+            if weight > 0:
                 for predicate, adjustment in name_weights.items():
                     if predicate(name):
                         weight *= adjustment
                         break
 
-                yield name, weight
+            yield name, weight
 
-    @staticmethod
-    @lru_cache(maxsize=256)
-    def _weighted_name_inference(names: Iterable[Tuple[str, float]]) -> str:
-        items = tuple((n, w) for n, w in names if w > 0 and len(n) > 2)
+    def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> Optional[str]:
+        likelihood = self._weighted_name_likelihood(names)
+        return max(likelihood.keys(), default=None, key=likelihood.__getitem__)
+
+    def _weighted_name_likelihood(self, names: Iterable[Tuple[str, float]]) -> str:
+        items = tuple((n, w) for n, w in names if w > 0)
         names = tuple(n for n, w in items)
         weights = dict(items)
 
         def edit_distance(name):
-            matches = rapidfuzz.process.extract(name, names, scorer=rapidfuzz.fuzz.QRatio)
+            matches = rapidfuzz.process.extract(
+                    name,
+                    names,
+                    scorer=rapidfuzz.fuzz.QRatio,
+                    score_cutoff=45,
+            )
             return sum(score * weights[name] for _, score, _ in matches)
 
-        if weights:
-            return max(names, key=edit_distance)
+        return {n: edit_distance(n) for n in names}
+
+    def describe(self) -> Counter:
+        """
+        Return descriptive statistics
+        """
+        ctr = Counter()
+        for engine, clf in self.items():
+            ctr['total'] += 1
+
+            if clf.is_EICAR:
+                ctr['EICAR'] += 1
+            if clf.is_heuristic:
+                ctr['heuristic'] += 1
+            if clf.is_paramalware:
+                ctr['paramalware'] += 1
+            if clf.is_nonmalware:
+                ctr['nonmalware'] += 1
+
+        return ctr
+
+    def vulnerability_ids(self):
+        """
+        Gather all vulnerability IDs (e.g CVE, Microsoft Security Bulletins, etc.)
+
+        >>> analyses.vulnerability_ids()
+        {'CVE-2012-3127'}
+        """
+        ids = set()
+        for clf in self.values():
+            for vuln in (clf.vulnerability_id_cve(), clf.vulnerability_id_microsoft()):
+                if vuln:
+                    ids.add(vuln)
+        return ids
+
+    def __repr__(self):
+        """
+        .. example::
+
+            Analyses(
+                name=Gamedrop,
+                total=5,
+                paramalware=1,
+                unique_weights={'Amonetize': 0.8, 'ELTdrop': 1.0},
+                vulnerability_ids={'MS-08-14'},
+                operating_system=['Windows'],
+                labels=['dropper', 'adware', 'trojan']
+            )
+        """
+        weighted_names = tuple(self._weighted_names())
+        parts = [('name', self._weighted_name_inference(weighted_names))]
+        parts.extend(self.describe().items())
+        parts.append(('unique_weights', {k: round(v, 5) for k, v in set(weighted_names)}))
+        parts.append(('vulnerability_ids', self.vulnerability_ids()))
+        parts.extend((vocab, self.summarize(attrgetter(vocab)))
+                     for vocab in ('operating_system', 'language', 'macro', 'labels', 'obfuscations'))
+
+        return '{}({})'.format(
+            self.__class__.__name__,
+            ', '.join('{}={}'.format(k, v) for k, v in parts if v),
+        )

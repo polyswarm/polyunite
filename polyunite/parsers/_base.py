@@ -24,7 +24,7 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     return property(lambda self: recieve(iter(sublabels.intersection(self._groups))))
 
 
-STANDARD_EICAR_NAME = intern('EICAR')
+EICAR_GROUP_NAME = intern('EICAR')
 
 
 class Classification(Mapping):
@@ -52,7 +52,7 @@ class Classification(Mapping):
 
     @classmethod
     def _compile_pattern(cls):
-        pat = group(r'(?P<nonmalware>.*(?P<EICAR>(?i:EICAR)).*)', cls.pattern)
+        pat = group(rf'(?P<nonmalware>.*(?P<{EICAR_GROUP_NAME}>(?i:EICAR)).*)', cls.pattern)
         return re.compile(pat, re.ASCII | re.VERBOSE | re.V1)
 
     def __getitem__(self, k):
@@ -77,12 +77,16 @@ class Classification(Mapping):
     operating_system = extract_vocabulary(OSES)
     language = extract_vocabulary(LANGS)
     macro = extract_vocabulary(MACROS)
+    obfuscations = extract_vocabulary(OBFUSCATIONS, recieve=set)
     labels = extract_vocabulary(LABELS, recieve=set)
 
     @property
     def name(self) -> str:
         """'name' of the virus"""
-        return self.family or self.taxon
+        family = self.family
+        if not family or len(family) <= 3:
+            return self.taxon
+        return family
 
     @property
     def family(self):
@@ -90,7 +94,7 @@ class Classification(Mapping):
         Captures the *named* malware family.
         """
         if self.is_EICAR:
-            return STANDARD_EICAR_NAME
+            return 'EICAR'
 
         return self.vulnerability_id_cve() or \
                 self.vulnerability_id_microsoft() or \
@@ -111,12 +115,23 @@ class Classification(Mapping):
     @property
     def is_EICAR(self):
         """Check if the EICAR test file was reported"""
-        return 'EICAR' in self
+        return EICAR_GROUP_NAME in self
 
     @property
     def is_heuristic(self) -> bool:
         """Check if we've parsed this classification as a heuristic-detection"""
         return 'HEURISTICS' in self
+
+    @property
+    def is_nonmalware(self) -> bool:
+        return self.is_EICAR or 'nonmalware' in self
+
+    @property
+    def is_paramalware(self) -> bool:
+        return self.is_nonmalware \
+            or 'security_assessment_tool' in self \
+            or 'greyware' in self \
+            or 'parental_control' in self
 
     # noinspection PyDefaultArgument
     def colorize(
@@ -129,6 +144,13 @@ class Classification(Mapping):
             ARCHIVES.name: colors.RED_FG,
             MACROS.name: colors.ORANGE_FG,
             LANGS.name: colors.BLUE_FG,
+            EICAR_GROUP_NAME: colors.BLUE_FG + colors.MAGENTA_BG,
+            'nonmalware': colors.WHITE_FG + colors.MAGENTA_BG,
+            'security_assessment_tool': colors.WHITE_FG + colors.BLACK_BG,
+            'greyware': colors.BLACK_BG,
+            'parental_control': colors.YELLOW_FG + colors.BLACK_BG,
+            'microsoft_security_bulletin': colors.BOLD + colors.GREEN_FG,
+            'CVE': colors.BOLD + colors.GREEN_FG,
             'FAMILY': colors.GREEN_FG,
             'VARIANT': colors.WHITE_FG,
         },
