@@ -128,7 +128,12 @@ class Analyses(UserDict):
         weights = dict(items)
 
         def edit_distance(name):
-            matches = rapidfuzz.process.extract(name, names, scorer=rapidfuzz.fuzz.QRatio)
+            matches = rapidfuzz.process.extract(
+                    name,
+                    names,
+                    scorer=rapidfuzz.fuzz.QRatio,
+                    score_cutoff=45,
+            )
             return sum(score * weights[name] for _, score, _ in matches)
 
         return {n: edit_distance(n) for n in names}
