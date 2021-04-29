@@ -19,7 +19,6 @@ default:
   before_script:
     - pip install -q --upgrade pip
     - pip install -q $END_TO_END_LIB@$CI_COMMIT_REF_NAME || pip install -q $END_TO_END_LIB
-    - e2e init
 
 ###############################################################
 # Build Stage (jobs inside a stage run in parallel)
@@ -39,12 +38,11 @@ dev-pypi:
 ###############################################################
 # Test Stage
 ###############################################################
-test-py37:
-  image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.8-slim-buster
+test-py38:
+  image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.7-slim-buster
   stage: test
   tags:
     - kube-small-new
-  coverage: '/TOTAL.*\s+(\d+%)$/'
   script:
     - python setup.py test
   except:
@@ -59,6 +57,8 @@ release-pypi:
   stage: release
   only:
     - master
+  before_script:
+    - e2e init
   script:
     # release to internal pypi but do not tag yet
     - e2e release --skip-tag --remote https://github.com/polyswarm/$CI_PROJECT_NAME.git
