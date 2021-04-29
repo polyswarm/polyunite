@@ -28,6 +28,7 @@ dev-pypi:
   image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.7-slim-buster
   stage: build
   script:
+    - apt-get install -y git
     - SHORT_SHA=$(git rev-parse --short HEAD) bumpversion --no-commit --no-tag local
     - python setup.py -q bdist_wheel
     - twine upload --skip-existing --disable-progress-bar --non-interactive dist/*
