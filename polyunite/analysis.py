@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Callable, Iterable, Optional, Tuple, Union
 
 from collections import Counter, UserDict
 import math
+import regex as re
 from operator import attrgetter
 import rapidfuzz
 
@@ -14,6 +15,8 @@ from .vocab import (
     MACROS,
     OBFUSCATIONS,
     OSES,
+    CVE_PATTERN,
+    MS_BULLETIN_PATTERN,
 )
 
 if TYPE_CHECKING:
@@ -86,6 +89,8 @@ class Analyses(UserDict):
             ARCHIVES.compile(1, 0).fullmatch: 1 / 8,
             MACROS.compile(1, 0).fullmatch: 1 / 8,
             OSES.compile(1, 0).fullmatch: 1 / 8,
+            re.compile(CVE_PATTERN, re.I).fullmatch: 1 / 2,
+            re.compile(MS_BULLETIN_PATTERN, re.I).fullmatch: 1 / 2,
         },
         taxon_weight=1 / 2,
     ):
