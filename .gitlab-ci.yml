@@ -25,7 +25,7 @@ default:
 dev-pypi:
   tags:
     - kube-small-new
-  image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.8-slim-buster
+  image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.7-slim-buster
   stage: build
   script:
     - SHORT_SHA=$(git rev-parse --short HEAD) bumpversion --no-commit --no-tag local
@@ -36,10 +36,10 @@ dev-pypi:
 # Test Stage
 ###############################################################
 test-py38:
-  image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.7-slim-buster
-  stage: test
   tags:
     - kube-small-new
+  image: 005789955001.dkr.ecr.us-east-1.amazonaws.com/python:3.7-slim-buster
+  stage: test
   script:
     - python setup.py test
   except:
