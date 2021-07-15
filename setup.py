@@ -21,6 +21,7 @@ setup(
     install_requires=[
         'regex~=2020.11.13',
         'rapidfuzz~=1.0.0',
+        'polyswarm~=2.6.2'
     ],
     long_description='file: README.rst',
     long_description_content_type='rst',
