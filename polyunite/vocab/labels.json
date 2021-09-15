@@ -3,6 +3,7 @@
   "children": {
     "adware": {
       "description": "Any software that is funded by advertising. Adware may also gather sensitive user information from a system.",
+      "malware-type": "adware",
       "match": [
         {
           "pattern": "(?<!\\w)AD(?!\\w)"
@@ -20,6 +21,7 @@
     },
     "backdoor": {
       "description": "Malware which, once running on a system, opens a communication vector to the outside so the computer can be accessed remotely by an attacker.",
+      "malware-type": "backdoor",
       "match": [
         "backdoor",
         "backdoorr",
@@ -32,12 +34,14 @@
     },
     "boot_sector_virus": {
       "description": "Malware that infects the master boot record of a storage device.",
+      "malware-type": "bootkit",
       "match": [
         "boot_sector_virus"
       ]
     },
     "bot": {
       "description": "Malware that resides on an infected system, communicating with and forming part of a botnet. The bot may be implanted by a worm or trojan, which opens a backdoor. The bot then monitors the backdoor for further instructions.",
+      "malware-type": "bot",
       "match": [
         "bot",
         "ircbot"
@@ -83,10 +87,13 @@
     },
     "ddos": {
       "description": "A tool used to perform a distributed denial of service attack.",
+      "malware-type": "ddos",
       "match": [
         {
           "pattern": "(?-i:DoS)"
         },
+        "Nuke",
+        "Nuker",
         "im-flooder",
         "flooder",
         "ddoser",
@@ -95,6 +102,7 @@
     },
     "downloader": {
       "description": "Malware programmed to download and execute other files, usually more complex malware.",
+      "malware-type": "downloader",
       "match": [
         {
           "pattern": "\\bDL\\b"
@@ -102,6 +110,7 @@
         {
           "pattern": "Download(er)?[0-9]*"
         },
+        "Porn-Downloader",
         "Downlaoder",
         "Downlder",
         "Loader",
@@ -129,6 +138,7 @@
     },
     "dropper": {
       "description": "A type of Trojan that deposits an enclosed payload onto a destination host computer by loading itself into memory, extracting the malicious payload, and then writing it to the file system.",
+      "malware-type": "dropper",
       "match": [
         "dldrop",
         "docdrop",
@@ -151,6 +161,7 @@
     },
     "exploit_kit": {
       "description": "A software toolkit to target common vulnerabilities.",
+      "malware-type": "exploit-kit",
       "match": [
         "exploit_kit"
       ]
@@ -193,6 +204,7 @@
         {
           "pattern": "\\bTool\\b"
         },
+        "Evilware",
         "greyware",
         "Harm",
         "hoax",
@@ -222,12 +234,12 @@
         {
           "pattern": "\\bPOS\\b"
         },
-        "behavior",
         "implant"
       ]
     },
     "keylogger": {
       "description": "A type of program implanted on a system to monitor the keys pressed and thus record any sensitive data, such as passwords, entered by the user.",
+      "malware-type": "keylogger",
       "match": [
         "keylogger",
         "keylog",
@@ -355,7 +367,7 @@
       "description": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system.",
       "match": [
         {
-          "pattern": "(?:PWS|pws|psw|password)[-_]?(?:steal(?:er)?|thief|tool)"
+          "pattern": "(?:PWS|pws|psw|password)(?:[-_]?(?:steal(?:er)?|thief|tool))?(?:[-_.]?(?:AOL|MSN))?"
         },
         "PWS",
         "PSW",
@@ -408,6 +420,7 @@
         {
           "pattern": "porn\\W?dialer"
         },
+        "DIAL",
         "dialer",
         "SMSSend",
         "premium-sms",
@@ -423,6 +436,7 @@
     },
     "ransomware": {
       "description": "Malware that encrypts files on a victim's system, demanding payment of ransom in return for the access codes required to unlock files.",
+      "malware-type": "ransomware",
       "match": [
         {
           "pattern": "ransom-?encoder"
@@ -442,6 +456,7 @@
     },
     "remote_access_trojan": {
       "description": "A remote access trojan program (or RAT), is a trojan horse capable of controlling a machine through commands issued by a remote attacker.",
+      "malware-type": "remote-access-trojan",
       "match": [
         {
           "pattern": "remote\\W?admin"
@@ -454,6 +469,7 @@
     },
     "resource_exploiter": {
       "description": "A type of malware that steals a system's resources (e.g., CPU cycles).",
+      "malware-type": "resource-exploitation",
       "match": [
         "resource_exploiter",
         "zipbomb"
@@ -472,6 +488,7 @@
     },
     "rogue_security_software": {
       "description": "A fake security product that demands money to clean phony infections.",
+      "malware-type": "rogue-security-software",
       "match": [
         "rogue",
         "fakeav",
@@ -481,6 +498,7 @@
     },
     "rootkit": {
       "description": "A method of hiding files or processes from normal methods of monitoring; often used by malware to conceal its presence and activities.",
+      "malware-type": "rootkit",
       "match": [
         "rootkit",
         "Rkit"
@@ -494,6 +512,7 @@
     },
     "screen_capture": {
       "description": "A type of malware used to capture images from the target systems screen, used for exfiltration and command and control.",
+      "malware-type": "screen-capture",
       "match": [
         "screen_capture"
       ]
@@ -543,6 +562,7 @@
     },
     "spyware": {
       "description": "Software that gathers information and passes it to a third-party without adequate permission from the owner of the data. It may also refer to software that makes changes to a system or any of its component software, or which makes use of system resources without the full understanding and consent of the system owner.",
+      "malware-type": "spyware",
       "match": [
         {
           "pattern": "Spy(?![[:alnum:]])"
@@ -562,6 +582,7 @@
     },
     "trojan": {
       "description": "Malware disguised as something inert or benign.",
+      "malware-type": "trojan",
       "match": [
         {
           "pattern": "\\bTr\\b"
@@ -576,6 +597,7 @@
     },
     "virus": {
       "description": "Self-replicating malware that requires human interaction to spread; also, self-replicating malware that runs and spreads by modifying and inserting itself into other programs or files.",
+      "malware-type": "virus",
       "match": [
         "VirusOrg",
         {
@@ -588,7 +610,12 @@
         {
           "pattern": "\\bvirus\\b"
         },
-        "Trivial"
+        "Trivial",
+        {
+          "pattern": "AV[-._]?Killer",
+          "behavior": "avkiller",
+          "description": "Attempts to end antivirus processes"
+        }
       ]
     },
     "web_bug": {
@@ -599,13 +626,13 @@
     },
     "worm": {
       "description": "Self-replicating malware that propagates across a network either with or without human interaction.",
+      "malware-type": "worm",
       "match": [
         {
           "pattern": "(?:I|IM|Net|P2P)[-.]?Worm"
         },
-        "Worm.P2p",
-        "Worm/P2p",
-        "i-worm/p2p",
+        "P2p",
+        "P2e",
         "hllw",
         "worm"
       ]

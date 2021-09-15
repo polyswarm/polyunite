@@ -3,11 +3,13 @@ from typing import ClassVar, Set
 from collections.abc import Mapping
 import regex as re
 from sys import intern
+import logging
 
 from ..errors import MatchError
 from ..registry import EngineRegistry
 from ..utils import colors, group
 from ..vocab import (
+    EICAR_GROUP_NAME,
     ARCHIVES,
     HEURISTICS,
     LABELS,
@@ -17,6 +19,7 @@ from ..vocab import (
     OSES,
 )
 
+log = logging.getLogger(__name__)
 
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     """Call `recieve` with a generator of all `vocab`'s matching label names"""
@@ -24,10 +27,9 @@ def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     return property(lambda self: recieve(iter(sublabels.intersection(self._groups))))
 
 
-EICAR_GROUP_NAME = intern('EICAR')
-
 
 class Classification(Mapping):
+    __patterns__: 'ClassVar[Iterable[str]]'
     pattern: 'ClassVar[str]'
     regex: 'ClassVar[re.Pattern]'
     match: 're.Match'
@@ -36,7 +38,7 @@ class Classification(Mapping):
     def __init__(self, name: str):
         try:
             self.match = self.regex.fullmatch(name, timeout=1, concurrent=False)
-            self._groups = frozenset(k for k, v in self.match.capturesdict().items() if any(v))
+            self._groups = frozenset(k for k, v in self.match.capturesdict().items() if v)
         except (AttributeError, TypeError):
             raise MatchError(name, self.__class__.__name__)
 
@@ -52,8 +54,14 @@ class Classification(Mapping):
 
     @classmethod
     def _compile_pattern(cls):
-        pat = group(rf'(?P<nonmalware>.*(?P<{EICAR_GROUP_NAME}>(?i:EICAR)).*)', cls.pattern)
-        return re.compile(pat, re.ASCII | re.VERBOSE | re.V1)
+        try:
+            return re.compile(group(*cls.__patterns__), re.ASCII | re.VERBOSE | re.V1)
+        except re.error as e:
+            print(e.pattern)
+            begin = e.pattern.rfind('\n', 0, e.pos)
+            end = e.pattern.find('\n', e.pos)
+            log.exception('%s:\n%s\n', e.msg, e.pattern[begin + 1:end])
+            raise
 
     def __getitem__(self, k):
         if k in self:

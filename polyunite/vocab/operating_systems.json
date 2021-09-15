@@ -9,6 +9,12 @@
         "AndroidOS"
       ]
     },
+    "FTP": {
+      "description": "Uses File Transfer Protocol",
+      "match": [
+        "FTP"
+      ]
+    },
     "Boot": {
       "description": "Uses or resides in the Master Boot Record (MBR) or DOS Boot Sector of an operating system",
       "match": [
@@ -55,7 +61,8 @@
       "description": "Linux platform",
       "match": [
         {
-          "pattern": "(?i:ELF.?(Linux|ARM|x)?\\d*)"
+          "pattern": "(?i:ELF.?(Linux|ARM|x)?\\d*)",
+          "processor-architecture": "arm"
         },
         "Linux"
       ]
@@ -137,6 +144,17 @@
         "Windows"
       ],
       "children": {
+        "internet_explorer": {
+          "match": [
+            "ActiveX"
+          ]
+        },
+        "IIS": {
+          "description": "Microsoft Windows IIS Webserver",
+          "match": [
+            "IIS"
+          ]
+        },
         "Win16": {
           "description": "Win16 (3.1) platform",
           "match": [
@@ -151,6 +169,7 @@
         },
         "Win32": {
           "description": "Windows 32-bit platform",
+          "processor_architecture": "x86",
           "match": [
             "W32",
             "Win32"
@@ -158,6 +177,7 @@
         },
         "Win64": {
           "description": "Windows 64-bit platform",
+          "processor-architecture": "x86-64",
           "match": [
             "W64",
             "Win64"
@@ -166,12 +186,15 @@
         "Win95": {
           "description": "Windows 95, 98 and ME platforms",
           "match": [
+            "W95",
             "Win95"
           ]
         },
         "Win98": {
           "description": "Windows 98 platform only",
           "match": [
+            "W98",
+            "W97",
             "Win9x",
             "Win98"
           ]

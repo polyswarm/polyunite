@@ -72,13 +72,6 @@
         ".Dr"
       ]
     },
-    "heuristic": {
-      "match": [
-        {
-          "pattern": "(?P<HEURISTICS>[-.][Hh]eur)"
-        }
-      ]
-    },
     "generated": {
       "description": "malware that appears to have been created with a virus authoring tool",
       "match": [
@@ -94,6 +87,9 @@
         ".Gen",
         ".Siggen",
         ".siggen",
+        {
+          "pattern": "[.]Suspect[0-9]?"
+        },
         {
           "pattern": ".(gen|Gen|GEN)[0-9]+"
         },
@@ -172,6 +168,7 @@
     "plugin": {
       "description": "plug-in component",
       "match": [
+        "-plugin",
         ".plugin"
       ]
     },
@@ -211,7 +208,8 @@
       "match": [
         "!srv",
         ".Srv",
-        ".srv"
+        ".srv",
+        ".server"
       ]
     },
     "client": {

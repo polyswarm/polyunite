@@ -59,6 +59,8 @@
         "SAgent",
         "macro",
         "macro.excel",
+        "Word",
+        "MSGate",
         "macro.word"
       ],
       "children": {

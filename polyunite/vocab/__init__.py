@@ -1,5 +1,6 @@
 from ..utils import group
 from ._base import VocabRegex
+from .pattern import CVE_PATTERN, MS_BULLETIN_PATTERN, EICAR_GROUP_NAME
 
 LABELS = VocabRegex.from_resource('LABELS')
 LANGS = VocabRegex.from_resource('LANGS')
@@ -10,9 +11,21 @@ HEURISTICS = VocabRegex.from_resource('HEURISTICS')
 OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS, OBFUSCATIONS)
-
 TYPES = group(f'{LABELS}(-?(?&LABELS))?', PLATFORM, name='TYPES')
 
+VOCABDEF = rf'''
+(?(DEFINE)
+    {LABELS}
+    {LANGS}
+    {ARCHIVES}
+    {MACROS}
+    {OSES}
+    {HEURISTICS}
+    {OBFUSCATIONS}
+    (?P<PLATFORM>(?&OPERATING_SYSTEMS)|(?&ARCHIVES)|(?&MACROS)|(?&LANGS)|(?&HEURISTICS)|(?&OBFUSCATIONS))
+    (?P<TYPES>(?:(?&LABELS)(-?(?&LABELS))?)|(?&PLATFORM))
+)
+'''
 
 def VARIANT_ID(*extra):
     return group(
@@ -23,10 +36,6 @@ def VARIANT_ID(*extra):
         r'[.][A-Z][a-z][a-z]',
         name='VARIANT'
     )
-
-
-CVE_PATTERN = r'(?P<exploit>(?P<CVE>(CVE|Cve|cve)([-_]?(?P<CVEYEAR>[0-9]{4})([-_]?((?P<CVENTH>[0-9]+)[[:alpha:]]*))?)?))'
-MS_BULLETIN_PATTERN = r'(?P<exploit>(?P<microsoft_security_bulletin>(?i:MS)(?P<MSSEC_YEAR>[0-9]{2})-?(?P<MSSECNTH>[0-9]{1,3})))'
 
 
 def FAMILY_ID(
@@ -67,3 +76,6 @@ def FAMILY_ID(
             name='FAMILY',
         ),
     )
+
+
+'<TITLE> ( <HEX> )'

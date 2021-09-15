@@ -1,9 +1,12 @@
-from ..vocab import FAMILY_ID, LABELS, PLATFORM, VARIANT_ID
+from ..vocab import FAMILY_ID, LABELS, PLATFORM, VARIANT_ID, pattern
 from ._base import Classification
 
 
 class ClamAV(Classification):
-    pattern = rf"""^
+    __av_name__ = 'ClamAV'
+    __patterns__ = (
+        pattern.EICAR_MATCH_ANYWHERE,
+        rf"""^
     (Clamav|Urlhaus)?
     (
         ([.]|^)
@@ -25,4 +28,5 @@ class ClamAV(Classification):
                     r'/CRDF(-[[:alnum:]])?',
                     r'[.]Extra_Field')}*
     )
-    $"""
+    $""",
+    )

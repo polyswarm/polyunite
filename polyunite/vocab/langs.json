@@ -46,6 +46,7 @@
     },
     "AppleScript": {
       "description": "compiled Apple scripts",
+      "implementation-language": "applescript",
       "match": [
         "AppleScript"
       ]
@@ -135,12 +136,16 @@
     "IRC": {
       "description": "mIRC/pIRC scripts",
       "match": [
-        "IRC"
+        "IRC",
+        "Client-IRC",
+        "mIRC"
       ]
     },
     "JS": {
       "description": "Javascript scripts",
+      "implementation-language": "javascript",
       "match": [
+        "JSON",
         "JSc",
         "jsc",
         "JS"
@@ -148,8 +153,11 @@
     },
     "Java": {
       "description": "Java binaries (classes)",
+      "implementation-language": "java",
       "match": [
+        "JSP",
         "Java",
+        "J2ME",
         "J2ME",
         "OLE-JAR",
         "J2EE"
@@ -194,6 +202,7 @@
     },
     "PHP": {
       "description": "Hypertext Preprocessor scripts",
+      "implementation-language": "php",
       "match": [
         "PHP",
         "WordPress"
@@ -207,18 +216,21 @@
     },
     "Perl": {
       "description": "Perl scripts",
+      "implementation-language": "perl",
       "match": [
         "Perl"
       ]
     },
     "PowerShell": {
       "description": "Powershell",
+      "implementation-language": "powershell",
       "match": [
         "PowerShell"
       ]
     },
     "Python": {
       "description": "Python scripts",
+      "implementation-language": "python",
       "match": [
         "Py2Exe",
         "Python"
@@ -226,6 +238,7 @@
     },
     "Ruby": {
       "description": "Ruby scripts",
+      "implementation-language": "ruby",
       "match": [
         "Ruby"
       ]
@@ -250,6 +263,7 @@
     },
     "VBS": {
       "description": "Visual Basic scripts",
+      "implementation-language": "visual-basic",
       "match": [
         "VB",
         "VBA",

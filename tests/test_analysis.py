@@ -90,7 +90,12 @@ def test_summarize_os(_family, _labels, results):
 @pytest.mark.parametrize('_family,labels,results', TEST_BOUNTIES)
 @pytest.mark.parametrize('k', [None, *range(5)])
 def test_summarize_labels(_family, labels, results, k):
-    assert set(labels[0:k]) == set(polyunite.analyze(results).labels_summary(top_k=k))
+    actual = set(polyunite.analyze(results).labels_summary(top_k=k))
+
+    if k is not None:
+        assert len(actual) <= k
+
+    assert set(labels) >= actual
 
 
 @pytest.mark.parametrize('_family,_labels,results', TEST_BOUNTIES)

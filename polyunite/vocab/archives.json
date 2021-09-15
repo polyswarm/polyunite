@@ -125,6 +125,13 @@
         "RAR"
       ]
     },
+    "SFX": {
+      "description": "Self-extracting archive",
+      "archive_type": "SFX",
+      "match": [
+        "SFX"
+      ]
+    },
     "SIS": {
       "archive_type": "SIS",
       "match": [
