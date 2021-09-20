@@ -57,11 +57,12 @@
         "Doc",
         "MSOffice",
         "SAgent",
-        "macro",
-        "macro.excel",
+        "Macro",
         "Word",
-        "MSGate",
-        "macro.word"
+        "Macro.Word",
+        "Excel",
+        "Macro.Excel",
+        "MSGate"
       ],
       "children": {
         "A97M": {

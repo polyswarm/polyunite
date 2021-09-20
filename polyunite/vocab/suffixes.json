@@ -13,6 +13,11 @@
         "!cv"
       ]
     },
+    "certificate": {
+      "match": [
+        ".Cert"
+      ]
+    },
     "cur": {
       "description": "an internal category used to refer to some threats",
       "match": [
@@ -42,6 +47,7 @@
       "description": "Dynamic Link Library component of a malware",
       "match": [
         "#dll",
+        ".Dll",
         ".dll",
         "@dll"
       ]
@@ -59,9 +65,7 @@
         "-based",
         ".based",
         ".Based",
-        {
-          "pattern": "-Based$"
-        }
+        ".Variant"
       ]
     },
     "dr": {
@@ -87,24 +91,33 @@
         ".Gen",
         ".Siggen",
         ".siggen",
-        {
-          "pattern": "[.]Suspect[0-9]?"
-        },
-        {
-          "pattern": ".(gen|Gen|GEN)[0-9]+"
-        },
-        {
-          "pattern": ".Generic$"
-        },
         "-gen",
         "-Gen",
-        ".generic"
+        {
+          "pattern": "[.]poly[1-9]"
+        },
+        {
+          "__example__": "Android.Tekwon.GEN6596",
+          "pattern": "[.]GEN[0-9]*"
+        },
+        {
+          "__example__": "virus.html.gen03.726",
+          "pattern": "[.]gen0?[1-9]"
+        },
+        {
+          "pattern": "[.]GEN[0-9]*"
+        },
+        {
+          "pattern": "[.]Gen[0-9]?"
+        },
+        {
+          "pattern": "[.]Gen[.][1-9]"
+        }
       ]
     },
     "Zen": {
       "description": "ALibaba specific field",
       "match": [
-        ".zen",
         ".Zen"
       ]
     },
@@ -182,6 +195,11 @@
       "description": "an internal category used to refer to some threats",
       "match": [
         "!rfn"
+      ]
+    },
+    "hook": {
+      "match": [
+        ".Hook"
       ]
     },
     "rootkit_suffix": {

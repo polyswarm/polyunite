@@ -9,6 +9,8 @@ MACROS = VocabRegex.from_resource('MACROS')
 OSES = VocabRegex.from_resource('OPERATING_SYSTEMS')
 HEURISTICS = VocabRegex.from_resource('HEURISTICS')
 OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
+BEHAVIORS = VocabRegex.from_resource('BEHAVIORS')
+ACCOUNT_TYPE = VocabRegex.from_resource('ACCOUNT_TYPE')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS, OBFUSCATIONS)
 TYPES = group(f'{LABELS}(-?(?&LABELS))?', PLATFORM, name='TYPES')
@@ -22,7 +24,8 @@ VOCABDEF = rf'''
     {OSES}
     {HEURISTICS}
     {OBFUSCATIONS}
-    (?P<PLATFORM>(?&OPERATING_SYSTEMS)|(?&ARCHIVES)|(?&MACROS)|(?&LANGS)|(?&HEURISTICS)|(?&OBFUSCATIONS))
+    {BEHAVIORS}
+    (?P<PLATFORM>(?&OPERATING_SYSTEMS)|(?&ARCHIVES)|(?&MACROS)|(?&LANGS)|(?&BEHAVIORS))
     (?P<TYPES>(?:(?&LABELS)(-?(?&LABELS))?)|(?&PLATFORM))
 )
 '''
@@ -76,6 +79,3 @@ def FAMILY_ID(
             name='FAMILY',
         ),
     )
-
-
-'<TITLE> ( <HEX> )'

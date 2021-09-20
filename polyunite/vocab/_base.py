@@ -22,6 +22,9 @@ class VocabRegex:
 
         if isinstance(fields, dict):
             self.match = [{'const': v} if isinstance(v, str) else v for v in fields.get('match', [])]
+            for m in self.match:
+                if 'match' in m:
+                    self.match.extend({'const': v} for v in m['match'])
             self.tags = {f.lower() for f in fields.get('tags', [])}
             self.description = fields.get('description', None)
             self.children = [VocabRegex(n, v, parent=self) for n, v in fields.get('children', dict()).items()]

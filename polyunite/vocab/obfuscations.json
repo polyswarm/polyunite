@@ -83,8 +83,6 @@
         "encpk",
         "kryptk",
         "malcrypt",
-        "vbcrypt",
-        "vbkrypt",
         {
           "pattern": "[KkCc]rypt(?:ed|er|ic|or|ik)?"
         }

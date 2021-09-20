@@ -1,0 +1,63 @@
+{
+  "group": "ACCOUNT_TYPE",
+  "children": {
+    "AOL": {
+      "description": "AOL instant messenger",
+      "account-type": "aol",
+      "match": [
+        "AOL"
+      ]
+    },
+    "Twitter": {
+      "account-type": "twitter",
+      "match": [
+        "Twitter"
+      ]
+    },
+    "Skype": {
+      "account-type": "skype",
+      "match": [
+        "Skype"
+      ]
+    },
+    "Yahoo": {
+      "account-type": "yahoo",
+      "match": [
+        "Yahoo",
+        "Yhoo"
+      ]
+    },
+    "MSN": {
+      "description": "MSN instant messenger",
+      "account-type": "msn",
+      "match": [
+        "MSN"
+      ]
+    },
+    "IM": {
+      "description": "Instan Messanger",
+      "match": [
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?(IM|IMMSG)"
+        },
+        "IM"
+      ]
+    },
+    "QQ": {
+      "description": "Tencent QQ",
+      "account-type": "tencent-qq",
+      "match": [
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?(QQ|QQMSG)"
+        },
+        "QQ"
+      ]
+    }
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "group": "BEHAVIORS",
+  "children": {
+    "packing": {
+      "description": "Packing of the malware instance code, not including encryption.",
+      "match": [
+        "Pack",
+        "aspack",
+        "asprotect",
+        "badPE",
+        "fsg",
+        "genpack",
+        "imptbl",
+        "kriz",
+        "magistr",
+        "malob",
+        "malpack",
+        "matchicon",
+        "md5sect",
+        "nspack",
+        "obfus",
+        "obfusc",
+        {
+          "pattern": "obfuscat(?:e|ed|or|ed|ing)"
+        },
+        {
+          "pattern": "[pP]acke[dr][0-9]*"
+        },
+        "packing",
+        "parite",
+        "pecompact",
+        "pespin",
+        "petite",
+        "polipos",
+        "suspiciouspacker",
+        "swizzor",
+        "themida",
+        "upack",
+        "upx",
+        "vbpack",
+        "vmprotect",
+        "wwpack",
+        "xpack",
+        "zpack"
+      ]
+    },
+    "certificate": {
+      "match": [
+        "Revoked.Certificate",
+        "Untrusted.Certificate"
+      ]
+    },
+    "hidden": {
+      "description": "Hidden code",
+      "match": [
+        "binder",
+        "patched"
+      ]
+    },
+    "intercept_manipulate_network_traffic": {
+      "description": "Intercepts and/or manipulates network traffic going to or originating from the system on which the malware instance is executing.",
+      "behavior": "intercept-manipulate-network-traffic",
+      "match": [
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?Sniffer"
+        },
+        "Sniffer"
+      ]
+    },
+    "exfiltrates_data": {
+      "description": "able to gather, prepare, (possibly obfuscate) data and transmit it to exfiltration points.",
+      "malware-capabilities": "exfiltrates-data",
+      "match": [
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?Notifier"
+        },
+        "Notifier"
+      ]
+    },
+    "anti_firewall": {
+      "behavior": "disable-firewall",
+      "match": [
+        "AntiFW"
+      ]
+    },
+    "anti_virtual_machine": {
+      "malware-capabilities": "anti-vm",
+      "match": [
+        "AntiVM"
+      ]
+    },
+    "kill_process": {
+      "malware-action": "kill-process",
+      "match": [
+        "KillProc"
+      ]
+    },
+    "evades_av": {
+      "malware-capabilities": "evades-av",
+      "match": [
+        "Countermeasure",
+        "AVKill",
+        "KillAV",
+        {
+          "pattern": "AV[-._]?Killer"
+        }
+      ]
+    },
+    "erase_data": {
+      "behavior": "erase-data",
+      "match": [
+        "KillFiles"
+      ]
+    },
+    "network_traffic_redirector": {
+      "behavior": "intercept-manipulate-network-traffic",
+      "match": [
+        "Redirector"
+      ]
+    },
+    "autorun": {
+      "behavior": "persist-after-system-reboot",
+      "match": [
+        "Autorun",
+        {
+          "pattern": "Autorunn?er[0-9]?"
+        }
+      ]
+    },
+    "kill_windows": {
+      "malware-action": "kill-windows",
+      "match": [
+        "KillWin"
+      ]
+    },
+    "code_encryption": {
+      "description": "Encryption of the malware instance code.",
+      "match": [
+        "PE-Encrypt",
+        "EXEHeader.AntiArj",
+        "code-encryption",
+        "encoder",
+        "encpk",
+        "kryptk",
+        "malcrypt",
+        {
+          "pattern": "[KkCc]rypt(?:ed|er|ic|or|ik)?"
+        }
+      ]
+    },
+    "unpacked": {
+      "description": "Upacked binary or code from the original malware",
+      "match": [
+        "unpacked"
+      ]
+    },
+    "suspicious": {
+      "description": "Suspicious behavior without signature match",
+      "match": [
+        {
+          "pattern": "\\bSusp?\\b"
+        },
+        "Abuse-Worry",
+        "confidence",
+        "highconfidence",
+        "possible-Threat",
+        {
+          "pattern": "(?:variant\\s?of|looks\\s?like|behaves\\s?like|suspect(?:ed)?|probabl[ey]|modification(?:\\sof)?|possibl[ey])"
+        },
+        "reputation",
+        "suspicious",
+        "threat",
+        "variant",
+        "DangerousObject"
+      ]
+    }
+  }
+}

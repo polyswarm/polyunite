@@ -8,6 +8,12 @@
         {
           "pattern": "(?<!\\w)AD(?!\\w)"
         },
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?Adware"
+        },
         "adware",
         "AdLoad",
         "AdInstaller"
@@ -23,6 +29,12 @@
       "description": "Malware which, once running on a system, opens a communication vector to the outside so the computer can be accessed remotely by an attacker.",
       "malware-type": "backdoor",
       "match": [
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?(?:Backdoor|Proxy)"
+        },
         "backdoor",
         "backdoorr",
         {
@@ -43,6 +55,12 @@
       "description": "Malware that resides on an infected system, communicating with and forming part of a botnet. The bot may be implanted by a worm or trojan, which opens a backdoor. The bot then monitors the backdoor for further instructions.",
       "malware-type": "bot",
       "match": [
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?Bot"
+        },
         "bot",
         "ircbot"
       ]
@@ -67,6 +85,12 @@
       "description": "A trojan that makes a system visit a specific web page, often very frequently and usually with the aim of increasing the traffic recorded by the site and thus increasing revenue from advertising. Clickers may also be used to carry out DDoS attacks.",
       "match": [
         {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?Clicker"
+        },
+        {
           "pattern": "Click(er)?[0-9]*"
         },
         "cliqker",
@@ -90,6 +114,12 @@
       "malware-type": "ddos",
       "match": [
         {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?(?:DoS|DDos)"
+        },
+        {
           "pattern": "(?-i:DoS)"
         },
         "Nuke",
@@ -110,12 +140,16 @@
         {
           "pattern": "Download(er)?[0-9]*"
         },
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "(?:Trojan|Tjn|Trjn)[.-]?(?:Downloader|DL|Dloader|Dloader|Dwnldr|Downldr|Loader)"
+        },
         "Porn-Downloader",
         "Downlaoder",
         "Downlder",
         "Loader",
-        "TjnDownldr",
-        "TrjnDwnlder",
         "dldr",
         "dload",
         "dloade",
@@ -140,6 +174,12 @@
       "description": "A type of Trojan that deposits an enclosed payload onto a destination host computer by loading itself into memory, extracting the malicious payload, and then writing it to the file system.",
       "malware-type": "dropper",
       "match": [
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?Dropper"
+        },
         "dldrop",
         "docdrop",
         "docdrp",
@@ -206,6 +246,7 @@
         },
         "Evilware",
         "greyware",
+        "GrayWare",
         "Harm",
         "hoax",
         "joke",
@@ -241,6 +282,12 @@
       "description": "A type of program implanted on a system to monitor the keys pressed and thus record any sensitive data, such as passwords, entered by the user.",
       "malware-type": "keylogger",
       "match": [
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?Keylogger"
+        },
         "keylogger",
         "keylog",
         "monitoring.tool",
@@ -273,7 +320,6 @@
           "pattern": "Client-?SMTP"
         },
         "email",
-        "hllm",
         "mail",
         "mass_mailer",
         "phishing",
@@ -283,7 +329,13 @@
         "spammalware",
         "spam-tool",
         "spamtool",
-        "spammer"
+        "spammer",
+        {
+          "description": "Mass-mailing virus written in a high Level Languages, such as Pascal, C, C++ or Basic",
+          "match": [
+            "HLLM"
+          ]
+        }
       ]
     },
     "metamorphic_virus": {
@@ -295,7 +347,6 @@
     "mid_infector": {
       "description": "A type of file_infecting virus which places its code in the middle of files it infects. It may move a section of the original code to the end of the file, or simply push the code aside to make space for its own code.",
       "match": [
-        "hllm",
         "mid_infector"
       ]
     },
@@ -349,6 +400,12 @@
         {
           "pattern": "banker(\\d)?"
         },
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?Banker"
+        },
         "banker",
         "BankFraud"
       ],
@@ -368,6 +425,12 @@
       "match": [
         {
           "pattern": "(?:PWS|pws|psw|password)(?:[-_]?(?:steal(?:er)?|thief|tool))?(?:[-_.]?(?:AOL|MSN))?"
+        },
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?(?:PWS|PSW|GameThief)"
         },
         "PWS",
         "PSW",
@@ -394,8 +457,13 @@
         {
           "pattern": "infect(or)?"
         },
-        "hllo",
-        "infector"
+        "infector",
+        {
+          "description": "A malicious program that secretly integrates itself into program or data files. It spreads by integrating itself into more files each time the host program is run",
+          "match": [
+            "HLLO"
+          ]
+        }
       ]
     },
     "polymorphic_virus": {
@@ -407,6 +475,12 @@
     "sms": {
       "description": "Malware that uses SMS for malicious purpose",
       "match": [
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[-.]?SMS"
+        },
         "sms",
         "SMSSpy",
         "SMSBot",
@@ -430,8 +504,13 @@
     "prepender": {
       "description": "A file-infecting virus that inserts code at the beginning of the files it infects.",
       "match": [
-        "hllp",
-        "prepender"
+        "Prepender",
+        {
+          "description": "HLLP is a family name - all prepending viruses written in High Level Languages, such as Pascal, C, C++ or Basic, have been grouped under this name. There are several unrelated members in the family",
+          "match": [
+            "HLLP"
+          ]
+        }
       ]
     },
     "ransomware": {
@@ -440,6 +519,12 @@
       "match": [
         {
           "pattern": "ransom-?encoder"
+        },
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?(?:Ransom|Ransomware)"
         },
         "ansom",
         "filecoder",
@@ -490,6 +575,12 @@
       "description": "A fake security product that demands money to clean phony infections.",
       "malware-type": "rogue-security-software",
       "match": [
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[-.]FakeAV"
+        },
         "rogue",
         "fakeav",
         "fakav",
@@ -567,9 +658,14 @@
         {
           "pattern": "Spy(?![[:alnum:]])"
         },
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?Spy"
+        },
         "Monitor",
-        "spyware",
-        "tjnspy"
+        "spyware"
       ]
     },
     "trackware": {
@@ -599,22 +695,18 @@
       "description": "Self-replicating malware that requires human interaction to spread; also, self-replicating malware that runs and spreads by modifying and inserting itself into other programs or files.",
       "malware-type": "virus",
       "match": [
+        "Virus",
+        "Small",
         "VirusOrg",
-        {
-          "pattern": "\\bHLLC?\\b"
-        },
-        {
-          "pattern": "\\bmal(?:ware)?\\b"
-        },
+        "Malware",
+        "Mal",
         "spoofer",
-        {
-          "pattern": "\\bvirus\\b"
-        },
         "Trivial",
         {
-          "pattern": "AV[-._]?Killer",
-          "behavior": "avkiller",
-          "description": "Attempts to end antivirus processes"
+          "description": "High Level Languages, such as Pascal, C, C++ or Basic",
+          "match": [
+            "HLLC"
+          ]
         }
       ]
     },
@@ -633,8 +725,13 @@
         },
         "P2p",
         "P2e",
-        "hllw",
-        "worm"
+        "worm",
+        {
+          "description": "Worm written in a high Level Languages, such as Pascal, C, C++ or Basic",
+          "match": [
+            "HLLW"
+          ]
+        }
       ]
     }
   }
