@@ -118,6 +118,15 @@
         "KillFiles"
       ]
     },
+    "capture_system_memory": {
+      "behavior": "capture-system-memory",
+      "match": [
+        {
+          "pattern": "MemScan(?:Trojan|Backdoor)"
+        },
+        "MemScan"
+      ]
+    },
     "network_traffic_redirector": {
       "behavior": "intercept-manipulate-network-traffic",
       "match": [
@@ -160,11 +169,23 @@
         "unpacked"
       ]
     },
+    "generic": {
+      "match": [
+        "Generic",
+        "Gen",
+        "Heuri",
+        "Heuristic",
+        "Heuristics"
+      ]
+    },
     "suspicious": {
       "description": "Suspicious behavior without signature match",
       "match": [
         {
           "pattern": "\\bSusp?\\b"
+        },
+        {
+          "pattern": "^Sus(?=[.])"
         },
         "Abuse-Worry",
         "confidence",

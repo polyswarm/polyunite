@@ -49,19 +49,11 @@
       "description": "Microsoft Office files",
       "match": [
         {
-          "pattern": "(?i:MS(Excel|Word|Powerpoint|Outlook)((20)?\\d\\d)?)"
-        },
-        {
-          "pattern": "(?i:Office((20)?\\d\\d)?)"
+          "pattern": "(?:MS[.-]?)?(?:Office|Excel|Word|Powerpoint|Outlook)(?:XP|1997|97|1995|95|2000|2003|2007|2010|2013|2016|2020)?"
         },
         "Doc",
-        "MSOffice",
         "SAgent",
         "Macro",
-        "Word",
-        "Macro.Word",
-        "Excel",
-        "Macro.Excel",
         "MSGate"
       ],
       "children": {
@@ -150,6 +142,8 @@
         "W97M": {
           "description": "Word 97, 2000, XP, 2003, 2007, and 2010 macros",
           "match": [
+            "Word",
+            "Macro.Word",
             "Word97",
             "W97M"
           ]
@@ -163,7 +157,13 @@
         "X97M": {
           "description": "Excel 97, 2000, XP, 2003, 2007, and 2010 macros",
           "match": [
-            "X97M"
+            "Excel",
+            "Macro.Excel",
+            "X97M",
+            "X2000M",
+            "X2003M",
+            "X2007M",
+            "X2010M"
           ]
         },
         "XF": {

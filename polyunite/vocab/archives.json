@@ -95,6 +95,7 @@
       "description": "Innosetup",
       "archive_type": "InnoSetup",
       "match": [
+        "Inno",
         "InnoSetup"
       ]
     },

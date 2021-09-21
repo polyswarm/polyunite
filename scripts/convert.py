@@ -21,27 +21,68 @@ Win32/Sorter.AutoVirus.70YPInstallerCRC.A
 Win32/Sorter.AutoVirus.ExeKiller.A
 Win32/Sorter.AutoVirus.70DLGInstall.B
 
+# Only use "valid" variants
 
-# Other
-Trojan.Clicker-DOTHETUK!8.E825
+Don't add variants if they could interfere with a "family name" pattern
+
+# Family-name expansion
+
+    Heur.Krypt.f
+    Heur.ARP.c
+
+# Handle this
+
+    PCK.Dumped
+    Micro.Relax
+
+## And this
+
+    MULDROP.Trojan
+    Sivis.Win32
+    CIH.Win32
+
+Do label matches first.
+
+# Do "account types"
+
+    PHISH.Yhoo
+
+# Format
+
+    |    Prefix    |         |Family|           |  Variant  |
+    possible-Threat:Download.Virtumod-Heuristic.11ef904de9df0.Generic1
+                    | Type |          | Affix |               |Suffix|
 
 """
 
 ACCOUNT_TYPE = VocabRegex.from_resource('ACCOUNT_TYPE')
 _LXL = group(
     'Net', 'Sorter.Autovirus', 'Sorter.AVE', 'Notifier', 'IRC-Worm', 'Behav', 'Expiro', 'Intended',
-    'WOX', 'Mailfinder', LABELS, OSES, ARCHIVES, MACROS, LANGS, HEURISTICS,
+    'WOX', 'Mailfinder', LABELS, OSES, ARCHIVES, MACROS, LANGS,
     BEHAVIORS, ACCOUNT_TYPE
 )
 _FAMILY = group(
-    '((CVE|Cve|cve|CAN)([-_]?([0-9]{4})([-_]?(([0-9]+)[[:alpha:]]*))?)?)',
-    '((?i:MS)([0-9]{2})-?([0-9]{1,3}))',
-    r'\w+',
-    '[A-Z]{1,3}-[A-Z]*(?:[A-Z][a-z]+)+',
-    '[A-Z][[:alnum:]]*-[[:alnum:]]+',
-    'km_[a-f0-9]+',
+    r'((?:Exp[.]|Exploit[.]))?((CVE|Cve|cve|CAN)([-_]?([0-9]{4})([-_]?(([0-9]+)[[:alpha:]]*))?)?)',
+    r'((?:Exp[.]|Exploit[.]))?((?i:MS)([0-9]{2})-?([0-9]{1,3}))',
+    r'[[:alnum:]]+',
+    r'[0-9]{1,4}[[:alpha:]]+',
+    r'[A-Z]{1,3}-[A-Z]*(?:[A-Z][a-z]+)+',
+    r'[A-Z][[:alnum:]]*-[[:alnum:]]+',
+    r'[A-Z][[:alpha:]]+[_-]([A-Z][[:alpha:]]*|[A-Z0-9]+)',
+    r'([A-Z][[:alpha:]]*|[A-Z0-9]+)[_-][A-Z][[:alpha:]]*',
+    # TrojanDownloader:Office/Specikr_macro.7e54b364
+    r'[A-Z][a-z]{2,}_[a-z]{2,}',
+    # TrojanDropper:Win32/ExeBundle_2x.95aedcbc
+    r'[A-Z][a-z]+[A-Z][a-z]+_[0-9a-z]{1,5}',
+    # Trojan:Package/phishing.2
+    r'[A-Z][_-][A-Z0-9][[:alpha:]]+',
+    # Trojan.Win32.BO-plugin-RCR.gtgj
+    r'[A-Z][[:alnum:]]-[a-z]+[A-Z][[:alnum:]]+',
+    # Marker.Win32.PE-Exe.bxzo
+    r'[A-Z][[:alpha:]]*[-_][A-Z][[:alpha:]]',
+    r'km_[a-f0-9]+',
     # Win32/Sorter.AutoVirus.70YPInstallerCRC.A
-    '70[A-Za-z]+',
+    r'70[A-Za-z]+',
     _LXL,
 )
 
@@ -116,8 +157,8 @@ def convert(s, label=_LXL, family=_FAMILY):
         r'[-][0-9]{5,7}[-][0-9]',
         # Win.Adware.Agent-1138899
         r'[-][0-9]{7}',
-        # Trojan:Win32/Generic.ec120d93
-        r'[.][a-f0-9]{8}',
+        # Trojan.Win32.Generic.13AC019D	Trojan:Win32/Generic.ec120d93
+        r'[.](?:[a-f0-9]{8}|[A-F0-9]{8})',
         # Malware.Heuristic!ET#100%
         r'!ET(#(100|[1-9][0-9]?)%)?',
         # AdWare.Win32.HotBar.da#RSUNPACK.a, Backdoor.Win32.RemoteABC.exb#RSUNPACK.a
@@ -171,11 +212,11 @@ def convert(s, label=_LXL, family=_FAMILY):
     ]
 
     s = re.escape(s)
-    s = s.replace('<Label>', label).replace('<Family>', family).replace('<Kind>', family)
+    s = s.replace('<Label>', label).replace('<Family>', family).replace('<Kind>', family).replace('<Language>', rf'(?:{LANGS}|{MACROS})')
     vg = '|'.join(variants)
     pz = '|'.join(prefixes)
     nz = '|'.join(namesuffix)
-    pat = re.compile(rf'^({pz})*{s}({nz})?({SUFFIXES:-g})?({vg})?({SUFFIXES:-g})?$')
+    pat = re.compile(rf'^({pz})*{s}(({SUFFIXES:-g})?{vg}|(?<![A-Za-z][a-z]+(*FAIL)))({SUFFIXES:-g})?$')
     return pat
 
 
@@ -209,6 +250,9 @@ patterns = [
         # '<Label><Label>:<Label>/<Family>',
         # Trojan-Dropper.Win32.Multibinder
         '<Label>-<Label>.<Label>.<Family>',
+        'Exp.<Language>.<Family>',
+        # Trojan ( 0fedaa428f )
+        '<Label> ( <Variant> )',
     ]
 ] + [
     # re.compile(rf'^{_LXL}({_LXL})?:{_LXL}/.+.[a-f0-9]{{8}}$'),

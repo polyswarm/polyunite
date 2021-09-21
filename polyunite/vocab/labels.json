@@ -144,7 +144,7 @@
           "malware-type": [
             "trojan"
           ],
-          "pattern": "(?:Trojan|Tjn|Trjn)[.-]?(?:Downloader|DL|Dloader|Dloader|Dwnldr|Downldr|Loader)"
+          "pattern": "(?:Trojan|Tjn|Trjn)[.-]?(?:Downloader|DL|Dloader|Dloader|Dwnldr|Downldr|Loader|Dwnlder|Downlder)"
         },
         "Porn-Downloader",
         "Downlaoder",
@@ -398,13 +398,10 @@
       "description": "A type of trojan designed to perform banking fraud.",
       "match": [
         {
-          "pattern": "banker(\\d)?"
-        },
-        {
           "malware-type": [
             "trojan"
           ],
-          "pattern": "Trojan[.-]?Banker"
+          "pattern": "Trojan[.-]?(?:Banker|Banke)"
         },
         "banker",
         "BankFraud"
@@ -579,7 +576,7 @@
           "malware-type": [
             "trojan"
           ],
-          "pattern": "Trojan[-.]FakeAV"
+          "pattern": "Trojan[-.]?FakeAV"
         },
         "rogue",
         "fakeav",
@@ -611,9 +608,7 @@
     "security_assessment_tool": {
       "description": "A program that can be used to gather information for unauthorized access to computer systems.",
       "match": [
-        {
-          "pattern": "(?<=[.])Tool(?=[.])"
-        },
+        "Tool",
         "virtool",
         "hack-tool",
         "VirusConstructor",
@@ -632,15 +627,11 @@
     "exploit": {
       "description": "Either a small piece of code that activates a command-line interface to a system that can be used to disable security measures, open a backdoor, or download further malicious code; or a small piece of code that opens a system up for exploitation, sometimes by not necessarily involving a command-line shell.",
       "match": [
-        {
-          "pattern": "exp\\b"
-        },
-        {
-          "pattern": "\\bhack\\b"
-        },
-        "exploit",
-        "shellcode",
-        "shellkode"
+        "Hack",
+        "Hack.Exploit",
+        "Exploit",
+        "Shellcode",
+        "Shellkode"
       ],
       "children": {
         "CVE": {
@@ -695,6 +686,7 @@
       "description": "Self-replicating malware that requires human interaction to spread; also, self-replicating malware that runs and spreads by modifying and inserting itself into other programs or files.",
       "malware-type": "virus",
       "match": [
+        "MalwareScope",
         "Virus",
         "Small",
         "VirusOrg",

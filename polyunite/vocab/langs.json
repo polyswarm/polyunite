@@ -147,6 +147,7 @@
       "match": [
         "JSON",
         "JSc",
+        "Script.JS",
         "jsc",
         "JS"
       ]

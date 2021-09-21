@@ -20,6 +20,13 @@
         "Skype"
       ]
     },
+    "Facebook": {
+      "account-type": "facebook",
+      "match": [
+        "FBook",
+        "Facebook"
+      ]
+    },
     "Yahoo": {
       "account-type": "yahoo",
       "match": [
@@ -44,6 +51,13 @@
           "pattern": "Trojan[.-]?(IM|IMMSG)"
         },
         "IM"
+      ]
+    },
+    "ICQ": {
+      "description": "ICQ instant messenger",
+      "account-type": "icq",
+      "match": [
+        "ICQ"
       ]
     },
     "QQ": {
