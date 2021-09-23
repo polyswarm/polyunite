@@ -51,8 +51,7 @@ def FAMILY_ID(
         # e.x `Hello_World99` & `Emotet`
         r'([0-9]{1,3})?[A-Z]{4,8}([0-9]{1,3})?',
         # Handle common year prefixes, like `2008Virus`
-        r'(?!.{1,3}($|[.!#@]))'
-        r'((?:20[012]\d|19[89]\d)(?=[A-Z]))?'
+        r'(?!.{1,3}($|[.!#@]))((?:20[012]\d|19[89]\d)(?=[A-Z]))?'
         # Handle special prefixes, like `iPhone`, `X-Connect` or `eWorm`
         r'(?:([a-z]{1,2}|[iIeExX]-)(?=[A-Z]))?'
         # Handle up to 5 capitalized words, optionally separated by '-' or '_'
@@ -65,8 +64,7 @@ def FAMILY_ID(
         r')?'
         r'){i<=2:\d}'
         # Handle upper-case suffixes like `FakeAV`
-        r'((?:[0-9]{1,3}|[A-Z]{1,3})(?![a-zA-Z0-9]))?'
-        r'((?<=[a-zA-Z0-9])_[a-z]+)?',
+        r'((?:[0-9]{1,3}|[A-Z]{1,3})(?![a-zA-Z0-9]))?((?<=[a-zA-Z0-9])_[a-z]+)?',
     ],
 ):
     return group(

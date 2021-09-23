@@ -47,6 +47,7 @@
     },
     "MSOffice": {
       "description": "Microsoft Office files",
+      "platform": "microsoft-office",
       "match": [
         {
           "pattern": "(?:MS[.-]?)?(?:Office|Excel|Word|Powerpoint|Outlook)(?:XP|1997|97|1995|95|2000|2003|2007|2010|2013|2016|2020)?"
@@ -80,7 +81,10 @@
           "match": [
             "O97",
             "O97M",
-            "Office2k"
+            "Office2k",
+            "O2000M",
+            "O2007M",
+            "O2020M"
           ]
         },
         "OM": {
@@ -100,7 +104,10 @@
         "PP97M": {
           "description": "PowerPoint 97, 2000, XP, 2003, 2007, and 2010 macros",
           "match": [
-            "PP97M"
+            "PP97M",
+            "P2000M",
+            "P2007M",
+            "P2020M"
           ]
         },
         "PPM": {
@@ -145,7 +152,10 @@
             "Word",
             "Macro.Word",
             "Word97",
-            "W97M"
+            "W97M",
+            "W2000M",
+            "W2007M",
+            "W2020M"
           ]
         },
         "WM": {

@@ -133,6 +133,22 @@
         "INI"
       ]
     },
+    "Golang": {
+      "match": [
+        "Golang",
+        "WinGo"
+      ]
+    },
+    "FTP": {
+      "match": [
+        "FTP"
+      ]
+    },
+    "HTTP": {
+      "match": [
+        "HTTP"
+      ]
+    },
     "IRC": {
       "description": "mIRC/pIRC scripts",
       "match": [
@@ -226,7 +242,8 @@
       "description": "Powershell",
       "implementation-language": "powershell",
       "match": [
-        "PowerShell"
+        "PowerShell",
+        "PS1"
       ]
     },
     "Python": {

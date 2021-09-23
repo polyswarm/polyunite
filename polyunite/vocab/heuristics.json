@@ -4,6 +4,16 @@
     "heuristic"
   ],
   "children": {
+    "damaged": {
+      "match": [
+        {
+          "pattern": "Damaged[._]?File"
+        },
+        "damaged.copy.of",
+        "damaged-copy-of",
+        "damaged copy of"
+      ]
+    },
     "generic": {
       "description": "Generic virus detection",
       "match": [
@@ -13,9 +23,6 @@
         {
           "pattern": "Siggen[0-9]?"
         },
-        "damaged.copy.of",
-        "damaged-copy-of",
-        "damaged copy of",
         "VBGeneric",
         "MGen",
         "Gen",

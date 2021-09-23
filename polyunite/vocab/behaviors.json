@@ -18,8 +18,15 @@
         "matchicon",
         "md5sect",
         "nspack",
+        "Obfuscated",
         "obfus",
         "obfusc",
+        {
+          "malware-type": [
+            "trojan"
+          ],
+          "pattern": "Trojan[.-]?Crypter"
+        },
         {
           "pattern": "obfuscat(?:e|ed|or|ed|ing)"
         },
@@ -178,6 +185,11 @@
         "Heuristics"
       ]
     },
+    "antiarj": {
+      "match": [
+        "AntiArj"
+      ]
+    },
     "suspicious": {
       "description": "Suspicious behavior without signature match",
       "match": [
@@ -186,6 +198,9 @@
         },
         {
           "pattern": "^Sus(?=[.])"
+        },
+        {
+          "pattern": "Suspect[0-9]?"
         },
         "Abuse-Worry",
         "confidence",

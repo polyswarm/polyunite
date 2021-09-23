@@ -102,7 +102,7 @@
         },
         {
           "__example__": "virus.html.gen03.726",
-          "pattern": "[.]gen0?[1-9]"
+          "pattern": "[.]gen0?[1-9]x?"
         },
         {
           "pattern": "[.]GEN[0-9]*"
@@ -124,7 +124,8 @@
     "MUE": {
       "description": "Who knows what it means",
       "match": [
-        ".mue"
+        ".mue",
+        ".MUE"
       ]
     },
     "kit": {
@@ -197,6 +198,16 @@
         "!rfn"
       ]
     },
+    "noneish": {
+      "match": [
+        ".None",
+        "!tfe",
+        ".MF",
+        ".cfg",
+        ".Cfg",
+        ".repd"
+      ]
+    },
     "hook": {
       "match": [
         ".Hook"
@@ -213,12 +224,6 @@
       "match": [
         "@mm",
         "@m"
-      ]
-    },
-    "mue": {
-      "description": "an internal category used to refer to some threats",
-      "match": [
-        ".mue"
       ]
     },
     "server": {
