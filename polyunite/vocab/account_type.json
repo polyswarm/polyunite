@@ -50,7 +50,8 @@
           ],
           "pattern": "Trojan[.-]?(IM|IMMSG)"
         },
-        "IM"
+        "IM",
+        "IMMSG"
       ]
     },
     "ICQ": {
@@ -70,6 +71,7 @@
           ],
           "pattern": "Trojan[.-]?(QQ|QQMSG)"
         },
+        "QQMSG",
         "QQ"
       ]
     }

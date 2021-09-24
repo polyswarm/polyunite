@@ -41,8 +41,7 @@
         "backdoor",
         "backdoorr",
         {
-          "pattern": "(?<!\\w)BC(?!\\w)",
-          "description": "Backdoor Connector"
+          "pattern": "(?<!\\w)BC(?!\\w)"
         },
         "proxy"
       ]
@@ -99,7 +98,9 @@
     },
     "ddos": {
       "description": "A tool used to perform a distributed denial of service attack.",
-      "malware-type": "ddos",
+      "malware-type": [
+        "ddos"
+      ],
       "match": [
         {
           "malware-type": [
@@ -134,12 +135,6 @@
           ],
           "pattern": "(?:Trojan|Tjn|Trjn)[.-]?(?:Downloader|DL|Dloader|Dloader|Dwnldr|Downldr|Loader|Dwnlder|Downlder|Downlaoder)"
         },
-        {
-          "malware-type": [
-            "virus"
-          ],
-          "pattern": "Virus[.-]?(?:Downloader|DL|Dloader|Dloader|Dwnldr|Downldr|Loader|Dwnlder|Downlder|Downlaoder)"
-        },
         "Porn-Downloader",
         "Downlaoder",
         "Downlder",
@@ -161,7 +156,19 @@
         "dwnldr",
         "exedown",
         "macrodown"
-      ]
+      ],
+      "children": {
+        "downloader-virus": {
+          "malware-type": [
+            "virus"
+          ],
+          "match": [
+            {
+              "pattern": "Virus[.-]?(?:Downloader|DL|Dloader|Dloader|Dwnldr|Downldr|Loader|Dwnlder|Downlder|Downlaoder)"
+            }
+          ]
+        }
+      }
     },
     "dropper": {
       "description": "A type of Trojan that deposits an enclosed payload onto a destination host computer by loading itself into memory, extracting the malicious payload, and then writing it to the file system.",
@@ -178,8 +185,7 @@
         "docdrp",
         "drop",
         {
-          "pattern": "\\bDP[-.]\\b",
-          "description": "Dropper shortcode"
+          "pattern": "\\bDP[-.]\\b"
         },
         "Droper",
         "dropped",
@@ -229,10 +235,6 @@
         "Harm",
         "Hoax",
         "Joke",
-        {
-          "const": "KMS",
-          "description": "Tool to enable illegal use of Microsoft Products"
-        },
         "Keygen",
         "Misleading",
         "PUA",
@@ -242,7 +244,15 @@
         "Risktool",
         "Settings-Modifier",
         "Toolbar"
-      ]
+      ],
+      "children": {
+        "greyware-cracks": {
+          "description": "Tool to enable illegal use of Microsoft Products",
+          "match": [
+            "KMS"
+          ]
+        }
+      }
     },
     "implant": {
       "description": "Code inserted into an existing program using a code patcher or other tool.",
@@ -305,14 +315,16 @@
         "SpamMalware",
         "Spam-Tool",
         "SpamTool",
-        "Spammer",
-        {
+        "Spammer"
+      ],
+      "children": {
+        "mass-mailer-high-level": {
           "description": "Mass-mailing virus written in a high Level Languages, such as Pascal, C, C++ or Basic",
           "match": [
             "HLLM"
           ]
         }
-      ]
+      }
     },
     "metamorphic_virus": {
       "description": "A virus that changes its own code with each infection."
@@ -328,9 +340,9 @@
     },
     "nonmalware": {
       "description": "Not a virus",
-      "tags": [
-        "nonmalware"
-      ],
+      "tags": {
+        "analysis-conclusion": "nonmalware"
+      },
       "match": [
         {
           "pattern": "(?i:eicar(?>[^a-z]?test(?>[^a-z]?file)?)?(?:[.]com)?)"
@@ -368,17 +380,17 @@
         },
         "Banker",
         "BankFraud"
-      ],
-      "steal_cryptocurrency_data": {
-        "description": "Steals cryptocurrency data that may be stored on a system (e.g., Bitcoin wallets).",
-        "tags": {
-          "behavior": "steal-cryptocurrency-data"
-        },
-        "match": [
-          "CoinThief",
-          "CoinStealer"
-        ]
-      }
+      ]
+    },
+    "steal_cryptocurrency_data": {
+      "description": "Steals cryptocurrency data that may be stored on a system (e.g., Bitcoin wallets).",
+      "tags": {
+        "behavior": "steal-cryptocurrency-data"
+      },
+      "match": [
+        "CoinThief",
+        "CoinStealer"
+      ]
     },
     "password_stealer": {
       "description": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system.",
@@ -414,14 +426,16 @@
         {
           "pattern": "infect(or)?"
         },
-        "infector",
-        {
+        "infector"
+      ],
+      "children": {
+        "infector_high_level": {
           "description": "A malicious program that secretly integrates itself into program or data files. It spreads by integrating itself into more files each time the host program is run",
           "match": [
             "HLLO"
           ]
         }
-      ]
+      }
     },
     "polymorphic_virus": {
       "description": "A type of virus that encrypts its code differently with each infection (or with each generation of infections).",
@@ -465,14 +479,16 @@
     "prepender": {
       "description": "A file-infecting virus that inserts code at the beginning of the files it infects.",
       "match": [
-        "Prepender",
-        {
+        "Prepender"
+      ],
+      "children": {
+        "prepender-high-level": {
           "description": "HLLP is a family name - all prepending viruses written in High Level Languages, such as Pascal, C, C++ or Basic, have been grouped under this name. There are several unrelated members in the family",
           "match": [
             "HLLP"
           ]
         }
-      ]
+      }
     },
     "ransomware": {
       "description": "Malware that encrypts files on a victim's system, demanding payment of ransom in return for the access codes required to unlock files.",
@@ -485,12 +501,6 @@
           "pattern": "(?:Trojan|Tjn|Trjn)[.-]?(?:Ransom|Ransomware|Crypt)"
         },
         {
-          "malware-type": [
-            "virus"
-          ],
-          "pattern": "Virus[.-]?(?:Ransom|Ransomware)"
-        },
-        {
           "pattern": "(?:Ransom|Ransomware|File)[._-]?(?:Cryptor|Crypter|Coder|Lock|Encoder)"
         },
         "Ransom",
@@ -499,7 +509,17 @@
         "ransm",
         "RansomX",
         "Virlock"
-      ]
+      ],
+      "children": {
+        "ransomware-virus": {
+          "malware-type": [
+            "virus"
+          ],
+          "match": [{
+          "pattern": "Virus[.-]?(?:Ransom|Ransomware)"
+        }]
+        }
+      }
     },
     "remote_access_trojan": {
       "description": "A remote access trojan program (or RAT), is a trojan horse capable of controlling a machine through commands issued by a remote attacker.",
@@ -645,14 +665,17 @@
         "Malware",
         "Mal",
         "Spoofer",
-        "Trivial",
-        {
+        "Trivial"
+
+      ],
+      "children": {
+        "virus-high-level": {
           "description": "High Level Languages, such as Pascal, C, C++ or Basic",
           "match": [
             "HLLC"
           ]
         }
-      ]
+      }
     },
     "web_bug": {
       "description": "Code embedded in a web page or email that checks whether a user has accessed the content (e.g., a tiny, transparent GIF image)."
@@ -668,14 +691,16 @@
         "P2P",
         "P2p",
         "P2e",
-        "Worm",
-        {
+        "Worm"
+      ],
+      "children": {
+        "HLLW": {
           "description": "Worm written in a high Level Languages, such as Pascal, C, C++ or Basic",
           "match": [
             "HLLW"
           ]
         }
-      ]
+      }
     }
   }
 }

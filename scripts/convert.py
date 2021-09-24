@@ -167,67 +167,108 @@ _LXL = group(
 #     r'70[A-Z]\w+',
 #     _LXL,
 # )
+'''
+([A-Z][a-z]+)+
+'''
 _FAMILY = group(
     r'((?:Exp|Exploit)[.])?((CVE|Cve|cve|CAN)([_.-]?([0-9]{4})([_.-]?(([0-9]+)[[:alpha:]]*))?)?)',
     r'((?:Exp|Exploit)[.])?((?i:MS)([0-9]{2})-?([0-9]{1,3}))',
-    r'([a-z]+|[0-9]+)?[A-Z][A-Za-z0-9]+',
-    # # VB	CXX
-    # r'[A-Z]{2,3}',
+    # r'([a-z]+|[0-9]+)?[A-Z][A-Za-z0-9]+',
+    ## BASIC
+    # r'(?:[A-Z][a-z]{4,}){i<=4:[A-Z0-9]}',
+    r'[a-z]?(?:[A-Z]+[a-z]+)+[0-9]+',
+    # iBryte
+    r'[a-z][A-Z][a-z]{3,}',
+    r'[a-z]?[A-Z](?:[[:alpha:]]{2,}){i<=3:[-_]}[[:alpha:]]',
+    r'[a-z]?(?:[A-Z](?:[a-z]{3,}){i<=3:[-_]}[a-z]){i<=6:[0-9]}',
+    r'(?:[A-Z][a-z]{4,}){s<=4:[A-Z0-9]}',
+    r'(?:[iIeExXu]-?)?[A-Z](?:[a-z]{4,}){s<=4:[A-Z_-]}[A-Za-z]',
+    r'[A-Z]{1,2}[A-Za-z]+',
+    r'[A-Z]{2,3}-[A-Z][A-Za-z]{2,}',
+    r'(?i:BO2K|JS|Lnk|Ag|njRAT|ICQ|IRC|VB|HTML|WOW|Wow|Fgt|Udr|BHO|Bho|WoW|LMir)',
+    # mIRC	njRAT
+    r'[a-z]{1,2}(?:[A-Z]{3,})',
+    # r'[A-Z](?:[a-z]{4,}){s<=2,i<=4:[-A-Z0-9]}[a-zA-Z]',
+    # # # VB	CXX
+    # # r'[A-Z]{2,3}',
 
-    # # SMS_Attacker,
-    # r'[A-Z]+_[A-Z][a-z]+',
+    # # # SMS_Attacker,
+    # # r'[A-Z]+_[A-Z][a-z]+',
 
-    # # BlackstoneUSPL,
-    # r'[A-Z][a-z]{3,}[A-Z]+',
+    # # # BlackstoneUSPL,
+    # # r'[A-Z][a-z]{3,}[A-Z]+',
 
-    # Serv-U
-    r'[A-Z][a-z]+-[A-Z0-9]',
+    # # Serv-U
+    # r'[A-Z][a-z]+-[A-Z0-9]',
 
-    # PDF-U3D
-    r'[A-Z][A-Z0-9][-_.][A-Z][A-Z0-9]',
+    # # PDF-U3D
+    # r'[A-Z][A-Z0-9][-_.][A-Z][A-Z0-9]',
 
-    # # PEF13C	BO2K
-    # r'[A-Z][A-Z0-9]{3,}',
+    # # # PEF13C	BO2K
+    # # r'[A-Z][A-Z0-9]{3,}',
 
-    # # njRAT
-    # r'[a-z0-9]{2,}[A-Z]{3,}',
+    # ## MEDIUM
+    # r'[0-9]{1,2}[a-z]{4,}',
+    # r'[A-Z](?:[a-z]{3,}){i<=4:[A-Z0-9-_]}[a-z]',
+    # r'[A-Z](?:[a-z]{4,}){s<=3:[A-Z0-9]}'
 
-    # # 4shared
-    # r'[0-9][A-Za-z][a-z]{2,}',
+    # # # # njRAT
+    # r'[a-z0-9]{2,}(?:[A-Z]{3,}){i<=4:[0-9]}',
+    # r'(?:([A-Z]{1,3}|[A-Z][a-z]+)[-_][A-Z][a-z]+){i<=2:[0-9]}',
+    # r'(?:[A-Z][a-z]+[-_][A-Z]+){i<=2:[0-9]}',
+    # r'[a-z][A-Z]+[a-z]{2,}',
+    # r'(?:[A-Z]{3,}-[A-Z]{3,}){d<=2:[A-Z]}',
+    # r'(?:DoS|DDos)-[A-Z][[:alnum:]]+',
 
-    # # T57iq0ngh
-    # r'[A-Z][A-Z0-9]+[a-z0-9]{3,}',
+    # ## MEDIUM HIGH
+    # r'[A-Z]{2,}[a-z]{2,}',
+    # r'[A-Z](?:[a-z]{2,}){}'
+    # r'[A-Z][a-z][A-Z]',
+    # r'[A-Z][a-z]',
+    # r'[A-Z][a-z]{2,3}',
 
-    # VB-Agent
-    r'[A-Z]{2}-[A-Z]+[a-z]{3,}',
+    # ## High
+    # r'[a-z](?:[a-z]+){i<=5:[A-Z0-9]}',
+    # r'[A-Z]{4}[0-9]{4}',
+    # r'[A-Z]+',
 
-    # # SillyP2p, SillyP2P, Silly_P2P, Silly.P2P
-    # r'[A-Z][a-z][._]?[A-Z0-9]{2,4}',
-    r'([a-z]{1,2}|[iIeExXu]-?|[A-Z]?[0-9]{1,5})?[A-Z]+[a-z]+([_-]?([A-Z]+[a-z]+|[0-9]{1,5}[a-z]+)){,3}(?:[0-9]{1,6}|[A-Z]{1,6})?',
 
-    # TrojanDownloader:Office/Specikr_macro.7e54b364
-    r'[A-Z][a-z]{2,}_[a-z]{2,}',
-    # TrojanDropper:Win32/ExeBundle_2x.95aedcbc
-    r'[A-Z][a-z]+[A-Z][a-z]+_[0-9a-z]{1,5}',
-    # Trojan:Package/phishing.2
-    r'[A-Z][_-][A-Z0-9][[:alpha:]]+',
-    # Trojan.Win32.BO-plugin-RCR.gtgj
-    r'[A-Z][[:alnum:]]+-[a-z]+-[A-Z][[:alnum:]]+',
-    # Marker.Win32.PE-Exe.bxzo
-    r'[A-Z][[:alpha:]]*[-_][A-Z][[:alpha:]]',
-    r'km_[a-f0-9]+',
+    # # # 4shared
+    # # r'[0-9][A-Za-z][a-z]{2,}',
+
+    # # # T57iq0ngh
+    # # r'[A-Z][A-Z0-9]+[a-z0-9]{3,}',
+
+    # # VB-Agent
+    # r'[A-Z]{2}-[A-Z]+[a-z]{3,}',
+
+    # # # SillyP2p, SillyP2P, Silly_P2P, Silly.P2P
+    # # r'[A-Z][a-z][._]?[A-Z0-9]{2,4}',
+    # r'([a-z]{1,2}|[iIeExXu]-?|[A-Z]?[0-9]{1,5})?[A-Z]+[a-z]+([_-]?([A-Z]+[a-z]+|[0-9]{1,5}[a-z]+)){,3}(?:[0-9]{1,6}|[A-Z]{1,6})?',
+
+    # # TrojanDownloader:Office/Specikr_macro.7e54b364
+    # r'[A-Z][a-z]{2,}_[a-z]{2,}',
+    # # TrojanDropper:Win32/ExeBundle_2x.95aedcbc
+    # r'[A-Z][a-z]+[A-Z][a-z]+_[0-9a-z]{1,5}',
+    # # Trojan:Package/phishing.2
+    # r'[A-Z][_-][A-Z0-9][[:alpha:]]+',
+    # # Trojan.Win32.BO-plugin-RCR.gtgj
+    # r'[A-Z][[:alnum:]]+-[a-z]+-[A-Z][[:alnum:]]+',
+    # # Marker.Win32.PE-Exe.bxzo
+    # r'[A-Z][[:alpha:]]*[-_][A-Z][[:alpha:]]',
+    # r'km_[a-f0-9]+',
     # # Win32/Sorter.AutoVirus.70YPInstallerCRC.A	Intended/10past3.775
-    r'[1-9][0-9][A-Z]*[a-z]+(?:[0-9]+|[A-Z]+)?',
-    r'[a-z]+(?=[.][[:xdigit:]]{8}$)',
-    r'[a-z]+(?=[.][0-9]{1,2}$)',
-    r'[a-z]+(?=[.]ali[0-9]+$)',
-    r'[[:alnum:]]+[.-]based',
-    r'^[a-z]+$',
-    r'(?i:Silly.?P2P)',
-    r'[A-Z]{2}-[A-Z][[:alnum:]]+',
+    # r'[1-9][0-9][A-Z]*[a-z]+(?:[0-9]+|[A-Z]+)?',
+    # r'[a-z]+(?=[.][[:xdigit:]]{8}$)',
+    # r'[a-z]+(?=[.][0-9]{1,2}$)',
+    # r'[a-z]+(?=[.]ali[0-9]+$)',
+    # r'[[:alnum:]]+[.-]based',
+    # r'^[a-z]+$',
+    # r'(?i:Silly.?P2P)',
+    # r'[A-Z]{2}-[A-Z][[:alnum:]]+',
     _LXL,
+    rf'{_LXL}[.]({_LXL}|(?:[0-9]{1,4}|[a-z]{1,2}|[a-z]-)?[A-Z](?:[a-z]{3,}){{i<=4:[A-Z0-9]}})',
 )
-
 
 def convert(s, label=_LXL, family=_FAMILY):
     variants = (
@@ -235,10 +276,8 @@ def convert(s, label=_LXL, family=_FAMILY):
         r'[.][A-F0-9]{1,5}',
         # Trojan:Win32/Patcher.d8	GreenCaterpillar.1575f
         r'[.][a-f0-9]{1,5}',
-        # Virus.Emotet.A	Virus/W32.Ramnit.C	Trojan-Downloader.Win32.Delf.CQ
-        r'[.][A-Z]{1,2}',
-        # Trojan.Peed.JEZ
-        r'[.][A-Z]{3}',
+        # Virus.Emotet.A	Virus/W32.Ramnit.C	Trojan-Downloader.Win32.Delf.CQ	Trojan.Peed.JEZ
+        r'[.][A-Z]{1,3}',
         # Trojan.Generic19.CAKN
         r'[.][A-Z]{4}',
         # Virus.MSExcel.Laroux.Cs
@@ -383,25 +422,30 @@ def convert(s, label=_LXL, family=_FAMILY):
     return pat
 
 
+Label = None
+Family = None
+
+pattern = '{Label}/{Label}.{Family}'
+
 patterns = [
     # convert(ss, family=r'(km_[a-f0-9]+|[0-9a-z]*[A-Z][a-zA-Z0-9._-]+|[a-z]{4,})') for ss in [
     convert(ss) for ss in [
+        '<Label>.<Label>.<Label>.<Family>',
+        '<Label>.<Label>.<Family>',
+        '<Label>:<Label>/<Family>',
         # Backdoor.[OceanLotus]Salgorea!1.C3DC
         '<Label>.[<Family>]<Family>',
         # Trojan[Proxy]/Win32.Coledor
-        '<Label>[<Label>]/<Label>.<Family>',
+        '<Label>[<Label>]/<Family>',
         # Trojan ( 0fedaa428f )
         '<Label> ( <Variant> )',
         # Nestha.Win32	Alcaul.Win32
         '<Label>/<Label>.<Family>',
-        '<Label>/<Label>',
+        # '<Label>/<Label>',
         '<Label>/<Family>',
-        '<Label>.<Label>.<Label>.<Family>',
-        '<Label>.<Label>.<Family>',
-        '<Label>.<Label>',
-        '<Label>.<Family>',
-        '<Label>:<Label>/<Family>',
+        # '<Label>.<Label>',
         '<Label>:<Family>',
+        '<Label>.<Family>',
         '<Family>.<OS>',
         '<Family>',
         ##################################
@@ -422,6 +466,7 @@ patterns = [
         'Exp.<Language>.<Family>',
         # TODO Exploit.2011-3544
         # TODO Pixel.Hydra
+        # TODO 'possible-Threat.(?Taxon:binomial)'
     ]
 ] + [
     # re.compile(rf'^{_LXL}({_LXL})?:{_LXL}/.+.[a-f0-9]{{8}}$'),

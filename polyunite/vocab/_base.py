@@ -15,19 +15,23 @@ class VocabRegex:
     description: 'Optional[str]'
     aliases: 'List[str]'
 
-    def __init__(self, name, fields, *, parent=None):
+    def __init__(self, name, fields, *, config=None, parent=None):
         self.name = name
         self.parent = parent
         self.group_name = name
+        config = dict() if config is None else config
 
         if isinstance(fields, dict):
+            config = fields.get('config', {})
             self.match = [{'const': v} if isinstance(v, str) else v for v in fields.get('match', [])]
             for m in self.match:
                 if 'match' in m:
                     self.match.extend({'const': v} for v in m['match'])
             self.tags = {f.lower() for f in fields.get('tags', [])}
             self.description = fields.get('description', None)
-            self.children = [VocabRegex(n, v, parent=self) for n, v in fields.get('children', dict()).items()]
+            self.children = [
+                VocabRegex(n, v, parent=self) for n, v in fields.get('children', dict()).items()
+            ]
         else:
             raise ValueError(name, fields)
 

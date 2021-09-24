@@ -60,12 +60,23 @@
     "Linux": {
       "description": "Linux platform",
       "match": [
-        {
-          "pattern": "(?i:ELF.?(Linux|ARM|x)?\\d*)",
-          "processor-architecture": "arm"
-        },
         "Linux"
-      ]
+      ],
+      "children": {
+        "linux_arm": {
+          "tags": {
+            "processor-architecture": [
+              "arm"
+            ],
+            "match": [
+              {
+                "pattern": "(?i:ELF.?(Linux|ARM|x)?\\d*)",
+                "processor-architecture": "arm"
+              }
+            ]
+          }
+        }
+      }
     },
     "MacOSX": {
       "description": "MACOSX 10.0 or later",
@@ -169,7 +180,7 @@
         },
         "Win32": {
           "description": "Windows 32-bit platform",
-          "processor_architecture": "x86",
+          "processor-architecture": "x86",
           "match": [
             "W32",
             "Win32"
