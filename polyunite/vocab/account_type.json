@@ -1,78 +1,122 @@
 {
-  "group": "ACCOUNT_TYPE",
+  "group_name": "ACCOUNT_TYPE",
   "children": {
     "AOL": {
       "description": "AOL instant messenger",
-      "account-type": "aol",
-      "match": [
+      "tags": {
+        "account-type": [
+          "aol"
+        ]
+      },
+      "match-exact": [
         "AOL"
       ]
     },
-    "Twitter": {
-      "account-type": "twitter",
-      "match": [
-        "Twitter"
-      ]
-    },
-    "Skype": {
-      "account-type": "skype",
-      "match": [
-        "Skype"
-      ]
-    },
     "Facebook": {
-      "account-type": "facebook",
-      "match": [
-        "FBook",
-        "Facebook"
-      ]
-    },
-    "Yahoo": {
-      "account-type": "yahoo",
-      "match": [
-        "Yahoo",
-        "Yhoo"
-      ]
-    },
-    "MSN": {
-      "description": "MSN instant messenger",
-      "account-type": "msn",
-      "match": [
-        "MSN"
-      ]
-    },
-    "IM": {
-      "description": "Instan Messanger",
-      "match": [
-        {
-          "malware-type": [
-            "trojan"
-          ],
-          "pattern": "Trojan[.-]?(IM|IMMSG)"
-        },
-        "IM",
-        "IMMSG"
+      "tags": {
+        "account-type": [
+          "facebook"
+        ]
+      },
+      "match-exact": [
+        "Facebook",
+        "FBook"
       ]
     },
     "ICQ": {
       "description": "ICQ instant messenger",
-      "account-type": "icq",
-      "match": [
+      "tags": {
+        "account-type": [
+          "icq"
+        ]
+      },
+      "match-exact": [
         "ICQ"
+      ]
+    },
+    "IM": {
+      "description": "Instan Messanger",
+      "match-exact": [
+        "IM",
+        "IMMSG"
+      ],
+      "children": {
+        "IM_trojan": {
+          "tags": {
+            "malware-type": [
+              "trojan"
+            ]
+          },
+          "match-regex": [
+            "Trojan[.-]?(IM|IMMSG)"
+          ]
+        }
+      }
+    },
+    "MSN": {
+      "description": "MSN instant messenger",
+      "tags": {
+        "account-type": [
+          "msn"
+        ]
+      },
+      "match-exact": [
+        "MSN"
       ]
     },
     "QQ": {
       "description": "Tencent QQ",
-      "account-type": "tencent-qq",
-      "match": [
-        {
-          "malware-type": [
-            "trojan"
-          ],
-          "pattern": "Trojan[.-]?(QQ|QQMSG)"
-        },
-        "QQMSG",
-        "QQ"
+      "tags": {
+        "account-type": [
+          "tencent-qq"
+        ]
+      },
+      "match-exact": [
+        "QQ",
+        "QQMSG"
+      ],
+      "children": {
+        "QQ_trojan": {
+          "tags": {
+            "malware-type": [
+              "trojan"
+            ]
+          },
+          "match-regex": [
+            "Trojan[.-]?(QQ|QQMSG)"
+          ]
+        }
+      }
+    },
+    "Skype": {
+      "tags": {
+        "account-type": [
+          "skype"
+        ]
+      },
+      "match-exact": [
+        "Skype"
+      ]
+    },
+    "Twitter": {
+      "tags": {
+        "account-type": [
+          "twitter"
+        ]
+      },
+      "match-exact": [
+        "Twitter"
+      ]
+    },
+    "Yahoo": {
+      "tags": {
+        "account-type": [
+          "yahoo"
+        ]
+      },
+      "match-exact": [
+        "Yahoo",
+        "Yhoo"
       ]
     }
   }

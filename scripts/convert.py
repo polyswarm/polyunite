@@ -267,7 +267,7 @@ _FAMILY = group(
     # r'(?i:Silly.?P2P)',
     # r'[A-Z]{2}-[A-Z][[:alnum:]]+',
     _LXL,
-    rf'{_LXL}[.]({_LXL}|(?:[0-9]{1,4}|[a-z]{1,2}|[a-z]-)?[A-Z](?:[a-z]{3,}){{i<=4:[A-Z0-9]}})',
+    rf'{_LXL}[.]({_LXL}|(?:[0-9]{1,4}|[a-z]{1,2}|[a-z]-)?[A-Z](?:[a-z]+){{i<=4:[A-Z0-9]}})',
 )
 
 def convert(s, label=_LXL, family=_FAMILY):

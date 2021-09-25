@@ -1,10 +1,53 @@
 {
-  "group": "OBFUSCATIONS",
+  "group_name": "OBFUSCATIONS",
   "children": {
+    "capabilities": {
+      "match-exact": [
+        "AntiFW",
+        "AntiVM",
+        "Autorun",
+        "AVKill",
+        "KillAV",
+        "KillFiles",
+        "KillProc",
+        "KillWin",
+        "Redirector"
+      ],
+      "match-regex": [
+        "Autorunn?er[0-9]?"
+      ]
+    },
+    "certificate": {
+      "match-exact": [
+        "Revoked.Certificate",
+        "Untrusted.Certificate"
+      ]
+    },
+    "code_encryption": {
+      "description": "Encryption of the malware instance code.",
+      "match-exact": [
+        "code-encryption",
+        "encoder",
+        "encpk",
+        "EXEHeader.AntiArj",
+        "kryptk",
+        "malcrypt",
+        "PE-Encrypt"
+      ],
+      "match-regex": [
+        "[KkCc]rypt(?:ed|er|ic|or|ik)?"
+      ]
+    },
+    "hidden": {
+      "description": "Hidden code",
+      "match-exact": [
+        "binder",
+        "patched"
+      ]
+    },
     "packing": {
       "description": "Packing of the malware instance code, not including encryption.",
-      "match": [
-        "Pack",
+      "match-exact": [
         "aspack",
         "asprotect",
         "badPE",
@@ -20,12 +63,7 @@
         "nspack",
         "obfus",
         "obfusc",
-        {
-          "pattern": "obfuscat(?:e|ed|or|ed|ing)"
-        },
-        {
-          "pattern": "[pP]acke[dr][0-9]*"
-        },
+        "Pack",
         "packing",
         "parite",
         "pecompact",
@@ -42,55 +80,15 @@
         "wwpack",
         "xpack",
         "zpack"
-      ]
-    },
-    "certificate": {
-      "match": [
-        "Revoked.Certificate",
-        "Untrusted.Certificate"
-      ]
-    },
-    "hidden": {
-      "description": "Hidden code",
-      "match": [
-        "binder",
-        "patched"
-      ]
-    },
-    "capabilities": {
-      "match": [
-        "AntiVM",
-        "AntiFW",
-        "KillProc",
-        "KillFiles",
-        "KillAV",
-        "AVKill",
-        "Redirector",
-        "Autorun",
-        "KillWin",
-        {
-          "pattern": "Autorunn?er[0-9]?"
-        }
-      ]
-    },
-    "code_encryption": {
-      "description": "Encryption of the malware instance code.",
-      "match": [
-        "PE-Encrypt",
-        "EXEHeader.AntiArj",
-        "code-encryption",
-        "encoder",
-        "encpk",
-        "kryptk",
-        "malcrypt",
-        {
-          "pattern": "[KkCc]rypt(?:ed|er|ic|or|ik)?"
-        }
+      ],
+      "match-regex": [
+        "[pP]acke[dr][0-9]*",
+        "obfuscat(?:e|ed|or|ed|ing)"
       ]
     },
     "unpacked": {
       "description": "Upacked binary or code from the original malware",
-      "match": [
+      "match-exact": [
         "unpacked"
       ]
     }

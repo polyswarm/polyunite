@@ -1,232 +1,235 @@
 {
-  "group": "OPERATING_SYSTEMS",
+  "group_name": "OPERATING_SYSTEMS",
   "children": {
     "Android": {
       "description": "Android Phone OS",
-      "match": [
+      "match-exact": [
         "Andr",
         "Android",
         "AndroidOS"
       ]
     },
-    "FTP": {
-      "description": "Uses File Transfer Protocol",
-      "match": [
-        "FTP"
-      ]
-    },
     "Boot": {
       "description": "Uses or resides in the Master Boot Record (MBR) or DOS Boot Sector of an operating system",
-      "match": [
+      "match-exact": [
         "Boot",
-        "TSR",
-        "Boot-DOS"
+        "Boot-DOS",
+        "TSR"
       ]
     },
     "DOS": {
       "description": "MS-DOS",
-      "match": [
-        {
-          "pattern": "(?-i:DOS|Dos|dos)(?:[.-](?:vcl|VCL))?"
-        },
-        "MSDOS",
-        "FDOS",
+      "match-exact": [
         "DOSCOM",
+        "FDOS",
+        "MSDOS",
         "PS-MPC"
+      ],
+      "match-regex": [
+        "(?-i:DOS|Dos|dos)(?:[.-](?:vcl|VCL))?"
       ]
     },
     "EPOC": {
       "description": "Psion devices",
-      "match": [
+      "match-exact": [
         "EPOC"
+      ]
+    },
+    "FTP": {
+      "description": "Uses File Transfer Protocol",
+      "match-exact": [
+        "FTP"
       ]
     },
     "FreeBSD": {
       "description": "FreeBSD platform",
-      "match": [
+      "match-exact": [
         "FreeBSD"
-      ]
-    },
-    "Multi": {
-      "match": [
-        "Any",
-        "Application",
-        "Legacy",
-        "Multi",
-        "System",
-        "multios"
       ]
     },
     "Linux": {
       "description": "Linux platform",
-      "match": [
-        "Linux"
+      "match-exact": [
+        "Linux",
+        "ELF",
+        "Elf32",
+        "Elf64"
       ],
       "children": {
         "linux_arm": {
           "tags": {
             "processor-architecture": [
               "arm"
-            ],
-            "match": [
-              {
-                "pattern": "(?i:ELF.?(Linux|ARM|x)?\\d*)",
-                "processor-architecture": "arm"
-              }
             ]
-          }
+          },
+          "match-exact": [
+            "ELFArm",
+            "ELFArm32"
+          ]
         }
       }
     },
     "MacOSX": {
       "description": "MACOSX 10.0 or later",
-      "match": [
-        {
-          "pattern": "Mac(?:\\_|\\s|\\.)?OS(?:\\_|\\s|\\.)?X?"
-        },
+      "match-exact": [
         "Mac",
         "MacOS",
         "MacOSX",
         "OSX"
       ]
     },
+    "Multi": {
+      "match-exact": [
+        "Any",
+        "Application",
+        "Legacy",
+        "Multi",
+        "multios",
+        "System"
+      ]
+    },
     "OS2": {
       "description": "OS2 platform",
-      "match": [
+      "match-exact": [
         "OS2"
       ]
     },
     "Palm": {
       "description": "Palm operating system",
-      "match": [
+      "match-exact": [
         "Palm"
-      ]
-    },
-    "Symbian": {
-      "description": "Symbian",
-      "match": [
-        "Symbian"
       ]
     },
     "Script": {
       "description": "Interpreted",
-      "match": [
+      "match-exact": [
         "Script"
       ]
     },
     "Solaris": {
       "description": "System V-based Unix platforms",
-      "match": [
+      "match-exact": [
         "Solaris"
       ]
     },
     "SunOS": {
       "description": "Unix platforms 4.1.3 or lower",
-      "match": [
+      "match-exact": [
         "SunOS"
       ]
     },
     "SymbOS": {
       "description": "Symbian operating system",
-      "match": [
+      "match-exact": [
         "SymbOS"
       ]
     },
+    "Symbian": {
+      "description": "Symbian",
+      "match-exact": [
+        "Symbian"
+      ]
+    },
     "UKP": {
-      "match": [
+      "match-exact": [
         "UKP"
       ]
     },
     "UNIX": {
       "description": "general Unix platforms",
-      "match": [
+      "match-exact": [
         "UNIX"
       ]
     },
     "Windows": {
       "description": "Microsoft windows",
-      "match": [
+      "match-exact": [
         "Win",
         "Win32.64",
         "Win32/64",
-        {
-          "pattern": "\\bWScr\\b"
-        },
         "Windows"
       ],
       "children": {
-        "internet_explorer": {
-          "match": [
-            "ActiveX"
-          ]
-        },
         "IIS": {
           "description": "Microsoft Windows IIS Webserver",
-          "match": [
+          "match-exact": [
             "IIS"
           ]
         },
         "Win16": {
           "description": "Win16 (3.1) platform",
-          "match": [
+          "match-exact": [
             "Win16"
           ]
         },
         "Win2K": {
           "description": "Windows 2000 platform",
-          "match": [
+          "match-exact": [
             "Win2K"
           ]
         },
         "Win32": {
           "description": "Windows 32-bit platform",
-          "processor-architecture": "x86",
-          "match": [
+          "tags": {
+            "processor-architecture": [
+              "x86"
+            ]
+          },
+          "match-exact": [
             "W32",
             "Win32"
           ]
         },
         "Win64": {
           "description": "Windows 64-bit platform",
-          "processor-architecture": "x86-64",
-          "match": [
+          "tags": {
+            "processor-architecture": [
+              "x86-64"
+            ]
+          },
+          "match-exact": [
             "W64",
             "Win64"
           ]
         },
         "Win95": {
           "description": "Windows 95, 98 and ME platforms",
-          "match": [
+          "match-exact": [
             "W95",
             "Win95"
           ]
         },
         "Win98": {
           "description": "Windows 98 platform only",
-          "match": [
-            "W98",
+          "match-exact": [
             "W97",
-            "Win9x",
-            "Win98"
+            "W98",
+            "Win98",
+            "Win9x"
           ]
         },
         "WinCE": {
           "description": "Windows CE platform",
-          "match": [
+          "match-exact": [
             "WinCE"
           ]
         },
         "WinNT": {
           "description": "WinNT",
-          "match": [
+          "match-exact": [
             "WinNT"
+          ]
+        },
+        "internet_explorer": {
+          "match-exact": [
+            "ActiveX"
           ]
         }
       }
     },
     "iPhoneOS": {
       "description": "IPhone",
-      "match": [
+      "match-exact": [
         "IOS",
         "iPhoneOS"
       ]

@@ -15,19 +15,15 @@ class VocabRegex:
     description: 'Optional[str]'
     aliases: 'List[str]'
 
-    def __init__(self, name, fields, *, config=None, parent=None):
+    def __init__(self, name, fields, *, parent=None):
         self.name = name
         self.parent = parent
         self.group_name = name
-        config = dict() if config is None else config
 
         if isinstance(fields, dict):
-            config = fields.get('config', {})
-            self.match = [{'const': v} if isinstance(v, str) else v for v in fields.get('match', [])]
-            for m in self.match:
-                if 'match' in m:
-                    self.match.extend({'const': v} for v in m['match'])
-            self.tags = {f.lower() for f in fields.get('tags', [])}
+            self.aliases = list(map(re.escape, filter(None, fields.get('match-exact', []))))
+            self.patterns = list(filter(None, fields.get('match-regex', [])))
+            self.tags = fields.get('tags', dict())
             self.description = fields.get('description', None)
             self.children = [
                 VocabRegex(n, v, parent=self) for n, v in fields.get('children', dict()).items()
@@ -35,26 +31,17 @@ class VocabRegex:
         else:
             raise ValueError(name, fields)
 
-    @property
-    def aliases(self):
-        """All identifying case-insensitive strings"""
-        return map(re.escape, filter(None, (m.get('const') for m in self.match)))
-
-    @property
-    def patterns(self):
-        """All identifying regular expressions"""
-        return filter(None, (m.get('pattern') for m in self.match))
-
     @lru_cache(typed=True)
     def compile(self, start: 'int' = 0, end: 'int' = 1) -> 're.Pattern':
         """Compile regex, name groups for fields nested at least ``start`` and at most ``end`` deep"""
         return re.compile(self.pattern(start, end), re.IGNORECASE)
 
+
     def pattern(self, start: 'int' = 0, end: 'int' = 1) -> 'str':
         """Convert this grouped regular expression pattern"""
         use_group_name = start <= self.depth <= end
         name = self.group_name if use_group_name else None
-        if any(self.match) or any(self.children):
+        if self.aliases or self.patterns or self.children:
             return group(
                 *(c.pattern(start, end) for c in self.children),
                 *self.aliases,
@@ -92,7 +79,7 @@ class VocabRegex:
 
     def has_tag(self, tag):
         """Check if this vocabulary has an associated tag"""
-        return tag.lower() in self.tags
+        return tag in self.tags
 
     @classmethod
     def from_resource(cls, name: 'str') -> 'VocabRegex':

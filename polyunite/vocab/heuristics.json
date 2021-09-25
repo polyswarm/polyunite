@@ -1,59 +1,47 @@
 {
-  "group": "HEURISTICS",
-  "tags": [
-    "heuristic"
-  ],
+  "group_name": "HEURISTICS",
   "children": {
     "damaged": {
-      "match": [
-        {
-          "pattern": "Damaged[._]?File"
-        },
-        "damaged.copy.of",
+      "match-exact": [
+        "damaged copy of",
         "damaged-copy-of",
-        "damaged copy of"
+        "damaged.copy.of"
+      ],
+      "match-regex": [
+        "Damaged[._]?File"
       ]
     },
     "generic": {
       "description": "Generic virus detection",
-      "match": [
-        {
-          "pattern": "heuristics?"
-        },
-        {
-          "pattern": "Siggen[0-9]?"
-        },
-        "VBGeneric",
-        "MGen",
-        "Gen",
+      "match-exact": [
         "advml",
         "attribute",
         "behaveslike",
         "bloodhound",
         "cloud",
+        "Gen",
+        "generic",
         "genetic",
         "genmalicious",
-        {
-          "pattern": "[hH]eur[0-9]*"
-        },
-        "generic",
-        {
-          "pattern": "[gG]eneric[0-9]+"
-        },
         "Heuri",
-        "NewHeur",
         "MaliciousHeuristic",
+        "MGen",
+        "NewHeur",
         "score",
         "static",
-        "undefined"
+        "undefined",
+        "VBGeneric"
+      ],
+      "match-regex": [
+        "[gG]eneric[0-9]+",
+        "[hH]eur[0-9]*",
+        "heuristics?",
+        "Siggen[0-9]?"
       ]
     },
     "heurfamily": {
       "description": "Contains characteristics usual of a particular class of viruses",
-      "match": [
-        {
-          "pattern": "Agent[0-9]+"
-        },
+      "match-exact": [
         "agent",
         "agent_",
         "agentad",
@@ -69,6 +57,9 @@
         "symvt",
         "undefined",
         "vgeneric"
+      ],
+      "match-regex": [
+        "Agent[0-9]+"
       ]
     }
   }
