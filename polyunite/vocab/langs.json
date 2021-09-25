@@ -81,6 +81,20 @@
         "CS"
       ]
     },
+    "PE_EXE": {
+      "description": "Microsoft's Personal Executable Binary",
+      "match-exact": [
+        "PE-EXE"
+      ],
+      "children": {
+        "windows_screensaver": {
+          "description": "Microsoft Windows Screensaver",
+          "match-exact": [
+            "WScr"
+          ]
+        }
+      }
+    },
     "FTP": {
       "match-exact": [
         "FTP"
