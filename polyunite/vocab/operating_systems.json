@@ -17,28 +17,20 @@
         "TSR"
       ]
     },
-    "DOS": {
-      "description": "MS-DOS",
+    "MSDOS": {
+      "description": "Microsoft MS-DOS",
       "match-exact": [
+        "DOS",
         "DOSCOM",
         "FDOS",
         "MSDOS",
         "PS-MPC"
-      ],
-      "match-regex": [
-        "(?-i:DOS|Dos|dos)(?:[.-](?:vcl|VCL))?"
       ]
     },
     "EPOC": {
       "description": "Psion devices",
       "match-exact": [
         "EPOC"
-      ]
-    },
-    "FTP": {
-      "description": "Uses File Transfer Protocol",
-      "match-exact": [
-        "FTP"
       ]
     },
     "FreeBSD": {

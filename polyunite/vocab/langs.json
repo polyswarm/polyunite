@@ -95,11 +95,6 @@
         }
       }
     },
-    "FTP": {
-      "match-exact": [
-        "FTP"
-      ]
-    },
     "Golang": {
       "match-exact": [
         "Golang",
@@ -118,11 +113,6 @@
         "HTML",
         "iframe",
         "url"
-      ]
-    },
-    "HTTP": {
-      "match-exact": [
-        "HTTP"
       ]
     },
     "IDA": {
@@ -155,17 +145,9 @@
       ]
     },
     "INI": {
-      "description": "Uses mIRC INI files",
+      "description": "INI config files",
       "match-exact": [
         "INI"
-      ]
-    },
-    "IRC": {
-      "description": "mIRC/pIRC scripts",
-      "match-exact": [
-        "Client-IRC",
-        "IRC",
-        "mIRC"
       ]
     },
     "JS": {

@@ -1,0 +1,23 @@
+{
+  "group_name": "PROTOCOLS",
+  "children": {
+    "FTP": {
+      "match-exact": [
+        "FTP"
+      ]
+    },
+    "HTTP": {
+      "match-exact": [
+        "HTTP"
+      ]
+    },
+    "IRC": {
+      "description": "mIRC/pIRC scripts",
+      "match-exact": [
+        "Client-IRC",
+        "IRC",
+        "mIRC"
+      ]
+    }
+  }
+}

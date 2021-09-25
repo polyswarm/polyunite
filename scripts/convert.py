@@ -9,7 +9,7 @@ except:
     sys.path.append(str(Path(__file__).parent.joinpath('../tests')))
     from utils import read_family_fixtures
 
-from polyunite.vocab import TYPES, SUFFIXES, BEHAVIORS, OSES, ARCHIVES, MACROS, LANGS, HEURISTICS, LABELS
+from polyunite.vocab import TYPES, SUFFIXES, BEHAVIORS, OSES, ARCHIVES, MACROS, LANGS, HEURISTICS, LABELS, PROTOCOLS
 
 from polyunite.vocab._base import VocabRegex
 from polyunite.utils import group
@@ -62,7 +62,7 @@ ACCOUNT_TYPE = VocabRegex.from_resource('ACCOUNT_TYPE')
 _LXL = group(
     'Net', 'Sorter.Autovirus', 'Sorter.AVE', 'Notifier', 'IRC-Worm', 'Behav', 'Expiro', 'Intended',
     'Obscure', 'Server-HTTP', 'Server-FTP', 'WOX', 'Mailfinder', LABELS, OSES, ARCHIVES, MACROS, LANGS,
-    BEHAVIORS, ACCOUNT_TYPE
+    BEHAVIORS, ACCOUNT_TYPE, PROTOCOLS,
 )
 
 # Prefix
