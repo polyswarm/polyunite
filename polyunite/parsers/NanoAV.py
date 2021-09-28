@@ -1,9 +1,12 @@
-from ..vocab import FAMILY_ID, LABELS, OBFUSCATIONS, PLATFORM, VARIANT_ID
+from ..vocab import FAMILY_ID, LABELS, OBFUSCATIONS, PLATFORM, VARIANT_ID, pattern
 from ._base import Classification
 
 
 class NanoAV(Classification):
-    pattern = rf"""^
+    __av_name__ = 'NanoAV'
+    __patterns__ = (
+        pattern.EICAR_MATCH_ANYWHERE,
+        rf"""^
     (([.-]|^)
         (
             {PLATFORM}
@@ -23,4 +26,5 @@ class NanoAV(Classification):
         )?
         {VARIANT_ID()}{{,2}}
     )
-    $"""
+    $""",
+    )

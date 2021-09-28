@@ -1,9 +1,12 @@
-from ..vocab import FAMILY_ID, LABELS, PLATFORM, VARIANT_ID
+from ..vocab import FAMILY_ID, LABELS, PLATFORM, VARIANT_ID, pattern
 from ._base import Classification
 
 
 class Ikarus(Classification):
-    pattern = rf"""^
+    __av_name__ = 'Ikarus'
+    __patterns__ = (
+        pattern.EICAR_MATCH_ANYWHERE,
+        rf"""^
     (
         ([.:-]|^)
         (
@@ -55,4 +58,5 @@ class Ikarus(Classification):
        )}{{,3}}
        ([.]{PLATFORM})?
     )?
-    $"""
+    $""",
+    )

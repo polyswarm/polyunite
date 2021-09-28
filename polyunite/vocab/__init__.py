@@ -1,5 +1,6 @@
 from ..utils import group
 from ._base import VocabRegex
+from .pattern import CVE_PATTERN, MS_BULLETIN_PATTERN, EICAR_GROUP_NAME
 
 LABELS = VocabRegex.from_resource('LABELS')
 LANGS = VocabRegex.from_resource('LANGS')
@@ -8,11 +9,27 @@ MACROS = VocabRegex.from_resource('MACROS')
 OSES = VocabRegex.from_resource('OPERATING_SYSTEMS')
 HEURISTICS = VocabRegex.from_resource('HEURISTICS')
 OBFUSCATIONS = VocabRegex.from_resource('OBFUSCATIONS')
+BEHAVIORS = VocabRegex.from_resource('BEHAVIORS')
+ACCOUNT_TYPE = VocabRegex.from_resource('ACCOUNT_TYPE')
+PROTOCOLS = VocabRegex.from_resource('PROTOCOLS')
 SUFFIXES = VocabRegex.from_resource('SUFFIXES')
 PLATFORM = group(OSES, ARCHIVES, MACROS, LANGS, HEURISTICS, OBFUSCATIONS)
-
 TYPES = group(f'{LABELS}(-?(?&LABELS))?', PLATFORM, name='TYPES')
 
+VOCABDEF = rf'''
+(?(DEFINE)
+    {LABELS}
+    {LANGS}
+    {ARCHIVES}
+    {MACROS}
+    {OSES}
+    {HEURISTICS}
+    {OBFUSCATIONS}
+    {BEHAVIORS}
+    (?P<PLATFORM>(?&OPERATING_SYSTEMS)|(?&ARCHIVES)|(?&MACROS)|(?&LANGS)|(?&BEHAVIORS))
+    (?P<TYPES>(?:(?&LABELS)(-?(?&LABELS))?)|(?&PLATFORM))
+)
+'''
 
 def VARIANT_ID(*extra):
     return group(
@@ -25,10 +42,6 @@ def VARIANT_ID(*extra):
     )
 
 
-CVE_PATTERN = r'(?P<exploit>(?P<CVE>(CVE|Cve|cve)([-_]?(?P<CVEYEAR>[0-9]{4})([-_]?((?P<CVENTH>[0-9]+)[[:alpha:]]*))?)?))'
-MS_BULLETIN_PATTERN = r'(?P<exploit>(?P<microsoft_security_bulletin>(?i:MS)(?P<MSSEC_YEAR>[0-9]{2})-?(?P<MSSECNTH>[0-9]{1,3})))'
-
-
 def FAMILY_ID(
     *extra,
     CVE=CVE_PATTERN,
@@ -39,8 +52,7 @@ def FAMILY_ID(
         # e.x `Hello_World99` & `Emotet`
         r'([0-9]{1,3})?[A-Z]{4,8}([0-9]{1,3})?',
         # Handle common year prefixes, like `2008Virus`
-        r'(?!.{1,3}($|[.!#@]))'
-        r'((?:20[012]\d|19[89]\d)(?=[A-Z]))?'
+        r'(?!.{1,3}($|[.!#@]))((?:20[012]\d|19[89]\d)(?=[A-Z]))?'
         # Handle special prefixes, like `iPhone`, `X-Connect` or `eWorm`
         r'(?:([a-z]{1,2}|[iIeExX]-)(?=[A-Z]))?'
         # Handle up to 5 capitalized words, optionally separated by '-' or '_'
@@ -53,8 +65,7 @@ def FAMILY_ID(
         r')?'
         r'){i<=2:\d}'
         # Handle upper-case suffixes like `FakeAV`
-        r'((?:[0-9]{1,3}|[A-Z]{1,3})(?![a-zA-Z0-9]))?'
-        r'((?<=[a-zA-Z0-9])_[a-z]+)?',
+        r'((?:[0-9]{1,3}|[A-Z]{1,3})(?![a-zA-Z0-9]))?((?<=[a-zA-Z0-9])_[a-z]+)?',
     ],
 ):
     return group(

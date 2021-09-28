@@ -1,225 +1,234 @@
 {
-  "group": "SUFFIXES",
+  "group_name": "SUFFIXES",
   "children": {
+    "MUE": {
+      "description": "Who knows what it means",
+      "match-exact": [
+        ".mue",
+        ".MUE"
+      ]
+    },
+    "Zen": {
+      "description": "ALibaba specific field",
+      "match-exact": [
+        ".Zen"
+      ]
+    },
+    "based": {
+      "description": "containers characteristics usual to a particular class of malware",
+      "match-exact": [
+        "-based",
+        ".based",
+        ".Based",
+        ".Variant"
+      ]
+    },
     "bit": {
       "description": "an internal category used to refer to some threats",
-      "match": [
+      "match-exact": [
         "!bit"
       ]
     },
-    "cv": {
-      "description": "an internal category used to refer to some threats",
-      "match": [
-        "!cv"
+    "certificate": {
+      "match-exact": [
+        ".Cert"
+      ]
+    },
+    "client": {
+      "description": "client component",
+      "match-exact": [
+        "!cl",
+        ".Cl",
+        ".Client"
+      ]
+    },
+    "corrupted": {
+      "description": "Corrupted virus component",
+      "match-exact": [
+        ".corrupted",
+        ".Corrupted"
       ]
     },
     "cur": {
       "description": "an internal category used to refer to some threats",
-      "match": [
+      "match-exact": [
         ".cur",
         ".Cur",
         ".Cur1"
       ]
     },
+    "cv": {
+      "description": "an internal category used to refer to some threats",
+      "match-exact": [
+        "!cv"
+      ]
+    },
     "dam": {
       "description": "damaged malware",
-      "match": [
-        ".Damaged-File",
-        ".damaged",
+      "match-exact": [
         ".dam",
         ".dam#1",
         ".dam#2",
-        ".dam#3"
+        ".dam#3",
+        ".damaged",
+        ".Damaged-File"
       ]
     },
     "dha": {
       "description": "an internal category used to refer to some threats",
-      "match": [
+      "match-exact": [
         "!dha"
       ]
     },
     "dll": {
       "description": "Dynamic Link Library component of a malware",
-      "match": [
+      "match-exact": [
         "#dll",
+        ".Dll",
         ".dll",
         "@dll"
       ]
     },
-    "corrupted": {
-      "description": "Corrupted virus component",
-      "match": [
-        ".corrupted",
-        ".Corrupted"
-      ]
-    },
-    "based": {
-      "description": "containers characteristics usual to a particular class of malware",
-      "match": [
-        "-based",
-        ".based",
-        ".Based",
-        {
-          "pattern": "-Based$"
-        }
-      ]
-    },
     "dr": {
       "description": "dropper component of a malware",
-      "match": [
-        ".dr",
+      "match-exact": [
         "-Dropper",
+        ".dr",
         ".Dr"
       ]
     },
-    "heuristic": {
-      "match": [
-        {
-          "pattern": "(?P<HEURISTICS>[-.][Hh]eur)"
-        }
+    "gen": {
+      "description": "malware that is detected using a generic signature",
+      "match-exact": [
+        "-gen",
+        "-Gen",
+        ".gen",
+        ".Gen",
+        ".Siggen",
+        ".siggen"
+      ],
+      "match-regex": [
+        "[.]gen0?[1-9]x?",
+        "[.]Gen[.][1-9]",
+        "[.]GEN[0-9]*",
+        "[.]GEN[0-9]*",
+        "[.]Gen[0-9]?",
+        "[.]poly[1-9]"
       ]
     },
     "generated": {
       "description": "malware that appears to have been created with a virus authoring tool",
-      "match": [
+      "match-exact": [
         ".Generated",
         ".Generator",
         ".Maker"
       ]
     },
-    "gen": {
-      "description": "malware that is detected using a generic signature",
-      "match": [
-        ".gen",
-        ".Gen",
-        ".Siggen",
-        ".siggen",
-        {
-          "pattern": ".(gen|Gen|GEN)[0-9]+"
-        },
-        {
-          "pattern": ".Generic$"
-        },
-        "-gen",
-        "-Gen",
-        ".generic"
-      ]
-    },
-    "Zen": {
-      "description": "ALibaba specific field",
-      "match": [
-        ".zen",
-        ".Zen"
-      ]
-    },
-    "MUE": {
-      "description": "Who knows what it means",
-      "match": [
-        ".mue"
+    "hook": {
+      "match-exact": [
+        ".Hook"
       ]
     },
     "kit": {
       "description": "virus constructor",
-      "match": [
+      "match-exact": [
         ".kit"
       ]
     },
     "ldr": {
       "description": "loader component of a malware",
-      "match": [
+      "match-exact": [
         ".ldr"
       ]
     },
-    "packed": {
-      "description": "packed malawre",
-      "match": [
-        ".Packed",
-        ".packed",
-        "-Packed",
-        "-packed"
+    "mm_suffix": {
+      "description": "mass mailer",
+      "match-exact": [
+        "@m",
+        "@mm"
+      ]
+    },
+    "noneish": {
+      "match-exact": [
+        "!tfe",
+        ".cfg",
+        ".Cfg",
+        ".MF",
+        ".None",
+        ".repd"
       ]
     },
     "origin": {
       "description": "unpacked variant",
-      "match": [
+      "match-exact": [
         "-origin",
         ".origin"
       ]
     },
+    "packed": {
+      "description": "packed malawre",
+      "match-exact": [
+        "-Packed",
+        "-packed",
+        ".Packed",
+        ".packed"
+      ]
+    },
     "pak": {
       "description": "compressed malware",
-      "match": [
+      "match-exact": [
         ".pak"
       ]
     },
     "patched": {
-      "match": [
+      "match-exact": [
         ".Patched"
       ]
     },
     "pfn": {
       "description": "an internal category used to refer to some threats",
-      "match": [
+      "match-exact": [
         ".pfn"
       ]
     },
     "plock": {
       "description": "an internal category used to refer to some threats",
-      "match": [
+      "match-exact": [
         ".plock"
       ]
     },
     "plugin": {
       "description": "plug-in component",
-      "match": [
+      "match-exact": [
+        "-plugin",
         ".plugin"
       ]
     },
     "remnants": {
       "description": "remnants of a virus",
-      "match": [
+      "match-exact": [
         "!remnants"
       ]
     },
     "rfn": {
       "description": "an internal category used to refer to some threats",
-      "match": [
+      "match-exact": [
         "!rfn"
       ]
     },
     "rootkit_suffix": {
       "description": "rootkit component of that malware",
-      "match": [
+      "match-exact": [
         "!rootkit"
-      ]
-    },
-    "mm_suffix": {
-      "description": "mass mailer",
-      "match": [
-        "@mm",
-        "@m"
-      ]
-    },
-    "mue": {
-      "description": "an internal category used to refer to some threats",
-      "match": [
-        ".mue"
       ]
     },
     "server": {
       "description": "server component",
-      "match": [
+      "match-exact": [
         "!srv",
+        ".server",
         ".Srv",
         ".srv"
-      ]
-    },
-    "client": {
-      "description": "client component",
-      "match": [
-        "!cl",
-        ".Client",
-        ".Cl"
       ]
     }
   }
