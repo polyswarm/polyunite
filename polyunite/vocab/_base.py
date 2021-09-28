@@ -25,9 +25,7 @@ class VocabRegex:
             self.patterns = list(filter(None, fields.get('match-regex', [])))
             self.tags = fields.get('tags', dict())
             self.description = fields.get('description', None)
-            self.children = [
-                VocabRegex(n, v, parent=self) for n, v in fields.get('children', dict()).items()
-            ]
+            self.children = [VocabRegex(n, v, parent=self) for n, v in fields.get('children', dict()).items()]
         else:
             raise ValueError(name, fields)
 
@@ -35,7 +33,6 @@ class VocabRegex:
     def compile(self, start: 'int' = 0, end: 'int' = 1) -> 're.Pattern':
         """Compile regex, name groups for fields nested at least ``start`` and at most ``end`` deep"""
         return re.compile(self.pattern(start, end), re.IGNORECASE)
-
 
     def pattern(self, start: 'int' = 0, end: 'int' = 1) -> 'str':
         """Convert this grouped regular expression pattern"""
@@ -47,6 +44,13 @@ class VocabRegex:
                 *self.aliases,
                 *self.patterns,
                 name=name,
+            )
+
+    def literals(self):
+        if self.aliases or self.children:
+            return group(
+                *(c.literals() for c in self.children),
+                *self.aliases,
             )
 
     def iter(self) -> 'Iterator[VocabRegex]':

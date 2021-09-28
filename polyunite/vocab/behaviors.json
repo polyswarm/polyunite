@@ -167,6 +167,7 @@
         ]
       },
       "match-exact": [
+        "ProcessKiller",
         "KillProc"
       ]
     },
@@ -255,7 +256,9 @@
         "reputation",
         "suspicious",
         "threat",
-        "variant"
+        "variant",
+        "Mailfinder",
+        "Obscure"
       ],
       "match-regex": [
         "(?:variant\\s?of|looks\\s?like|behaves\\s?like|suspect(?:ed)?|probabl[ey]|modification(?:\\sof)?|possibl[ey])",

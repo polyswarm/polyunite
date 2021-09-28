@@ -61,6 +61,7 @@
       },
       "match-exact": [
         "Doc",
+        "Office.Doc",
         "Macro",
         "MSGate",
         "SAgent"
@@ -222,6 +223,7 @@
       "description": "Portable document format",
       "match-exact": [
         "PDF",
+        "PDF.DOC",
         "pdfjs"
       ]
     },
@@ -234,7 +236,8 @@
     "RTF": {
       "description": "Rich-text format",
       "match-exact": [
-        "RTF"
+        "RTF",
+        "RTF.DOC"
       ]
     },
     "SB": {

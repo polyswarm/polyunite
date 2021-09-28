@@ -212,6 +212,7 @@
         "docdl",
         "downagent",
         "downexec",
+        "Downloader",
         "Downlaoder",
         "Downlder",
         "downldexe",
@@ -823,6 +824,7 @@
         "virus_high_level": {
           "description": "High Level Languages, such as Pascal, C, C++ or Basic",
           "match-exact": [
+            "Virus.HLL",
             "HLLC"
           ]
         }
