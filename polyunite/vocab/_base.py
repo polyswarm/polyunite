@@ -1,6 +1,7 @@
 from typing import Iterator, List, Optional
 
 from functools import lru_cache
+from itertools import product
 import json
 import os.path
 import regex as re
@@ -21,7 +22,21 @@ class VocabRegex:
         self.group_name = name
 
         if isinstance(fields, dict):
-            self.aliases = list(map(re.escape, filter(None, fields.get('match-exact', []))))
+            self.aliases = fields.get('match-exact', [])
+            if 'match-combine' in fields:
+                for match_combine in fields['match-combine']:
+                    separator = match_combine.get('separator', None)
+                    if separator is None:
+                        sep_chars = ['']
+                    elif separator == 'word-break':
+                        sep_chars = ['', '.', '-', '_']
+                    else:
+                        raise KeyError(f"Invalid separator: {separator}")
+
+                    for parts in product(*match_combine['parts']):
+                        self.aliases.extend(ch.join(filter(None, parts)) for ch in sep_chars)
+
+            self.aliases = list(map(re.escape, filter(None, self.aliases)))
             self.patterns = list(filter(None, fields.get('match-regex', [])))
             self.tags = fields.get('tags', dict())
             self.description = fields.get('description', None)

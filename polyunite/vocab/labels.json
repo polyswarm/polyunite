@@ -13,9 +13,6 @@
         "AdLoad",
         "adware"
       ],
-      "match-regex": [
-        "(?<!\\w)AD(?!\\w)"
-      ],
       "children": {
         "adware_trojan": {
           "tags": {
@@ -23,8 +20,18 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?Adware"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Adware"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -47,9 +54,19 @@
         "backdoorr",
         "proxy"
       ],
-      "match-regex": [
-        "(?<!\\w)BC(?!\\w)",
-        "Server[.-]?(?:Backdoor|Proxy)"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Server"
+            ],
+            [
+              "Backdoor",
+              "Proxy"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ],
       "children": {
         "backdoor_trojan": {
@@ -58,8 +75,19 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?(?:Backdoor|Proxy)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Backdoor",
+                  "Proxy"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -77,8 +105,19 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?(?:Banker|Banke)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Banker",
+                  "Bank"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -109,8 +148,18 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?Bot"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Bot"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -141,8 +190,18 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?Clicker"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Clicker"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -157,8 +216,24 @@
         "coinhive",
         "cryptominer"
       ],
-      "match-regex": [
-        "(?:bitcoin|bit|crypto|BTC|ETH|XMR)?(?:coin)?[-]?miner"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Bitcoin",
+              "Crypto",
+              "CryptoCoin",
+              "BTC",
+              "ETH",
+              "Coin",
+              "XMR"
+            ],
+            [
+              "Miner"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ]
     },
     "data_diddler": {
@@ -179,9 +254,6 @@
         "Nuke",
         "Nuker"
       ],
-      "match-regex": [
-        "(?-i:DoS)"
-      ],
       "children": {
         "ddos_trojan": {
           "tags": {
@@ -189,8 +261,24 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?(?:DoS|DDos|IM[.-]?Flooder|Flooder|Nuke|Nuker)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "DoS",
+                  "DDoS",
+                  "IM",
+                  "IM-Flooder",
+                  "Flooder",
+                  "Nuker",
+                  "Nuke"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -227,7 +315,6 @@
         "Porn-Downloader"
       ],
       "match-regex": [
-        "\\bDL\\b",
         "Download(er)?[0-9]*"
       ],
       "children": {
@@ -237,8 +324,27 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "(?:Trojan|Tjn|Trjn)[.-]?(?:Downloader|DL|Dloader|Dloader|Dwnldr|Downldr|Loader|Dwnlder|Downlder|Downlaoder)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan",
+                  "Tjn",
+                  "Trjn"
+                ],
+                [
+                  "Downloader",
+                  "DL",
+                  "Dloader",
+                  "Dwnldr",
+                  "Downldr",
+                  "Loader",
+                  "Dwnlder",
+                  "Downlaoder"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         },
         "downloader_virus": {
@@ -247,8 +353,25 @@
               "virus"
             ]
           },
-          "match-regex": [
-            "Virus[.-]?(?:Downloader|DL|Dloader|Dloader|Dwnldr|Downldr|Loader|Dwnlder|Downlder|Downlaoder)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Virus"
+                ],
+                [
+                  "Downloader",
+                  "DL",
+                  "Dloader",
+                  "Dwnldr",
+                  "Downldr",
+                  "Loader",
+                  "Dwnlder",
+                  "Downlaoder"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -273,9 +396,6 @@
         "exedrop",
         "mdropper"
       ],
-      "match-regex": [
-        "\\bDP[-.]\\b"
-      ],
       "children": {
         "dropper_trojan": {
           "tags": {
@@ -283,8 +403,19 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "(?:Trojan|Tjn)[.-]?(?:Dropper|Droper)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Dropper",
+                  "Droper"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -305,8 +436,18 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?Exploit"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Exploit"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -353,10 +494,53 @@
         "Toolbar"
       ],
       "match-regex": [
-        "(?:Crack|Fraud|Porn|Net|Risk)[-]?Tool",
-        "(?:Software|SW|SFTWR)-?(?:Bndlr|Bundle|Bundler|Bundlr|Bndlr)",
-        "\\bTool\\b",
-        "unwanted[.]?(?:program|file)"
+        "\\bTool\\b"
+      ],
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Unwanted"
+            ],
+            [
+              "Program",
+              "File"
+            ]
+          ],
+          "separator": "word-break"
+        },
+        {
+          "parts": [
+            [
+              "Crack",
+              "Fraud",
+              "Porn",
+              "Net",
+              "Risk"
+            ],
+            [
+              "Tool"
+            ]
+          ],
+          "separator": "word-break"
+        },
+        {
+          "parts": [
+            [
+              "Software",
+              "SW",
+              "SFTWR"
+            ],
+            [
+              "Bundler",
+              "Bndlr",
+              "Bundle",
+              "Bundlr",
+              "Bndlr"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ],
       "children": {
         "greyware_cracks": {
@@ -371,18 +555,13 @@
       "description": "Code inserted into an existing program using a code patcher or other tool.",
       "match-exact": [
         "implant"
-      ],
-      "match-regex": [
-        "\\bPOS\\b"
       ]
     },
     "infector": {
       "description": "A type of trojan that spreads by attaching its code to other files.",
       "match-exact": [
+        "infect",
         "infector"
-      ],
-      "match-regex": [
-        "infect(or)?"
       ],
       "children": {
         "infector_high_level": {
@@ -419,8 +598,18 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?Keylogger"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Keylogger"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -449,11 +638,24 @@
         "Spam-Tool",
         "SpamMalware",
         "Spammer",
+        "Client-SMTP",
+        "ClientSMTP",
         "SpamTool"
       ],
-      "match-regex": [
-        "(SMTP|Email)[.-]?(?:Flooder|Spammer)",
-        "Client-?SMTP"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "SMTP",
+              "Email"
+            ],
+            [
+              "Flooder",
+              "Spammer"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ],
       "children": {
         "mass_mailer_trojan": {
@@ -462,8 +664,20 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?(?:Spammer|Mailer|SMTP)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Spammer",
+                  "Mailer",
+                  "SMTP"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         },
         "mass_mailer_high_level": {
@@ -533,8 +747,20 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?(?:PWS|PSW|GameThief)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "PWS",
+                  "PSW",
+                  "GameThief"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -553,8 +779,19 @@
         "Premium-SMS",
         "SMSSend"
       ],
-      "match-regex": [
-        "porn\\W?dialer"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Porn"
+            ],
+            [
+              "Dialer",
+              "Dial"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ],
       "children": {
         "premium_dialer_smser_trojan": {
@@ -563,8 +800,19 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[-.]?(?:Dialer|Dial)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Dialer",
+                  "Dial"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -598,8 +846,24 @@
         "RansomX",
         "Virlock"
       ],
-      "match-regex": [
-        "(?:Ransom|Ransomware|File)[._-]?(?:Cryptor|Crypter|Coder|Lock|Encoder)"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Ransom",
+              "Ransomware",
+              "File"
+            ],
+            [
+              "Cryptor",
+              "Crypter",
+              "Coder",
+              "Lock",
+              "Encoder"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ],
       "children": {
         "ransomware_trojan": {
@@ -608,8 +872,22 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "(?:Trojan|Tjn|Trjn)[.-]?(?:Ransom|Ransomware|Crypt)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan",
+                  "Tjn",
+                  "Trjn"
+                ],
+                [
+                  "Ransom",
+                  "Ransomware",
+                  "Crypt"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         },
         "ransomware_virus": {
@@ -634,8 +912,19 @@
       "match-exact": [
         "RAT"
       ],
-      "match-regex": [
-        "Remote[-._]?(?:Access|Admin)"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Remote"
+            ],
+            [
+              "Access",
+              "Admin"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ]
     },
     "resource_exploiter": {
@@ -668,8 +957,18 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[-.]?FakeAV"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "FakeAV"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -723,8 +1022,22 @@
       "match-exact": [
         "SMS"
       ],
-      "match-regex": [
-        "SMS[-._]?(?:SMS(?:Theft|Thief|Bot|Send|Spy)?)"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "SMS"
+            ],
+            [
+              "Theft",
+              "Thief",
+              "Bot",
+              "Send",
+              "Spy"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ],
       "children": {
         "sms_trojan": {
@@ -733,8 +1046,23 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[-.]?(?:SMS(?:Theft|Thief|Bot|Send|Spy)?)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "SMS",
+                  "SMSTheft",
+                  "SMSThief",
+                  "SMSBot",
+                  "SMSSend",
+                  "SMSSpy"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -760,8 +1088,20 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?(?:Spy|Monitor|Spyware)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Spy",
+                  "Monitor",
+                  "Spyware"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -841,14 +1181,39 @@
         ]
       },
       "match-exact": [
-        "I-Worm",
-        "P2e",
-        "P2P",
-        "P2p",
         "Worm"
       ],
-      "match-regex": [
-        "(?:IM|Net|P2P|Email)[-._]?Worm"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "I",
+              "IM",
+              "Net",
+              "P2e",
+              "P2P",
+              "Email"
+            ],
+            [
+              "Worm"
+            ]
+          ],
+          "separator": "word-break"
+        },
+        {
+          "parts": [
+            [
+              "Worm"
+            ],
+            [
+              "P2e",
+              "P2P",
+              "IM",
+              "Email"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ],
       "children": {
         "HLLW": {

@@ -48,8 +48,18 @@
       "match-exact": [
         "MemScan"
       ],
-      "match-regex": [
-        "MemScan(?:Trojan|Backdoor)"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "MemScan"
+            ],
+            [
+              "Trojan",
+              "Backdoor"
+            ]
+          ]
+        }
       ]
     },
     "certificate": {
@@ -115,8 +125,18 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?Notifier"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Notifier"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -154,8 +174,18 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?Sniffer"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Sniffer"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -239,8 +269,18 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?Crypter"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "Crypter"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }

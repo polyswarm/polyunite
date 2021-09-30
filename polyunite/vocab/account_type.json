@@ -47,8 +47,19 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?(IM|IMMSG)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "IM",
+                  "IMMSG"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -82,8 +93,19 @@
               "trojan"
             ]
           },
-          "match-regex": [
-            "Trojan[.-]?(QQ|QQMSG)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Trojan"
+                ],
+                [
+                  "QQ",
+                  "QQMSG"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
