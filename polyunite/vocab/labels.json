@@ -314,9 +314,6 @@
         "macrodown",
         "Porn-Downloader"
       ],
-      "match-regex": [
-        "Download(er)?[0-9]*"
-      ],
       "children": {
         "downloader_trojan": {
           "tags": {
@@ -407,10 +404,13 @@
             {
               "parts": [
                 [
+                  "Tjn",
+                  "Trjn",
                   "Trojan"
                 ],
                 [
                   "Dropper",
+                  "Droppr",
                   "Droper"
                 ]
               ],
@@ -492,9 +492,6 @@
         "riskware",
         "Settings-Modifier",
         "Toolbar"
-      ],
-      "match-regex": [
-        "\\bTool\\b"
       ],
       "match-combine": [
         {
@@ -730,15 +727,29 @@
     "password_stealer": {
       "description": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system.",
       "match-exact": [
-        "GameThief",
         "PSW",
         "PWS",
-        "PWSteal",
         "Stealer"
       ],
-      "match-regex": [
-        "(?:Info|PW|Password|PSW|PWS)[-._]?(?:Thief|Stealer)",
-        "(?:PWS|pws|psw|password)(?:[-_]?(?:steal(?:er)?|thief|tool))?(?:[-_.]?(?:AOL|MSN))?"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Game",
+              "Info",
+              "PW",
+              "Password",
+              "PSW",
+              "PWS"
+            ],
+            [
+              "Thief",
+              "Stealer",
+              "Steal"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ],
       "children": {
         "password_stealer_trojan": {
@@ -896,8 +907,19 @@
               "virus"
             ]
           },
-          "match-regex": [
-            "Virus[.-]?(?:Ransom|Ransomware)"
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "Virus"
+                ],
+                [
+                  "Ransom",
+                  "Ransomware"
+                ]
+              ],
+              "separator": "word-break"
+            }
           ]
         }
       }
@@ -1004,17 +1026,30 @@
       "match-exact": [
         "Constructor",
         "GameHack",
-        "Hack-Tool",
-        "hacktool",
         "HKTL",
         "MalMaker",
-        "Security-Tool",
-        "SecurityTool",
         "Tool",
         "ToolKit",
-        "virtool",
-        "Virtool",
         "VirusConstructor"
+      ],
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Hack",
+              "Security",
+              "Vir",
+              "Virus",
+              "Mal",
+              "Malware"
+            ],
+            [
+              "Tool",
+              "Toolkit"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ]
     },
     "sms": {
@@ -1078,9 +1113,6 @@
         "Monitor",
         "Spyware"
       ],
-      "match-regex": [
-        "Spy(?![[:alnum:]])"
-      ],
       "children": {
         "spyware_trojan": {
           "tags": {
@@ -1092,6 +1124,8 @@
             {
               "parts": [
                 [
+                  "Tjn",
+                  "Trjn",
                   "Trojan"
                 ],
                 [
@@ -1135,12 +1169,26 @@
       },
       "match-exact": [
         "Trj",
-        "TrjGen",
         "Trjn",
-        "Trojan",
-        "TrojanAPT",
-        "TrojanHorse",
-        "trojanvariant"
+        "Trojan"
+      ],
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Trj",
+              "Trjn",
+              "Trojan"
+            ],
+            [
+              "Horse",
+              "APT",
+              "Gen",
+              "Variant"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ]
     },
     "virus": {

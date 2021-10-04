@@ -437,7 +437,7 @@ VARIANTS = [
     # Js.Trojan.Agent-1553495-4663817-1
     # BC.Win.Virus.Ransom-9157.A	BC.Legacy.Exploit.Andr-2.Extra_Field	BC.Unix.Packer.UPX-7086472-2.Corrupted
     # Worm.ChineseHacker-2.a	Trojan.Win32.Ges-31.gnlo
-    r"(?:[-]\d{1,8}){1,4}(?P<_variant_extra_field>[.][A-Z]|[a-z]+|[A-Z]\w+)?",
+    r"(?:[-]\d{1,8}){1,4}(?:[.](?P<_variant_extra_field>[A-Z]|[a-z]+|[A-Z]\w+))?",
     # Win.Trojan.B-466	Win.Worm.R-97
     r"[.][A-Z]-[1-9][0-9]*",
     # Trojan.CYWATCH-A-000067
