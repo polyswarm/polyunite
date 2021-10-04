@@ -1,6 +1,7 @@
 import sys
 import regex as re
 from itertools import product
+import string
 from pprint import pprint
 from pathlib import Path
 from collections import Counter, defaultdict
@@ -188,109 +189,147 @@ _LIT = group(
 _FAMILY = group(
     r'((CVE|Cve|cve|CAN)([_.-]?([0-9]{4})([_.-]?(([0-9]+)[[:alpha:]]*))?)?)',
     r'((?i:MS)([0-9]{2})-?([0-9]{1,3}))',
-    r'[[:alnum:]]*[A-Z][[:alnum:]]*[a-z][[:alnum:]]*',
+    r'\w+',
+    # Serv-U
+    r"[A-Z][a-z]-[A-Z]",
+    # VB-Agent
+    r"[A-Z]+-[A-Z][[:alnum:]]+",
+    # SMS_Attacker
+    r"[A-Z]+_[A-Z][[:alnum:]]+",
+    # Specikr_macro
+    r"[A-Z][[:alpha:]]+_[a-z]+",
+    # ExeBundle_2x
+    r"[A-Z][[:alpha:]]+_[0-9][[:alpha:]]",
+    # BO-plugin-RCR
+    r"[A-Z][[:alnum:]]+-[a-z]+-[A-Z][[:alnum:]]+",
+    # Trojan.Clicker-DOTHETUK!8.E825	Trojan.Flooder-VB!8.2F70	Trojan.DoS-DKToyBox!8.533A
+    r"[A-Z][[:alpha:]]+-[A-Z][[:alpha:]]+",
 )
 
-_FAMILY = group(
-    r'((?:Exp|Exploit)[.])?((CVE|Cve|cve|CAN)([_.-]?([0-9]{4})([_.-]?(([0-9]+)[[:alpha:]]*))?)?)',
-    r'((?:Exp|Exploit)[.])?((?i:MS)([0-9]{2})-?([0-9]{1,3}))',
-    # r'([a-z]+|[0-9]+)?[A-Z][A-Za-z0-9]+',
-    ## BASIC
-    # r'(?:[A-Z][a-z]{4,}){i<=4:[A-Z0-9]}',
-    r'[[:alnum:]]*[A-Z][[:alnum:]]*[a-z][[:alnum:]]*',
-    r'[a-z]?(?:[A-Z]+[a-z]+)+[0-9]+',
-    # iBryte
-    r'[a-z][A-Z][a-z]{3,}',
-    r'[a-z]?[A-Z](?:[[:alpha:]]{2,}){i<=3:[-_]}[[:alpha:]]',
-    r'[a-z]?(?:[A-Z](?:[a-z]{3,}){i<=3:[-_]}[a-z]){i<=6:[0-9]}',
-    r'(?:[A-Z][a-z]{4,}){s<=4:[A-Z0-9]}',
-    r'(?:[iIeExXu]-?)?[A-Z](?:[a-z]{4,}){s<=4:[A-Z_-]}[A-Za-z]',
-    r'[A-Z]{1,2}[A-Za-z]+',
-    r'[A-Z]{2,3}-[A-Z][A-Za-z]{2,}',
-    r'(?i:BO2K|JS|Lnk|Ag|njRAT|ICQ|IRC|VB|HTML|WOW|Wow|Fgt|Udr|BHO|Bho|WoW|LMir)',
-    # mIRC	njRAT
-    r'[a-z]{1,2}(?:[A-Z]{3,})',
-    # r'[A-Z](?:[a-z]{4,}){s<=2,i<=4:[-A-Z0-9]}[a-zA-Z]',
-    # # # VB	CXX
-    # # r'[A-Z]{2,3}',
+# _FAMILY = group(
+#     r'((?:Exp|Exploit)[.])?((CVE|Cve|cve|CAN)([_.-]?([0-9]{4})([_.-]?(([0-9]+)[[:alpha:]]*))?)?)',
+#     r'((?:Exp|Exploit)[.])?((?i:MS)([0-9]{2})-?([0-9]{1,3}))',
+#     # r'([a-z]+|[0-9]+)?[A-Z][A-Za-z0-9]+',
+#     ## BASIC
+#     # r'(?:[A-Z][a-z]{4,}){i<=4:[A-Z0-9]}',
+#     # Basic
+#     r"\d*[a-z]?[A-Z][[:alnum:]]+[a-z][[:alnum:]]*",
+#     # njRAT
+#     r"[a-z]+[A-Z]+",
+#     # 4shared
+#     r"[0-9][a-z]{4,}",
+#     # Serv-U
+#     r"[A-Z][a-z]-[A-Z]",
+#     # VB-Agent
+#     r"[A-Z]+-[A-Z][[:alnum:]]+",
+#     # SMS_Attacker
+#     r"[A-Z]+_[A-Z][[:alnum:]]+",
+#     # Specikr_macro
+#     r"[A-Z][[:alpha:]]+_[a-z]+",
+#     # ExeBundle_2x
+#     r"[A-Z][[:alpha:]]+_[0-9][[:alpha:]]",
+#     # BO-plugin-RCR
+#     r"[A-Z][[:alnum:]]+-[a-z]+-[A-Z][[:alnum:]]+",
+#     r"[A-Z]+",
+#     r"[A-Z]+[a-z]+_[0-9]+",
+#     r"[A-Z][a-z][A-Z]?",
+#     r"[A-Z][[:alnum:]]+-[A-Z][[:alnum:]]*",
+#     _LIT,
 
-    # # # SMS_Attacker,
-    # # r'[A-Z]+_[A-Z][a-z]+',
+#     # r'[[:alnum:]]*[A-Z][[:alnum:]]*[a-z][[:alnum:]]*',
+#     # r'[a-z]?(?:[A-Z]+[a-z]+)+[0-9]+',
+#     # # iBryte
+#     # r'[a-z][A-Z][a-z]{3,}',
+#     # r'[a-z]?[A-Z](?:[[:alpha:]]{2,}){i<=3:[-_]}[[:alpha:]]',
+#     # r'[a-z]?(?:[A-Z](?:[a-z]{3,}){i<=3:[-_]}[a-z]){i<=6:[0-9]}',
+#     # r'(?:[A-Z][a-z]{4,}){s<=4:[A-Z0-9]}',
+#     # r'(?:[iIeExXu]-?)?[A-Z](?:[a-z]{4,}){s<=4:[A-Z_-]}[A-Za-z]',
+#     # r'[A-Z]{1,2}[A-Za-z]+',
+#     # r'[A-Z]{2,3}-[A-Z][A-Za-z]{2,}',
+#     # r'(?i:BO2K|JS|Lnk|Ag|njRAT|ICQ|IRC|VB|HTML|WOW|Wow|Fgt|Udr|BHO|Bho|WoW|LMir)',
+#     # # mIRC	njRAT
+#     # r'[a-z]{1,2}(?:[A-Z]{3,})',
+#     # # r'[A-Z](?:[a-z]{4,}){s<=2,i<=4:[-A-Z0-9]}[a-zA-Z]',
+#     # # # # VB	CXX
+#     # # # r'[A-Z]{2,3}',
 
-    # # # BlackstoneUSPL,
-    # # r'[A-Z][a-z]{3,}[A-Z]+',
+#     # # # # SMS_Attacker,
+#     # # # r'[A-Z]+_[A-Z][a-z]+',
 
-    # # Serv-U
-    # r'[A-Z][a-z]+-[A-Z0-9]',
+#     # # # # BlackstoneUSPL,
+#     # # # r'[A-Z][a-z]{3,}[A-Z]+',
 
-    # # PDF-U3D
-    # r'[A-Z][A-Z0-9][-_.][A-Z][A-Z0-9]',
+#     # # # Serv-U
+#     # # r'[A-Z][a-z]+-[A-Z0-9]',
 
-    # # # PEF13C	BO2K
-    # # r'[A-Z][A-Z0-9]{3,}',
+#     # # # PDF-U3D
+#     # # r'[A-Z][A-Z0-9][-_.][A-Z][A-Z0-9]',
 
-    # ## MEDIUM
-    # r'[0-9]{1,2}[a-z]{4,}',
-    # r'[A-Z](?:[a-z]{3,}){i<=4:[A-Z0-9-_]}[a-z]',
-    # r'[A-Z](?:[a-z]{4,}){s<=3:[A-Z0-9]}'
+#     # # # # PEF13C	BO2K
+#     # # # r'[A-Z][A-Z0-9]{3,}',
 
-    # # # # njRAT
-    # r'[a-z0-9]{2,}(?:[A-Z]{3,}){i<=4:[0-9]}',
-    # r'(?:([A-Z]{1,3}|[A-Z][a-z]+)[-_][A-Z][a-z]+){i<=2:[0-9]}',
-    # r'(?:[A-Z][a-z]+[-_][A-Z]+){i<=2:[0-9]}',
-    # r'[a-z][A-Z]+[a-z]{2,}',
-    # r'(?:[A-Z]{3,}-[A-Z]{3,}){d<=2:[A-Z]}',
-    # r'(?:DoS|DDos)-[A-Z][[:alnum:]]+',
+#     # # ## MEDIUM
+#     # # r'[0-9]{1,2}[a-z]{4,}',
+#     # # r'[A-Z](?:[a-z]{3,}){i<=4:[A-Z0-9-_]}[a-z]',
+#     # # r'[A-Z](?:[a-z]{4,}){s<=3:[A-Z0-9]}'
 
-    # ## MEDIUM HIGH
-    # r'[A-Z]{2,}[a-z]{2,}',
-    # r'[A-Z](?:[a-z]{2,}){}'
-    # r'[A-Z][a-z][A-Z]',
-    # r'[A-Z][a-z]',
-    # r'[A-Z][a-z]{2,3}',
+#     # # # # # njRAT
+#     # # r'[a-z0-9]{2,}(?:[A-Z]{3,}){i<=4:[0-9]}',
+#     # # r'(?:([A-Z]{1,3}|[A-Z][a-z]+)[-_][A-Z][a-z]+){i<=2:[0-9]}',
+#     # # r'(?:[A-Z][a-z]+[-_][A-Z]+){i<=2:[0-9]}',
+#     # # r'[a-z][A-Z]+[a-z]{2,}',
+#     # # r'(?:[A-Z]{3,}-[A-Z]{3,}){d<=2:[A-Z]}',
+#     # # r'(?:DoS|DDos)-[A-Z][[:alnum:]]+',
 
-    # ## High
-    # r'[a-z](?:[a-z]+){i<=5:[A-Z0-9]}',
-    # r'[A-Z]{4}[0-9]{4}',
-    # r'[A-Z]+',
+#     # # ## MEDIUM HIGH
+#     # # r'[A-Z]{2,}[a-z]{2,}',
+#     # # r'[A-Z](?:[a-z]{2,}){}'
+#     # # r'[A-Z][a-z][A-Z]',
+#     # # r'[A-Z][a-z]',
+#     # # r'[A-Z][a-z]{2,3}',
 
-    # # # 4shared
-    # # r'[0-9][A-Za-z][a-z]{2,}',
+#     # # ## High
+#     # # r'[a-z](?:[a-z]+){i<=5:[A-Z0-9]}',
+#     # # r'[A-Z]{4}[0-9]{4}',
+#     # # r'[A-Z]+',
 
-    # # # T57iq0ngh
-    # # r'[A-Z][A-Z0-9]+[a-z0-9]{3,}',
+#     # # # # 4shared
+#     # # # r'[0-9][A-Za-z][a-z]{2,}',
 
-    # # VB-Agent
-    # r'[A-Z]{2}-[A-Z]+[a-z]{3,}',
+#     # # # # T57iq0ngh
+#     # # # r'[A-Z][A-Z0-9]+[a-z0-9]{3,}',
 
-    # # # SillyP2p, SillyP2P, Silly_P2P, Silly.P2P
-    # # r'[A-Z][a-z][._]?[A-Z0-9]{2,4}',
-    # r'([a-z]{1,2}|[iIeExXu]-?|[A-Z]?[0-9]{1,5})?[A-Z]+[a-z]+([_-]?([A-Z]+[a-z]+|[0-9]{1,5}[a-z]+)){,3}(?:[0-9]{1,6}|[A-Z]{1,6})?',
+#     # # # VB-Agent
+#     # # r'[A-Z]{2}-[A-Z]+[a-z]{3,}',
 
-    # # TrojanDownloader:Office/Specikr_macro.7e54b364
-    # r'[A-Z][a-z]{2,}_[a-z]{2,}',
-    # # TrojanDropper:Win32/ExeBundle_2x.95aedcbc
-    # r'[A-Z][a-z]+[A-Z][a-z]+_[0-9a-z]{1,5}',
-    # # Trojan:Package/phishing.2
-    # r'[A-Z][_-][A-Z0-9][[:alpha:]]+',
-    # # Trojan.Win32.BO-plugin-RCR.gtgj
-    # r'[A-Z][[:alnum:]]+-[a-z]+-[A-Z][[:alnum:]]+',
-    # # Marker.Win32.PE-Exe.bxzo
-    # r'[A-Z][[:alpha:]]*[-_][A-Z][[:alpha:]]',
-    # r'km_[a-f0-9]+',
-    # # Win32/Sorter.AutoVirus.70YPInstallerCRC.A	Intended/10past3.775
-    # r'[1-9][0-9][A-Z]*[a-z]+(?:[0-9]+|[A-Z]+)?',
-    # r'[a-z]+(?=[.][[:xdigit:]]{8}$)',
-    # r'[a-z]+(?=[.][0-9]{1,2}$)',
-    # r'[a-z]+(?=[.]ali[0-9]+$)',
-    # r'[[:alnum:]]+[.-]based',
-    # r'^[a-z]+$',
-    # r'(?i:Silly.?P2P)',
-    # r'[A-Z]{2}-[A-Z][[:alnum:]]+',
-    _LXL,
-    rf'(?>{_LXL}[.][A-Z][a-z]+|[A-Z][a-z]+[.][A-Z][a-z]+(?=[.-/])){{i<=4:[A-Z0-9]}}',
-    # rf'{_LXL}[.]({_LXL}|(?:[0-9]{1,4}|[a-z]{1,2}|[a-z]-)?[A-Z](?:[a-z]+){{i<=4:[A-Z0-9]}})',
-)
+#     # # # # SillyP2p, SillyP2P, Silly_P2P, Silly.P2P
+#     # # # r'[A-Z][a-z][._]?[A-Z0-9]{2,4}',
+#     # # r'([a-z]{1,2}|[iIeExXu]-?|[A-Z]?[0-9]{1,5})?[A-Z]+[a-z]+([_-]?([A-Z]+[a-z]+|[0-9]{1,5}[a-z]+)){,3}(?:[0-9]{1,6}|[A-Z]{1,6})?',
+
+#     # # # TrojanDownloader:Office/Specikr_macro.7e54b364
+#     # # r'[A-Z][a-z]{2,}_[a-z]{2,}',
+#     # # # TrojanDropper:Win32/ExeBundle_2x.95aedcbc
+#     # # r'[A-Z][a-z]+[A-Z][a-z]+_[0-9a-z]{1,5}',
+#     # # # Trojan:Package/phishing.2
+#     # # r'[A-Z][_-][A-Z0-9][[:alpha:]]+',
+#     # # # Trojan.Win32.BO-plugin-RCR.gtgj
+#     # # r'[A-Z][[:alnum:]]+-[a-z]+-[A-Z][[:alnum:]]+',
+#     # # # Marker.Win32.PE-Exe.bxzo
+#     # # r'[A-Z][[:alpha:]]*[-_][A-Z][[:alpha:]]',
+#     # # r'km_[a-f0-9]+',
+#     # # # Win32/Sorter.AutoVirus.70YPInstallerCRC.A	Intended/10past3.775
+#     # # r'[1-9][0-9][A-Z]*[a-z]+(?:[0-9]+|[A-Z]+)?',
+#     # # r'[a-z]+(?=[.][[:xdigit:]]{8}$)',
+#     # # r'[a-z]+(?=[.][0-9]{1,2}$)',
+#     # # r'[a-z]+(?=[.]ali[0-9]+$)',
+#     # # r'[[:alnum:]]+[.-]based',
+#     # # r'^[a-z]+$',
+#     # # r'(?i:Silly.?P2P)',
+#     # # r'[A-Z]{2}-[A-Z][[:alnum:]]+',
+#     # _LXL,
+#     # rf'(?>{_LXL}[.][A-Z][a-z]+|[A-Z][a-z]+[.][A-Z][a-z]+(?=[.-/])){{i<=4:[A-Z0-9]}}',
+#     # rf'{_LXL}[.]({_LXL}|(?:[0-9]{1,4}|[a-z]{1,2}|[a-z]-)?[A-Z](?:[a-z]+){{i<=4:[A-Z0-9]}})',
+# )
 
 VARIANTS = [
     # Trojan:Win32/Patcher.D8
@@ -299,6 +338,7 @@ VARIANTS = [
     r"[.][a-f][0-9]",
     # GreenCaterpillar.1575f
     r"[.][a-f0-9]{4,7}",
+    r"[.][[:xdigit:]]{1,2}",
     # Virus.Emotet.A	Virus/W32.Ramnit.C	Trojan-Downloader.Win32.Delf.CQ	Trojan.Peed.JEZ
     # Trojan.Generic19.CAKN
     r"[.][A-Z]{1,5}",
@@ -371,7 +411,7 @@ VARIANTS = [
     # Malware.FakePIC@CV!1.6AB7	Trojan.Bayrob@VE!1.A37E	Virus.VirLock@EP!1.A247
     # Virus.Parite#dll!1.A144
     # Worm.EternalRocks-02!1.AB01
-    r"(-[0-9]{1,2})?(/[[:alnum:]]+)?(\#[[:alnum:]]+)?(@[[:alpha:]]+)?![0-9][.][A-F0-9]{1,6}",
+    r"([-][0-9]{1,2})?([/][[:alnum:]]+)?([#][[:alnum:]]+)?([@][[:alpha:]]+)?![0-9][.][A-F0-9]{1,6}",
     # Trojan.Fuerboos!8.EFC8/N3#91%
     r"[!][0-9][.][0-9A-F]{4}/([A-Z][A-Z0-9])#(100|[1-9][0-9]?)%",
     # Backdoor.Boychi[HT]!1.A08F
@@ -454,18 +494,183 @@ def convert(s, label=_LXL, family=_FAMILY):
     return pat
 
 
+class Symbols:
+    def states(self):
+        pass
+
+    def __str__(self):
+        return '(?:{})'.format('|'.join(self.states()))
+
+
+class StringSymbols(Symbols):
+    def __init__(self, s):
+        self.name = re.escape(s)
+        self._string = s
+
+    def states(self):
+        return [self._string]
+
+    def __str__(self):
+        return re.escape(self._string)
+
+
+class RegexSymbols(Symbols):
+    def __init__(self, pattern):
+        self.pattern = pattern
+        super().__init__()
+
+    def states(self):
+        return [self.pattern]
+
+
+class VocabularySymbols(Symbols):
+    def __init__(self, vocab):
+        self.vocab = vocab
+        super().__init__()
+
+    def states(self):
+        return [self.vocab.pattern(start=1, end=0)]
+
+
+class NameSymbols(Symbols):
+    patterns = {
+        "basic":
+            group(
+                r"((CVE|Cve|cve|CAN)([_.-]?([0-9]{4})([_.-]?(([0-9]+)[[:alpha:]]*))?)?)",
+                r"((?i:MS)([0-9]{2})-?([0-9]{1,3}))",
+                r"\w+",
+            ),
+        "breaks":
+            group(
+                # Serv-U
+                r"[A-Z][a-z]-[A-Z]",
+                # VB-Agent
+                r"[A-Z]+-[A-Z][[:alnum:]]+",
+                # SMS_Attacker
+                r"[A-Z]+_[A-Z][[:alnum:]]+",
+                # Specikr_macro
+                r"[A-Z][[:alpha:]]+_[a-z]+",
+                # ExeBundle_2x
+                r"[A-Z][[:alpha:]]+_[0-9][[:alpha:]]",
+                # BO-plugin-RCR
+                r"[A-Z][[:alnum:]]+-[a-z]+-[A-Z][[:alnum:]]+",
+                # Clicker-DOTHETUK	Flooder-VB
+                r"[A-Z][[:alpha:]]+-[A-Z][[:alpha:]]+",
+            )
+    }
+
+    def states(self):
+        return product(self.patterns.values(), VARIANTS)
+
+    def __str__(self):
+        return r"(({})({}|$))".format(self.patterns['basic'], '|'.join(VARIANTS))
+
+
+class Template:
+    def __init__(self, tmpl):
+        self.tmpl = tmpl
+        self.prefix = None
+        self.parts = self.parse()
+        self.patterns_used = []
+        self.patterns_count = Counter()
+        self.all_pattern = self._compile_match_all()
+
+    def parse(self):
+        parts = []
+        fmt = string.Formatter()
+        for i, (literal, field_name, format_spec, conv) in enumerate(fmt.parse(self.tmpl)):
+            escaped = re.sub(r'(?<!\\)(?P<sym>[-:./ []])', r'\\\g<sym>', literal)
+            parts.append(StringSymbols(escaped))
+            if field_name == 'Label':
+                parts.append(RegexSymbols(_LXL))
+            elif field_name == 'Name':
+                parts.append(NameSymbols())
+                if self.prefix is None:
+                    self.prefix = slice(0, i)
+
+        return parts
+
+    def _compile_match_all(self):
+        return re.compile(''.join(r"({})".format("|".join, part.states) for part in self.parts))
+
+    def iterpatterns(self):
+        for match in product(*self.parts):
+            return re.compile(''.join(match))
+
+    def add_match(self, pattern, existing):
+        if not existing:
+            self.patterns_used.append(pattern)
+        self.patterns_count[pattern] += 1
+
+    def crawl(self, lines):
+        patterns = list(self.iterpatterns())
+
+        for line in filter(self.all_pattern.fullmatch, lines):
+            for pattern in self.patterns_used:
+                if pattern.fullmatch(line):
+                    self.add_match(pattern, existing=True)
+                    break
+            else:
+                for i, pattern in enumerate(patterns):
+                    if pattern.fullmatch(line):
+                        self.add_match(pattern, existing=False)
+                        del patterns[i]
+
+
+def do_converto():
+    import string
+    Label = None
+
+    Template = lambda s: s
+    # PatternTemplate('{Label}.{Label}.{ExtendedFamily}')
+    # '{Label}:{Name}'
+
+    # NameTemplate(Label, '/', ExtendedFamily(Label, Label | Name, Variant))
+    # [Label, '/', Family(Label | Name, Variant)]
+
+    patterns = [
+        Template("{Label}.{ExtName}"),
+        Template("{Label}/{ExtName}"),
+        Template("{Label}:{Label}/{Name}"),
+        Template("{Label}.{Name}"),
+        Template("{Label}[{Label}]/{ExtName}"),
+        Template("{Label}.[{Family}]{Family}"),
+        Template("{Name}"),
+    ]
+
+    def parse_template(tmpl):
+        fmt = string.Formatter()
+        translate = {'Label': None, 'Family': None, 'Variant': None}
+
+        def generator():
+            rx = ''
+            for literal, field_name, format_spec, conv in fmt.parse(tmpl):
+                yield StringSymbols(re.sub(r'(?<!\\)(?P<sym>[-:./ []])', r'\\\g<sym>', literal))
+                yield translate[field_name](format_spec)
+
+    def crawl(lines, levels):
+        by_head = defaultdict(list)
+
+        for level in levels:
+            by_head[level[0]].append(level)
+
+        for sym, levels in by_head.items():
+            subset = lines.filter(sym)
+            for lvl in levels:
+                yield from crawl(subset, lvl)
+
+
 def do_convert():
-    '(?&Label).(?&Label).(?&Family)'
     patterns = [
         # convert(ss, family=r'(km_[a-f0-9]+|[0-9a-z]*[A-Z][a-zA-Z0-9._-]+|[a-z]{4,})') for ss in [
         convert(ss) for ss in [
             '<Label>.<Label>.<Label>.<Family>',
             '<Label>.<Label>.<Family>',
             '<Label>:<Label>/<Family>',
-
             # Backdoor.[OceanLotus]Salgorea!1.C3DC
             '<Label>.[<Family>]<Family>',
             # Trojan[Proxy]/Win32.Coledor
+            '<Label>[<Label>]/<Label>.<Family>',
             '<Label>[<Label>]/<Family>',
             # Trojan ( 0fedaa428f )
             '<Label> ( <Variant> )',
@@ -528,6 +733,9 @@ def do_convert():
     print(counter)
 
 
+do_convert()
+
+
 def make_all(base_pattern, family):
     prefixes = ['']
     counter = Counter()
@@ -557,62 +765,58 @@ def make_all(base_pattern, family):
 
     pprint(counter)
 
-        # for line, pats in matches.items():
-        #     if len(pats) > 1:
-        #         print(line, 'Pattners=', pats)
+    # for line, pats in matches.items():
+    #     if len(pats) > 1:
+    #         print(line, 'Pattners=', pats)
 
-        # for line in (lines - matched):
-        #     for prefix, base, name in product(prefixes, base_pattern, family):
-        #         baseo = re.compile(rf'^{prefix}{base}({_LIT}[.])?{name}')
-        #         if baseo.fullmatch(line):
-        #             matched.add(line)
-        #             break
-        # print(lines - matched)
-
-
+    # for line in (lines - matched):
+    #     for prefix, base, name in product(prefixes, base_pattern, family):
+    #         baseo = re.compile(rf'^{prefix}{base}({_LIT}[.])?{name}')
+    #         if baseo.fullmatch(line):
+    #             matched.add(line)
+    #             break
+    # print(lines - matched)
 
 
-make_all(
-    # [r'{LABELS}/', r'(({LABELS})[.]({LABELS}))/'],
-    [r'{_LXL}/', r'{LABELS}[.]', r'({LABELS}[.]{LABELS})/'],
-    [
-        group(
-            r'((CVE|Cve|cve|CAN)([_.-]?([0-9]{4})([_.-]?(([0-9]+)[[:alpha:]]*))?)?)',
-            r'((?i:MS)([0-9]{2})-?([0-9]{1,3}))',
-            r'\w*(?:[a-z][A-Z]|[A-Z][a-z])\w+',
-            str(_LIT),
-            # r'([A-Z]{1,4}-|[0-9]{1,4}-?)?[[:alpha:]]{2,}([0-9]{1,4})?',
-            # r'[A-Z][A-Za-z_-]*[a-zA-Z]',
-            # r'(?:(?:[a-z]{1,2}|20[0-9]{2}|19[789][0-9])[-]?)(?:(?:[A-Z]+[a-z]+)+){i<=4:[A-Z0-9]}',
-            # r'([A-Z]+[a-z]+)+-[A-Z0-9]{1,4}',
-            # r'[a-z][A-Z][a-z]{3,}',
-        ),
-    ],
-)
-"""
-(?(DEFINE)
-[[:alnum:]]{4,}
-[[:alnum:]]{1,3}
-(?P<name_capital>[A-Z]+[a-z]{2,})
-(?P<name_lprefix>[a-z](?&name_capital))
-(?P<name_nprefix>[0-9]{1,4}(?&name_capital))
-(?P<name_nsuffix>(?&name_capital)[0-9]{1,4})
-(?P<name_basic>[A-Z]+[a-z]+)
-)
-"""
-
-# def construct_name_patterns(
-#     blocks=[
-#         r'[A-Z](?:[A-Z]{3,}){s<=1:[0-9]}',  # B02K, ATH0
-#         r'[A-Z]+[a-z]+',
+# make_all(
+#     # [r'{LABELS}/', r'(({LABELS})[.]({LABELS}))/'],
+#     [r'{_LXL}/', r'{LABELS}[.]', r'({LABELS}[.]{LABELS})/'],
+#     [
+#         group(
+#             r'((CVE|Cve|cve|CAN)([_.-]?([0-9]{4})([_.-]?(([0-9]+)[[:alpha:]]*))?)?)',
+#             r'((?i:MS)([0-9]{2})-?([0-9]{1,3}))',
+#             r'\w*(?:[a-z][A-Z]|[A-Z][a-z])\w+',
+#             r'\d*(?>[A-Z]+[a-z]+\d*){2,5}',
+#             str(_LIT),
+#             # r'([A-Z]{1,4}-|[0-9]{1,4}-?)?[[:alpha:]]{2,}([0-9]{1,4})?',
+#             # r'[A-Z][A-Za-z_-]*[a-zA-Z]',
+#             # r'(?:(?:[a-z]{1,2}|20[0-9]{2}|19[789][0-9])[-]?)(?:(?:[A-Z]+[a-z]+)+){i<=4:[A-Z0-9]}',
+#             # r'([A-Z]+[a-z]+)+-[A-Z0-9]{1,4}',
+#             # r'[a-z][A-Z][a-z]{3,}',
+#         ),
+#         group(
+#             # Basic
+#             r"\d*[a-z]?[A-Z][[:alnum:]]+[a-z][[:alnum:]]*",
+#             # njRAT
+#             r"[a-z]+[A-Z]+",
+#             # 4shared
+#             r"[0-9][a-z]{4,}",
+#             # Serv-U
+#             r"[A-Z][a-z]-[A-Z]",
+#             # VB-Agent
+#             r"[A-Z]+-[A-Z][[:alnum:]]+",
+#             # SMS_Attacker
+#             r"[A-Z]+_[A-Z][[:alnum:]]+",
+#             # Specikr_macro
+#             r"[A-Z][[:alpha:]]+_[a-z]+",
+#             # ExeBundle_2x
+#             r"[A-Z][[:alpha:]]+_[0-9][[:alpha:]]",
+#             # BO-plugin-RCR
+#             r"[A-Z][[:alnum:]]+-[a-z]+-[A-Z][[:alnum:]]+",
+#         ),
+#         group(
+#             r'[A-Z]+_[A-Z]*[a-z]+',
+#             r'[0-9][a-z]{4,}',
+#         )
 #     ],
-#     PREFIXES=[
-#         r'[A-Z0-9]{1,5}[-]',
-#         r'[a-z]{1,2}[-]?(?=[A-Z])',
-#         r'(?:19[89][0-9]|20[0-9]{2})-(?=[[:alpha:]])',
-#     ],
-#     suffixes=[
-#         r'(?:19[89][0-9]|20[0-9]{2})',
-#     ]
-# ):
-#     pass
+# )
