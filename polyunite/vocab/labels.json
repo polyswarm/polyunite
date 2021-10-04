@@ -1249,6 +1249,8 @@
         "Malware",
         "MalwareScope",
         "Small",
+        "Sorter.AVE",
+        "Sorter.AutoVirus",
         "Spoofer",
         "Trivial",
         "Virus",
