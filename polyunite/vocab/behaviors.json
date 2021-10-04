@@ -34,9 +34,6 @@
       },
       "match-exact": [
         "Autorun"
-      ],
-      "match-regex": [
-        "Autorunn?er[0-9]?"
       ]
     },
     "capture_system_memory": {
@@ -63,9 +60,19 @@
       ]
     },
     "certificate": {
-      "match-exact": [
-        "Revoked.Certificate",
-        "Untrusted.Certificate"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Revoked",
+              "Untrusted"
+            ],
+            [
+              "Certificate"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ]
     },
     "code_encryption": {
@@ -74,13 +81,25 @@
         "code-encryption",
         "encoder",
         "encpk",
-        "EXEHeader.AntiArj",
         "kryptk",
         "malcrypt",
         "PE-Encrypt"
       ],
-      "match-regex": [
-        "[KkCc]rypt(?:ed|er|ic|or|ik)?"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Crypt",
+              "Krypt"
+            ],
+            [
+              "ed",
+              "ic",
+              "or",
+              "er"
+            ]
+          ]
+        }
       ]
     },
     "erase_data": {
@@ -104,8 +123,19 @@
         "Countermeasure",
         "KillAV"
       ],
-      "match-regex": [
-        "AV[-._]?Killer"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "AV",
+              "AntiVirus"
+            ],
+            [
+              "Killer"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ]
     },
     "exfiltrates_data": {
@@ -224,6 +254,15 @@
     "packing": {
       "description": "Packing of the malware instance code, not including encryption.",
       "match-exact": [
+        "Obfus",
+        "Obfusc",
+        "Obfuscate",
+        "Obfuscator",
+        "Pack",
+        "SuspiciousPacker",
+        "Swizzor",
+        "Themida",
+        "UPX",
         "aspack",
         "asprotect",
         "badPE",
@@ -237,30 +276,32 @@
         "matchicon",
         "md5sect",
         "nspack",
-        "obfus",
-        "obfusc",
-        "Obfuscated",
-        "Pack",
-        "packing",
         "parite",
         "pecompact",
         "pespin",
         "petite",
         "polipos",
-        "suspiciouspacker",
-        "swizzor",
-        "themida",
         "upack",
-        "upx",
         "vbpack",
         "vmprotect",
         "wwpack",
         "xpack",
         "zpack"
       ],
-      "match-regex": [
-        "[pP]acke[dr][0-9]*",
-        "obfuscat(?:e|ed|or|ed|ing)"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Obfuscat",
+              "Pack"
+            ],
+            [
+              "ing",
+              "ed",
+              "er"
+            ]
+          ]
+        }
       ],
       "children": {
         "packing_trojan": {
@@ -289,27 +330,34 @@
       "description": "Suspicious behavior without signature match",
       "match-exact": [
         "Abuse-Worry",
-        "confidence",
         "DangerousObject",
-        "highconfidence",
-        "possible-Threat",
-        "reputation",
-        "suspicious",
-        "threat",
-        "variant",
         "Mailfinder",
-        "Obscure"
-      ],
-      "match-regex": [
-        "(?:variant\\s?of|looks\\s?like|behaves\\s?like|suspect(?:ed)?|probabl[ey]|modification(?:\\sof)?|possibl[ey])",
-        "\\bSusp?\\b",
-        "^Sus(?=[.])",
-        "Suspect[0-9]?"
+        "Obscure",
+        "Reputation",
+        "Suspect",
+        "Suspected",
+        "Suspected",
+        "Suspicious",
+        "Threat",
+        "Variant",
+        "behaves like ",
+        "confidence",
+        "highconfidence",
+        "looks like ",
+        "modification ",
+        "modification of ",
+        "possible ",
+        "possible-Threat",
+        "possibly ",
+        "probable ",
+        "probably ",
+        "variant of "
       ]
     },
     "unpacked": {
       "description": "Upacked binary or code from the original malware",
       "match-exact": [
+        "Raw",
         "unpacked"
       ]
     }

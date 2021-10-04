@@ -330,14 +330,15 @@
                   "Trjn"
                 ],
                 [
-                  "Downloader",
                   "DL",
                   "Dloader",
-                  "Dwnldr",
+                  "Downlaoder",
+                  "Downlder",
                   "Downldr",
-                  "Loader",
+                  "Downloader",
                   "Dwnlder",
-                  "Downlaoder"
+                  "Dwnldr",
+                  "Loader"
                 ]
               ],
               "separator": "word-break"
@@ -772,6 +773,7 @@
       "description": "A type of trojan designed to steal passwords, personal data and details, or other sensitive information from an infected system.",
       "match-exact": [
         "PSW",
+        "PSWTool",
         "PWS",
         "Stealer"
       ],

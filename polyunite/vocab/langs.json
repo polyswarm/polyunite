@@ -127,12 +127,11 @@
         "BMP",
         "GIF",
         "IMAGE",
+        "JPEG",
+        "JPG",
         "PNG",
+        "IMG",
         "TIFF"
-      ],
-      "match-regex": [
-        "IMG-[A-Z]+",
-        "JPE?G"
       ]
     },
     "INF": {
@@ -140,8 +139,18 @@
       "match-exact": [
         "INF"
       ],
-      "match-regex": [
-        "AutoRun[.-_]?INF"
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "AutoRun"
+            ],
+            [
+              "INF"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ]
     },
     "INI": {
