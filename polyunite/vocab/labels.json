@@ -584,9 +584,22 @@
       },
       "match-exact": [
         "keylog",
-        "keylogger",
-        "monitoring.tool",
-        "monitoringtool"
+        "keylogger"
+      ],
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Keylog",
+              "Keylogging",
+              "Monitoring"
+            ],
+            [
+              "Tool"
+            ]
+          ],
+          "separator": "word-break"
+        }
       ],
       "children": {
         "keylogger_trojan": {
@@ -711,12 +724,43 @@
         "not-virus",
         "notavirus"
       ],
-      "match-regex": [
-        "(?i:eicar(?>[^a-z]?test(?>[^a-z]?file)?)?(?:[.]com)?)",
-        "^nonmalware:",
-        "^not(?:-a)?-virus:",
-        "test([.-]?file)?"
-      ]
+      "match-combine": [
+        {
+          "parts": [
+            [
+              "Test"
+            ],
+            [
+              "File"
+            ]
+          ],
+          "separator": "word-break"
+        }
+      ],
+      "children": {
+        "eicar_test_string": {
+          "match-exact": [
+            "EICAR",
+            "eicar.com"
+          ],
+          "match-combine": [
+            {
+              "parts": [
+                [
+                  "EICAR"
+                ],
+                [
+                  "Test"
+                ],
+                [
+                  "File"
+                ]
+              ],
+              "separator": "word-break"
+            }
+          ]
+        }
+      }
     },
     "parental_control": {
       "description": "A program that monitors or limits machine usage. Such programs can run undetected and can transmit monitoring information to another machine.",
@@ -892,9 +936,10 @@
                   "Trjn"
                 ],
                 [
+                  "Crypt",
+                  "Ransm",
                   "Ransom",
-                  "Ransomware",
-                  "Crypt"
+                  "Ransomware"
                 ]
               ],
               "separator": "word-break"
@@ -1111,6 +1156,7 @@
       },
       "match-exact": [
         "Monitor",
+        "Spy",
         "Spyware"
       ],
       "children": {
