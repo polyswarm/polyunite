@@ -4,7 +4,7 @@ from ._base import Classification
 
 class CapeSandbox(Classification):
     pattern = rf"""^
-    (?:family[:./-]?)?
+    (family[:./-]?)?
     (?P<VEID>
-        {FAMILY_ID('(?&TYPES)', r'[[:alnum:]]+')}
+        {FAMILY_ID(r'[[:alnum:]]+')}
     )$"""
