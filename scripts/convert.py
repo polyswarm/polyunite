@@ -341,7 +341,7 @@ VARIANTS = [
     r"[.][[:xdigit:]]{1,2}",
     # Virus.Emotet.A	Virus/W32.Ramnit.C	Trojan-Downloader.Win32.Delf.CQ	Trojan.Peed.JEZ
     # Trojan.Generic19.CAKN
-    r"[.][A-Z]{1,5}",
+    r"[.][A-Z]{1,6}",
     # Virus.MSExcel.Laroux.Cs
     r"[.][A-Z][a-z]",
     # Backdoor/SdBot.axp
@@ -349,7 +349,9 @@ VARIANTS = [
     # Backdoor/Y3KRat.pro.01
     r"[.][a-z]{1,3}[.][0-9]{1,2}",
     # Trojan.Tenagour.3	Trojan.Emotet.323	Trojan.Click.9832	Trojan/W32.VB-Agent.53289	Trojan-Clicker/W32.DP-AdBar.1202176
-    r"[.][1-9][0-9]{1,4}",
+    # Trojan/W32.VB-VBKrypt.1576960.B	Trojan/W32.Agent.212992.XPB	Backdoor/W32.Padodor.6145.I
+    # Trojan/W32.VB-HackTool.196608.B	Trojan/W32.VB-VBKrypt.1576960.B
+    r"[.]\d{1,7}(?:[.][A-Z]{1,3})?",
     # Adware.VBKrypt.P7	Adware.Dealply.P10	Ransom.GandCrab.MUE.YY5
     r"[.][A-Z]{1,2}[0-9]{1,2}",
     # TrojanDownloader.Geral.i8	Trojan.OnLineGames.xi5
@@ -367,9 +369,6 @@ VARIANTS = [
     r"[.][0-9]{1,3}[.][a-z]{1,2}",
     # Backdoor/Huigezi.2007.auqh
     r"[.]20[0-9][0-9][.][a-z]+",
-    # Trojan/W32.VB-VBKrypt.1576960.B	Trojan/W32.Agent.212992.XPB	Backdoor/W32.Padodor.6145.I
-    # Trojan/W32.VB-HackTool.196608.B	Trojan/W32.VB-VBKrypt.1576960.B
-    r"[.][0-9]{4,6}[.][A-Z]{1,4}",
     # Backdoor:Win32/IRCBot.1f4
     r"[.][a-f0-9]{3,5}",
     # Worm.Strictor.S5	PUA.LLCMail.DC7 	TrojanRansom.Crowti.A4	PUA.HacKMS.A5
@@ -428,21 +427,17 @@ VARIANTS = [
     # Win.Downloader.910-1
     # Win.Spyware.26904-1	Win.Downloader.103202-1
     # Win.Trojan.11313659-10
-    r"[.][0-9]{1,8}[-][1-9]?[0-9]",
+    r"[.]\d+(?:-\d){1,3}",
     # Win.Malware.0051f05f-6957431-0
     # Win.Malware.7958d-8528040-0
-    r"[.][a-f0-9]{5,8}[-][0-9]{5,7}[-][1-9]?[0-9]",
+    r"[.][a-f0-9]{5,8}(?:-\d){1,3}",
     # Win.Trojan.Agent-90809-1	Win.Malware.Autoit-7599063-0
     # Win.Trojan.Agent-6825810-0-6852456-0
     # Win.Trojan.Generic-2-6449654-0
     # Js.Trojan.Agent-1553495-4663817-1
-    r"(?:[-][0-9]{5,7})?(?:[-][1-9]?[0-9])?[-][0-9]{5,7}[-][1-9]?[0-9]",
-    # BC.Win.Virus.Ransom-9157.A
-    r"[-][1-9][0-9]{3}[.][A-Z]",
-    # Trojan.Win32.Ges-31.gnlo
-    r"[-][1-9][0-9]{1,3}[.][a-z]{4}",
-    # Worm.ChineseHacker-2.a
-    r"[-][0-9][.][a-z]",
+    # BC.Win.Virus.Ransom-9157.A	BC.Legacy.Exploit.Andr-2.Extra_Field	BC.Unix.Packer.UPX-7086472-2.Corrupted
+    # Worm.ChineseHacker-2.a	Trojan.Win32.Ges-31.gnlo
+    r"(?:[-]\d{1,8}){1,4}(?P<_variant_extra_field>[.][A-Z]|[a-z]+|[A-Z]\w+)?",
     # Win.Trojan.B-466	Win.Worm.R-97
     r"[.][A-Z]-[1-9][0-9]*",
     # Trojan.CYWATCH-A-000067
