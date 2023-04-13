@@ -92,7 +92,7 @@ class EngineRegistry:
         Return an iterator of engines with their family name decoded into a classification
         """
         for engine, family in results.items():
-            if isinstance(family, str):
+            if isinstance(family, (str, list)):
                 try:
                     clf = self.decode(engine, family)
                     yield clf.registration, clf

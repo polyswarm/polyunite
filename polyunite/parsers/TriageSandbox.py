@@ -1,5 +1,5 @@
 from ._base import Classification
 
 
-class CapeSandbox(Classification):
+class TriageSandbox(Classification):
     pattern = rf"""^(.+)$"""

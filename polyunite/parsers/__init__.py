@@ -15,4 +15,5 @@ from .Tachyon import Tachyon
 from .URLHaus import URLHaus
 from .Virusdie import Virusdie
 from .CAPESandbox import CapeSandbox
+from .TriageSandbox import TriageSandbox
 from ._base import Classification

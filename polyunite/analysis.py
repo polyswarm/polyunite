@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Iterable, Optional, Tuple, Union
 
 from collections import Counter, UserDict
@@ -80,7 +81,10 @@ class Analyses(UserDict):
 
     def _weighted_names(
         self,
-        weights={},
+        weights={
+            'triagesandbox': 30,
+            'capesandbox': 20,
+        },
         name_weights={
             LABELS.compile(1, 0).fullmatch: 1 / 8,
             HEURISTICS.compile(1, 0).fullmatch: 1 / 4,
@@ -97,31 +101,31 @@ class Analyses(UserDict):
         for engine, clf in self.items():
             weight = weights.get(engine, 1.0)
 
-            name = clf.family
+            names = clf.families or [clf.family]
+            for name in names:
+                if name is None:
+                    name = clf.taxon
+                    weight *= taxon_weight
 
-            if name is None:
-                name = clf.taxon
-                weight *= taxon_weight
+                if not isinstance(name, str):
+                    continue
 
-            if not isinstance(name, str):
-                continue
+                if len(name) < 2:
+                    weight = 0.0
+                elif len(name) < 5:
+                    weight *= len(name) / 5
+                elif len(name) > 10:
+                    # Lower the weight of names longer than 10 chars
+                    weight /= math.log(len(name), 10)
 
-            if len(name) < 2:
-                weight = 0.0
-            elif len(name) < 5:
-                weight *= len(name) / 5
-            elif len(name) > 10:
-                # Lower the weight of names longer than 10 chars
-                weight /= math.log(len(name), 10)
+                # Match `name` against the pattern predicates in `name_weights`, adjusting appropriately
+                if weight > 0:
+                    for predicate, adjustment in name_weights.items():
+                        if predicate(name):
+                            weight *= adjustment
+                            break
 
-            # Match `name` against the pattern predicates in `name_weights`, adjusting appropriately
-            if weight > 0:
-                for predicate, adjustment in name_weights.items():
-                    if predicate(name):
-                        weight *= adjustment
-                        break
-
-            yield name, weight
+                yield name, weight
 
     def _weighted_name_inference(self, names: Iterable[Tuple[str, float]]) -> Optional[str]:
         likelihood = self._weighted_name_likelihood(names)
