@@ -33,8 +33,12 @@ class Classification(Mapping):
     match: 're.Match'
     _groups: 'Set[str]'
 
-    def __init__(self, name: str):
+    def __init__(self, name: str | list[str]):
+        self.families = []
         try:
+            if isinstance(name, list):
+                self.families = name
+                name = ','.join(self.families)
             self.match = self.regex.fullmatch(name, timeout=1, concurrent=False)
             self._groups = frozenset(k for k, v in self.match.capturesdict().items() if any(v))
         except (AttributeError, TypeError):

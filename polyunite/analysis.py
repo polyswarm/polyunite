@@ -81,7 +81,10 @@ class Analyses(UserDict):
 
     def _weighted_names(
         self,
-        weights={},
+        weights={
+            'triagesandbox': 30,
+            'capesandbox': 20,
+        },
         name_weights={
             LABELS.compile(1, 0).fullmatch: 1 / 8,
             HEURISTICS.compile(1, 0).fullmatch: 1 / 4,
@@ -98,10 +101,7 @@ class Analyses(UserDict):
         for engine, clf in self.items():
             weight = weights.get(engine, 1.0)
 
-            names: str | list[str] = clf.family
-            if isinstance(names, str):
-                names = [names]
-
+            names = clf.families or [clf.family]
             for name in names:
                 if name is None:
                     name = clf.taxon
