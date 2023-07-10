@@ -23,7 +23,7 @@ from .utils import EngineName, EngineResults
 if TYPE_CHECKING:
     from polyunite.parsers import Classification
 
-log = logging.getLogger('polyunite')
+logger = logging.getLogger(__name__)
 
 _ENGINE_NAME_XLATE = str.maketrans(
     string.ascii_uppercase,
@@ -56,7 +56,7 @@ class EngineRegistry:
         try:
             return self[engine].from_string(name)
         except PolyuniteError as e:
-            log.debug('Error parsing %s using %s: %s', name, engine, e)
+            logger.debug('Error parsing %s using %s: %s', name, engine, e)
             raise
 
     def try_decode(self, engine: 'str', name: 'str') -> 'Optional[Classification]':
@@ -96,7 +96,8 @@ class EngineRegistry:
                 try:
                     clf = self.decode(engine, family)
                     yield clf.registration, clf
-                except PolyuniteError:
+                except PolyuniteError as e:
+                    logger.info(e)
                     continue
 
     def analyze(self, results: EngineResults, **kwargs):
