@@ -16,4 +16,6 @@ from .URLHaus import URLHaus
 from .Virusdie import Virusdie
 from .CAPESandbox import CapeSandbox
 from .TriageSandbox import TriageSandbox
+from .EngineEicar import EngineEicar
+from .FamilyTag import FamilyTag
 from ._base import Classification

@@ -82,6 +82,7 @@ class Analyses(UserDict):
     def _weighted_names(
         self,
         weights={
+            'familytag': 50,
             'triagesandbox': 30,
             'capesandbox': 20,
         },
