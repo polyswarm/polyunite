@@ -31,6 +31,7 @@ setup(
     package_data={'polyunite': ['vocab/*.json']},
     setup_requires=[
         'pytest-runner',
+        'bumpversion',
     ],
     test_suite='tests',
     tests_require=[
