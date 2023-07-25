@@ -15,6 +15,8 @@ MalwareNameRemap = {
     "Google": "FakeGoogleUpdate",
 }
 
+# write everything lowercase for comparation
+FAMILY_NAME_BLACKLIST = ['google', 'microsoft']
 
 class colors:
     BLACK_FG = '\033[30m'
