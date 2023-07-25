@@ -7,7 +7,7 @@ import regex as re
 from operator import attrgetter
 import rapidfuzz
 
-from .utils import flatmap, MalwareNameRemap, FAMILY_NAME_BLACKLIST
+from .utils import flatmap, MALWARE_NAME_REMAP, FAMILY_NAME_BLACKLIST
 from .vocab import (
     ARCHIVES,
     HEURISTICS,
@@ -99,7 +99,7 @@ class Analyses(UserDict):
         },
         taxon_weight=1 / 2,
     ):
-        malware_name_remap_keys = MalwareNameRemap.keys()
+        MALWARE_NAME_REMAP_KEYS = MALWARE_NAME_REMAP.keys()
 
         for engine, clf in self.items():
             weight = weights.get(engine, 1.0)
@@ -116,8 +116,8 @@ class Analyses(UserDict):
                 if name.lower() in FAMILY_NAME_BLACKLIST:
                     continue
 
-                if name in malware_name_remap_keys:
-                    name = MalwareNameRemap[name]
+                if name.lower() in MALWARE_NAME_REMAP_KEYS:
+                    name = MALWARE_NAME_REMAP[name.lower()]
 
                 if len(name) < 2:
                     weight = 0.0

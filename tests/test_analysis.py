@@ -1,6 +1,5 @@
-import pytest
-
 import polyunite
+import pytest
 
 TEST_BOUNTIES = [
     (
@@ -73,7 +72,7 @@ TEST_BOUNTIES = [
 
 TEST_BLACKLISTED_FAMILIES = [
     (
-        'Mepaow', ['trojan', 'backdoor'], {
+        'FakeGoogleUpdater', ['trojan', 'backdoor'], {
             'DrWeb': 'Win32.HLLW.Google.24576',
             'NanoAV': 'Trojan.Win32.Google.fvgiok',
             'Ikarus': 'Trojan.Win32.Mepaow'

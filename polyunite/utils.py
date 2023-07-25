@@ -7,16 +7,19 @@ EngineResults = Mapping[EngineName, str]
 
 """
 There are some malware names that we don't like, so
-we will remap them to a replacement name.
+we will remap them to a replacement name. There are
+other malware names that we want to unify to a common
+name.
 
-ORIG_NAME: NEW_NAME
+ORIG_NAME_lowercase: NEW_NAME
 """
-MalwareNameRemap = {
-    "Google": "FakeGoogleUpdate",
+MALWARE_NAME_REMAP = {
+    "google": "FakeGoogleUpdater",
 }
 
-# write everything lowercase for comparation
-FAMILY_NAME_BLACKLIST = ['google', 'microsoft']
+# write everything lowercase for comparison
+FAMILY_NAME_BLACKLIST = ['microsoft']
+
 
 class colors:
     BLACK_FG = '\033[30m'
