@@ -7,7 +7,7 @@ import regex as re
 from operator import attrgetter
 import rapidfuzz
 
-from .utils import flatmap
+from .utils import flatmap, MalwareNameRemap
 from .vocab import (
     ARCHIVES,
     HEURISTICS,
@@ -99,6 +99,8 @@ class Analyses(UserDict):
         },
         taxon_weight=1 / 2,
     ):
+        malware_name_remap_keys = MalwareNameRemap.keys()
+
         for engine, clf in self.items():
             weight = weights.get(engine, 1.0)
 
@@ -110,6 +112,9 @@ class Analyses(UserDict):
 
                 if not isinstance(name, str):
                     continue
+
+                if name in malware_name_remap_keys:
+                    name = MalwareNameRemap[name]
 
                 if len(name) < 2:
                     weight = 0.0

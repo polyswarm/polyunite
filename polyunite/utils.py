@@ -5,6 +5,17 @@ from collections.abc import Iterable
 EngineName = str
 EngineResults = Mapping[EngineName, str]
 
+"""
+There are some malware names that we don't like, so
+we will remap them to a replacement name.
+
+ORIG_NAME: NEW_NAME
+"""
+MalwareNameRemap = {
+    "Google": "FakeGoogleUpdate",
+}
+
+
 class colors:
     BLACK_FG = '\033[30m'
     RED_FG = '\033[31m'
