@@ -1,6 +1,5 @@
-import pytest
-
 import polyunite
+import pytest
 
 TEST_BOUNTIES = [
     (
@@ -70,6 +69,29 @@ TEST_BOUNTIES = [
         }
     ),
 ]
+
+TEST_BLACKLISTED_FAMILIES = [
+    (
+        'FakeGoogleUpdater', ['trojan', 'backdoor'], {
+            'DrWeb': 'Win32.HLLW.Google.24576',
+            'NanoAV': 'Trojan.Win32.Google.fvgiok',
+            'Ikarus': 'Trojan.Win32.Mepaow'
+        }
+    ),
+    (
+        'Qukart', ['trojan', 'backdoor', 'greyware', 'ransomware', 'virus', 'worm'], {
+            'Ikarus': 'possible-Threat.HackTool.Microsoft',
+            'Jiangmin': 'TrojanProxy.Qukart.dyoi',
+            'ClamAV': 'Html.Phishing.Microsoft-9851725-0',
+            'Alibaba': 'Trojan:PHP/Microsoft.639f4876',
+        }
+     ),
+]
+
+
+@pytest.mark.parametrize('family,_labels,results', TEST_BLACKLISTED_FAMILIES)
+def test_blacklisted_malware_family_name(family, _labels, results):
+    assert family == polyunite.infer_name(results)
 
 
 @pytest.mark.parametrize('family,_labels,results', TEST_BOUNTIES)

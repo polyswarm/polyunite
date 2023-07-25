@@ -31,12 +31,13 @@ setup(
     package_data={'polyunite': ['vocab/*.json']},
     setup_requires=[
         'pytest-runner',
+        'bumpversion',
     ],
     test_suite='tests',
     tests_require=[
         'pytest',
     ],
     url='https://github.com/polyscore/polyunite',
-    version='1.7.1',
+    version='1.8.0',
     zip_safe=True,
 )
