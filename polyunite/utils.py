@@ -15,6 +15,8 @@ ORIG_NAME_lowercase: NEW_NAME
 """
 MALWARE_NAME_REMAP = {
     "google": "FakeGoogleUpdater",
+    "qbot": "Qakbot",
+    "quakbot": "Qakbot"
 }
 
 # write everything lowercase for comparison

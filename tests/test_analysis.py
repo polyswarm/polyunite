@@ -70,14 +70,7 @@ TEST_BOUNTIES = [
     ),
 ]
 
-TEST_BLACKLISTED_FAMILIES = [
-    (
-        'FakeGoogleUpdater', ['trojan', 'backdoor'], {
-            'DrWeb': 'Win32.HLLW.Google.24576',
-            'NanoAV': 'Trojan.Win32.Google.fvgiok',
-            'Ikarus': 'Trojan.Win32.Mepaow'
-        }
-    ),
+TEST_BLACKLISTED_FAMILIES =  [
     (
         'Qukart', ['trojan', 'backdoor', 'greyware', 'ransomware', 'virus', 'worm'], {
             'Ikarus': 'possible-Threat.HackTool.Microsoft',
@@ -88,11 +81,35 @@ TEST_BLACKLISTED_FAMILIES = [
      ),
 ]
 
+TEST_REMAP_FAMILIES = [
+    (
+        'FakeGoogleUpdater', ['trojan', 'backdoor'], {
+            'DrWeb': 'Win32.HLLW.Google.24576',
+            'NanoAV': 'Trojan.Win32.Google.fvgiok',
+            'Ikarus': 'Trojan.Win32.Mepaow'
+        }
+    ),
+    (
+        'Qakbot', ['trojan', 'backdoor'], {
+            'Ikarus': 'Backdoor.QBot',
+        }
+    ),
+    (
+        'Qakbot', ['trojan', 'backdoor'], {
+            'ClamAV': 'Win.Dropper.Quakbot-9980616-1',
+        }
+    ),
+
+]
+
 
 @pytest.mark.parametrize('family,_labels,results', TEST_BLACKLISTED_FAMILIES)
 def test_blacklisted_malware_family_name(family, _labels, results):
     assert family == polyunite.infer_name(results)
 
+@pytest.mark.parametrize('family,_labels,results', TEST_REMAP_FAMILIES)
+def test_remap_malware_family_name(family, _labels, results):
+    assert family == polyunite.infer_name(results)
 
 @pytest.mark.parametrize('family,_labels,results', TEST_BOUNTIES)
 def test_guess_malware_name(family, _labels, results):
