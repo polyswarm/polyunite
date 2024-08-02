@@ -38,10 +38,10 @@ dev-pypi:
 ###############################################################
 # Test Stage
 ###############################################################
-test-py37:
+test-py310:
   tags:
     - kube-small-new
-  image: $REPO_URL/python:3.7-slim-buster
+  image: $REPO_URL/public/docker/library/python:3.10-slim-bullseye
   stage: test
   before_script:
     - pip install -q --upgrade pip setuptools wheel
