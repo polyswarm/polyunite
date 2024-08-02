@@ -1,24 +1,13 @@
 image: $REPO_URL/stage
 
-services:
-  - $REPO_URL/docker:dind
-
 stages:
   - build
   - test
   - release
 
-variables:
-  BASE_IMAGE_NAME: polyunite
-  DOCKER_HOST: tcp://localhost:2376
-  DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_TLS_VERIFY: 1
-  DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
-
 default:
   before_script:
-    - apt-get update -y && apt-get install -y git
-    - pip install -q --upgrade pip setuptools twine wheel bump2version
+    - pip install -q --upgrade pip
     - pip install -q $END_TO_END_LIB@$CI_COMMIT_REF_NAME || pip install -q $END_TO_END_LIB
     - e2e init
 
@@ -28,8 +17,9 @@ default:
 dev-pypi:
   tags:
     - kube-small-new
-  image: $REPO_URL/python:3.7-slim-buster
   stage: build
+  before_script:
+    - pip3 install -q --upgrade pip setuptools twine wheel bump2version
   script:
     - SHORT_SHA=$(git rev-parse --short HEAD) bumpversion --no-commit --no-tag local
     - python setup.py -q bdist_wheel
@@ -38,15 +28,17 @@ dev-pypi:
 ###############################################################
 # Test Stage
 ###############################################################
-test-py37:
+test-py310:
   tags:
     - kube-small-new
-  image: $REPO_URL/python:3.7-slim-buster
+  image: $REPO_URL/public/docker/library/python:3.10-slim-bullseye
   stage: test
   before_script:
     - pip install -q --upgrade pip setuptools wheel
   script:
-    - python setup.py test
+    - pip install -q pytest
+    - pip install .
+    - pytest -s -v
 
 ###############################################################
 # Release Stage
