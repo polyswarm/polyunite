@@ -17,8 +17,9 @@ default:
 dev-pypi:
   tags:
     - kube-small-new
-  image: $REPO_URL/python:3.7-slim-buster
   stage: build
+  before_script:
+    - pip3 install -q --upgrade pip setuptools twine wheel bump2version
   script:
     - SHORT_SHA=$(git rev-parse --short HEAD) bumpversion --no-commit --no-tag local
     - python setup.py -q bdist_wheel
