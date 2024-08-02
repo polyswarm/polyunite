@@ -1,8 +1,5 @@
 image: $REPO_URL/stage
 
-services:
-  - $REPO_URL/public/docker/library/docker:dind
-
 stages:
   - build
   - test
