@@ -36,7 +36,8 @@ test-py310:
   before_script:
     - pip install -q --upgrade pip setuptools wheel
   script:
-    - python setup.py test
+    - pip install .
+    - pytest -s -v
 
 ###############################################################
 # Release Stage
