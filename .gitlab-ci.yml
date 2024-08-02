@@ -36,6 +36,7 @@ test-py310:
   before_script:
     - pip install -q --upgrade pip setuptools wheel
   script:
+    - pip install -q pytest
     - pip install .
     - pytest -s -v
 
