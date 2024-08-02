@@ -5,17 +5,9 @@ stages:
   - test
   - release
 
-variables:
-  BASE_IMAGE_NAME: polyunite
-  DOCKER_HOST: tcp://localhost:2376
-  DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_TLS_VERIFY: 1
-  DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
-
 default:
   before_script:
-    - apt-get update -y && apt-get install -y git
-    - pip install -q --upgrade pip setuptools twine wheel bump2version
+    - pip install -q --upgrade pip
     - pip install -q $END_TO_END_LIB@$CI_COMMIT_REF_NAME || pip install -q $END_TO_END_LIB
     - e2e init
 
