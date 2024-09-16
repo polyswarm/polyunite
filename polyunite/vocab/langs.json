@@ -1,82 +1,115 @@
 {
-  "group": "LANGS",
+  "group_name": "LANGS",
   "children": {
-    "AutoIt": {
-      "description": "AutoIt automation language",
-      "match": [
-        "AutoIt",
-        "AutoIT"
-      ]
-    },
-    "AutoHotKey": {
-      "match": [
-        "AutohotKey",
-        "AHK"
-      ]
-    },
     "ABAP": {
       "description": "Advanced Business Application Programming scripts",
-      "match": [
+      "match-exact": [
         "ABAP"
       ]
     },
     "ALisp": {
       "description": "ALisp scripts",
-      "match": [
+      "match-exact": [
         "ALisp"
       ]
     },
     "ANSI": {
       "description": "American National Standards Institute scripts",
-      "match": [
+      "match-exact": [
         "ANSI"
       ]
     },
     "ASP": {
       "description": "Active Server Pages scripts",
-      "match": [
+      "match-exact": [
         "ASP"
       ]
     },
     "AmiPro": {
       "description": "AmiPro script",
-      "match": [
+      "match-exact": [
         "AmiPro"
       ]
     },
     "AppleScript": {
       "description": "compiled Apple scripts",
-      "match": [
+      "tags": {
+        "implementation-language": [
+          "applescript"
+        ]
+      },
+      "match-exact": [
         "AppleScript"
+      ]
+    },
+    "AutoHotKey": {
+      "match-exact": [
+        "AHK",
+        "AutohotKey"
+      ]
+    },
+    "AutoIt": {
+      "description": "AutoIt automation language",
+      "match-exact": [
+        "AutoIt",
+        "AutoIT"
       ]
     },
     "BAS": {
       "description": "Basic scripts",
-      "match": [
+      "match-exact": [
         "BAS"
       ]
     },
     "BAT": {
       "description": "Basic scripts",
-      "match": [
+      "match-exact": [
         "BAT"
+      ]
+    },
+    "COM": {
+      "description": "Component Object Model",
+      "match-exact": [
+        "COM",
+        "COM.EXE",
+        "ComObj"
       ]
     },
     "CS": {
       "description": "Uses the CorelScript interpreter found in many Corel products",
-      "match": [
+      "match-exact": [
         "CS"
+      ]
+    },
+    "PE_EXE": {
+      "description": "Microsoft's Personal Executable Binary",
+      "match-exact": [
+        "PE-EXE"
+      ],
+      "children": {
+        "windows_screensaver": {
+          "description": "Microsoft Windows Screensaver",
+          "match-exact": [
+            "WScr"
+          ]
+        }
+      }
+    },
+    "Golang": {
+      "match-exact": [
+        "Golang",
+        "WinGo"
       ]
     },
     "HTA": {
       "description": "HTML Application scripts",
-      "match": [
+      "match-exact": [
         "HTA"
       ]
     },
     "HTML": {
       "description": "HTML Application scripts",
-      "match": [
+      "match-exact": [
         "HTML",
         "iframe",
         "url"
@@ -84,173 +117,202 @@
     },
     "IDA": {
       "description": "Uses the IDA Pro application",
-      "match": [
+      "match-exact": [
         "IDA"
       ]
     },
     "IMAGE": {
       "description": "Image files",
-      "match": [
-        {
-          "pattern": "JPE?G"
-        },
-        {
-          "pattern": "IMG-[A-Z]+"
-        },
+      "match-exact": [
         "BMP",
         "GIF",
         "IMAGE",
         "PNG",
         "TIFF"
-      ]
-    },
-    "TXT": {
-      "description": "Text file",
-      "match": [
-        "TXT",
-        "Text",
-        "Text.File",
-        "Txt.File",
-        "Txt-File",
-        "Text-File",
-        "TxtFile",
-        "TextFile"
+      ],
+      "match-regex": [
+        "IMG-[A-Z]+",
+        "JPE?G"
       ]
     },
     "INF": {
       "description": "Uses Windows INF files",
-      "match": [
-        {
-          "pattern": "AutoRun[.-_]?INF"
-        },
+      "match-exact": [
         "INF"
+      ],
+      "match-regex": [
+        "AutoRun[.-_]?INF"
       ]
     },
     "INI": {
-      "description": "Uses mIRC INI files",
-      "match": [
+      "description": "INI config files",
+      "match-exact": [
         "INI"
-      ]
-    },
-    "IRC": {
-      "description": "mIRC/pIRC scripts",
-      "match": [
-        "IRC"
       ]
     },
     "JS": {
       "description": "Javascript scripts",
-      "match": [
+      "tags": {
+        "implementation-language": [
+          "javascript"
+        ]
+      },
+      "match-exact": [
+        "JS",
         "JSc",
         "jsc",
-        "JS"
+        "JSON",
+        "Script.JS"
       ]
     },
     "Java": {
       "description": "Java binaries (classes)",
-      "match": [
-        "Java",
+      "tags": {
+        "implementation-language": [
+          "java"
+        ]
+      },
+      "match-exact": [
+        "J2EE",
         "J2ME",
-        "OLE-JAR",
-        "J2EE"
+        "J2ME",
+        "Java",
+        "JSP",
+        "OLE-JAR"
       ]
     },
     "LOGO": {
       "description": "LOGO scripts",
-      "match": [
+      "match-exact": [
         "LOGO"
       ]
     },
     "MPB": {
       "description": "MapBasic scripts",
-      "match": [
+      "match-exact": [
         "MPB"
       ]
     },
     "MSH": {
       "description": "Monad shell scripts",
-      "match": [
+      "match-exact": [
         "MSH"
-      ]
-    },
-    "COM": {
-      "description": "Component Object Model",
-      "match": [
-        "COM",
-        "COM.EXE",
-        "ComObj"
       ]
     },
     "MSIL": {
       "description": ".Net intermediate language scripts",
-      "match": [
+      "match-exact": [
         "MSIL"
       ]
     },
     "MusicMaker": {
-      "match": [
+      "match-exact": [
         "MMM"
       ]
     },
     "PHP": {
       "description": "Hypertext Preprocessor scripts",
-      "match": [
+      "tags": {
+        "implementation-language": [
+          "php"
+        ]
+      },
+      "match-exact": [
         "PHP",
         "WordPress"
       ]
     },
     "PS": {
       "description": "Postscript",
-      "match": [
+      "match-exact": [
         "PS"
       ]
     },
     "Perl": {
       "description": "Perl scripts",
-      "match": [
+      "tags": {
+        "implementation-language": [
+          "perl"
+        ]
+      },
+      "match-exact": [
         "Perl"
       ]
     },
     "PowerShell": {
       "description": "Powershell",
-      "match": [
-        "PowerShell"
+      "tags": {
+        "implementation-language": [
+          "powershell"
+        ]
+      },
+      "match-exact": [
+        "PowerShell",
+        "PS1"
       ]
     },
     "Python": {
       "description": "Python scripts",
-      "match": [
+      "tags": {
+        "implementation-language": [
+          "python"
+        ]
+      },
+      "match-exact": [
         "Py2Exe",
         "Python"
       ]
     },
     "Ruby": {
       "description": "Ruby scripts",
-      "match": [
+      "tags": {
+        "implementation-language": [
+          "ruby"
+        ]
+      },
+      "match-exact": [
         "Ruby"
       ]
     },
     "SAP": {
       "description": "SAP platform scripts",
-      "match": [
+      "match-exact": [
         "SAP"
       ]
     },
     "SH": {
       "description": "Shell scripts",
-      "match": [
+      "match-exact": [
         "SH"
       ]
     },
     "SMS": {
       "description": "Uses Short Messaging System (SMS) messages",
-      "match": [
+      "match-exact": [
         "SMS"
+      ]
+    },
+    "TXT": {
+      "description": "Text file",
+      "match-exact": [
+        "Text",
+        "Text-File",
+        "Text.File",
+        "TextFile",
+        "TXT",
+        "Txt-File",
+        "Txt.File",
+        "TxtFile"
       ]
     },
     "VBS": {
       "description": "Visual Basic scripts",
-      "match": [
+      "tags": {
+        "implementation-language": [
+          "visual-basic"
+        ]
+      },
+      "match-exact": [
         "VB",
         "VBA",
         "VBS"
@@ -258,30 +320,36 @@
     },
     "WinBAT": {
       "description": "Winbatch scripts",
-      "match": [
-        "WinBAT",
-        "BATCH"
+      "match-exact": [
+        "BATCH",
+        "WinBAT"
       ]
     },
     "WinHlp": {
       "description": "Windows Help scripts",
-      "match": [
-        "WinHlp",
-        "hlp"
+      "match-exact": [
+        "hlp",
+        "WinHlp"
       ]
     },
     "WinLNK": {
       "description": "Windows shortcut",
-      "match": [
+      "match-exact": [
         "LNK",
         "WinLNK"
       ]
     },
     "WinREG": {
       "description": "Windows registry scripts",
-      "match": [
+      "match-exact": [
         "REG",
         "WinREG"
+      ]
+    },
+    "amd64": {
+      "match-exact": [
+        "amd64",
+        "x64"
       ]
     }
   }

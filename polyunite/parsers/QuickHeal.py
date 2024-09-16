@@ -1,9 +1,12 @@
-from ..vocab import FAMILY_ID, LABELS, PLATFORM, VARIANT_ID
+from ..vocab import FAMILY_ID, LABELS, PLATFORM, VARIANT_ID, pattern
 from ._base import Classification
 
 
 class QuickHeal(Classification):
-    pattern = rf"""^
+    __av_name__ = 'QuickHeal'
+    __patterns__ = (
+        pattern.EICAR_MATCH_ANYWHERE,
+        rf"""^
     (
         ([./]|^)
         ({PLATFORM}|{LABELS}(?&LABELS)?|Cmd|PIF|alware)
@@ -47,4 +50,5 @@ class QuickHeal(Classification):
             r'[.][A-Z]{1,3}[0-9]{1,2}',
             )}{{,2}}
     )?
-    $"""
+    $""",
+    )
