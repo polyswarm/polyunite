@@ -16,7 +16,7 @@ default:
 ###############################################################
 dev-pypi:
   tags:
-    - kube-small-new
+    - stage-kube-newer
   stage: build
   before_script:
     - pip3 install -q --upgrade pip setuptools twine wheel bump2version
@@ -30,7 +30,7 @@ dev-pypi:
 ###############################################################
 test-py310:
   tags:
-    - kube-small-new
+    - stage-kube-newer
   image: $REPO_URL/public/docker/library/python:3.10-slim-bullseye
   stage: test
   before_script:
@@ -45,7 +45,7 @@ test-py310:
 ###############################################################
 release-pypi:
   tags:
-    - kube-small-new
+    - stage-kube-newer
   stage: release
   only:
     - master
