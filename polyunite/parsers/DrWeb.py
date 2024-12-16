@@ -1,14 +1,18 @@
-from ..vocab import FAMILY_ID, LABELS, PLATFORM, VARIANT_ID
+from ..vocab import FAMILY_ID, LABELS, PLATFORM, VARIANT_ID, pattern
 from ._base import Classification
 
 
 class DrWeb(Classification):
-    pattern = rf"""^
+    __av_name__ = 'DrWeb'
+    __patterns__ = (
+        pattern.EICAR_MATCH_ANYWHERE,
+        rf"""^
     (
         (^|[.-]|\s)
         (
             (?!PWS[.]){LABELS}(?&LABELS)?
             | {PLATFORM}
+            | Nuke
             | STPAGE
         )
     )*
@@ -29,4 +33,5 @@ class DrWeb(Classification):
         )?
         {VARIANT_ID()}{{,2}}
     )
-    $"""
+    $""",
+    )
