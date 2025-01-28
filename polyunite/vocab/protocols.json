@@ -1,0 +1,38 @@
+{
+  "group_name": "PROTOCOLS",
+  "children": {
+    "FTP": {
+      "match-exact": [
+        "Server-FTP",
+        "FTP"
+      ]
+    },
+    "HTTP": {
+      "match-exact": [
+        "Server-HTTP",
+        "HTTP"
+      ]
+    },
+    "IRC": {
+      "description": "mIRC/pIRC scripts",
+      "match-exact": [
+        "Server-IRC",
+        "Client-IRC",
+        "IRC",
+        "mIRC"
+      ],
+      "children": {
+        "irc_worm": {
+          "tags": {
+            "malware-type": [
+              "worm"
+            ]
+          },
+          "match-exact": [
+            "IRC-Worm"
+          ]
+        }
+      }
+    }
+  }
+}

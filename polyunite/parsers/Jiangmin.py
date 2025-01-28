@@ -1,4 +1,6 @@
+from ..vocab import pattern
 from ..vocab import (
+    VOCABDEF,
     FAMILY_ID,
     HEURISTICS,
     LABELS,
@@ -10,25 +12,21 @@ from ._base import Classification
 
 
 class Jiangmin(Classification):
-    pattern = rf"""^
-    (
-        ([./:]|^)
-        (
-            {PLATFORM}
-            | Intended
-            | Garbage
-            | Riot
-            | {LABELS}(-?(?&LABELS))?
+    __av_name__ = 'Jiangmin'
+    __patterns__ = (
+        VOCABDEF,
+        pattern.EICAR_MATCH_ANYWHERE,
+        r"""
+        (?(DEFINE)
+            (?P<FAMILY>(?:PSW|AOL|MSN)[.][[:alnum:]]+|CVE-[0-9]+-[0-9]+|(?:Variant[.]\w+)|\w+)
+            (?P<VARIANT>(?:-based)?(?:[.][0-9]{1,2}[a-z])?(?:[.][0-9]+)?(?:[.][a-z]+)?([.](?:[A-Z][a-z]+))?)
         )
-    )*
-    (?P<VEID>
+        """,
+        rf"""^
         (
-            ([./]|^)
-            (
-                {FAMILY_ID(r'[A-Z][a-z]+-[0-9]')}
-                | [A-Z][a-z]{{1,2}}(?=[.])
-            )
-        )?
-        {VARIANT_ID()}{{,2}}
-    )?
-    $"""
+            (?&TYPES)[./](?&TYPES)[.](?&FAMILY)
+            | (?&TYPES)[./](?&FAMILY)
+        )
+        (?&VARIANT)
+        $""",
+    )

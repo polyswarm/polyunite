@@ -4,11 +4,14 @@ from typing import ClassVar, Set
 from collections.abc import Mapping
 import regex as re
 from sys import intern
+import logging
 
 from ..errors import MatchError
 from ..registry import EngineRegistry
 from ..utils import colors, group
 from ..vocab import (
+    VocabRegex,
+    EICAR_GROUP_NAME,
     ARCHIVES,
     HEURISTICS,
     LABELS,
@@ -18,17 +21,23 @@ from ..vocab import (
     OSES,
 )
 
+log = logging.getLogger(__name__)
 
 def extract_vocabulary(vocab, recieve=lambda m: next(m, None)):
     """Call `recieve` with a generator of all `vocab`'s matching label names"""
-    sublabels = frozenset(vocab.sublabels)
-    return property(lambda self: recieve(iter(sublabels.intersection(self._groups))))
+    def driver(self):
+        tags = self._fetch()
+        if vocab in tags:
+            return tags[vocab]
+        else:
+            return None
 
+    return property(driver)
 
-EICAR_GROUP_NAME = intern('EICAR')
 
 
 class Classification(Mapping):
+    __patterns__: 'ClassVar[Iterable[str]]'
     pattern: 'ClassVar[str]'
     regex: 'ClassVar[re.Pattern]'
     match: 're.Match'
@@ -41,7 +50,7 @@ class Classification(Mapping):
                 self.families = name
                 name = ','.join(self.families)
             self.match = self.regex.fullmatch(name, timeout=1, concurrent=False)
-            self._groups = frozenset(k for k, v in self.match.capturesdict().items() if any(v))
+            self._groups = frozenset(k for k, v in self.match.capturesdict().items() if v)
         except (AttributeError, TypeError):
             raise MatchError(name, self.__class__.__name__)
 
@@ -55,10 +64,27 @@ class Classification(Mapping):
         cls.regex = cls._compile_pattern()
         cls.registration = EngineRegistry.register(cls, cls.__name__)
 
+    def _fetch(self):
+        if 'tags' not in self.__dict__:
+            all_tags = dict()
+            for group in self._groups:
+                if group in VocabRegex.groups:
+                    for tagname, tags in VocabRegex.groups[group].tags.items():
+                        all_tags.setdefault(tagname, set())
+                        all_tags[tagname] |= set(tags)
+            self.__dict__['tags'] = all_tags
+        return self.__dict__['tags']
+
     @classmethod
     def _compile_pattern(cls):
-        pat = group(rf'(?P<nonmalware>.*(?P<{EICAR_GROUP_NAME}>(?i:EICAR)).*)', cls.pattern)
-        return re.compile(pat, re.ASCII | re.VERBOSE | re.V1)
+        try:
+            return re.compile(group(*cls.__patterns__), re.ASCII | re.VERBOSE | re.V1)
+        except re.error as e:
+            print(e.pattern)
+            begin = e.pattern.rfind('\n', 0, e.pos)
+            end = e.pattern.find('\n', e.pos)
+            log.exception('%s:\n%s\n', e.msg, e.pattern[begin + 1:end])
+            raise
 
     def __getitem__(self, k):
         if k in self:
@@ -79,11 +105,14 @@ class Classification(Mapping):
         """Build a `Classification` from the raw malware name provided by this engine"""
         return cls(name)
 
-    operating_system = extract_vocabulary(OSES)
-    language = extract_vocabulary(LANGS)
-    macro = extract_vocabulary(MACROS)
-    obfuscations = extract_vocabulary(OBFUSCATIONS, recieve=set)
-    labels = extract_vocabulary(LABELS, recieve=set)
+    operating_system = extract_vocabulary('operating-system')
+    archive_types = extract_vocabulary('archive-type')
+    platform = extract_vocabulary('platform')
+    language = extract_vocabulary('implementation-language')
+    behaviors = extract_vocabulary('behavior')
+    macro = extract_vocabulary('platform')
+    # obfuscations = extract_vocabulary(OBFUSCATIONS, recieve=set)
+    labels = extract_vocabulary('malware-type')
 
     @property
     def name(self) -> str:

@@ -1,11 +1,15 @@
-import regex as re
-
-from ..vocab import TYPES
+from ..vocab import pattern, VOCABDEF
 from ._base import Classification
 
+base_pattern = rf"^(?P<K7KIND>(?&TYPES)|[\w-]+)(?P<VEID>\s+\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?\s*$"
 
 class K7(Classification):
-    pattern = rf"^(?P<K7KIND>{TYPES}|[\w-]+)(?P<VEID>\s+\(\s*(?P<VARIANT>[a-f0-9]+)\s*\))?\s*$"
+    __av_name__ = 'K7'
+    __patterns__ = (
+        VOCABDEF,
+        pattern.EICAR_MATCH_ANYWHERE,
+        base_pattern
+    )
 
     @property
     def family(self):
