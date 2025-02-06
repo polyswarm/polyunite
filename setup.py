@@ -23,7 +23,7 @@ setup(
         'rapidfuzz>=1.0',
     ],
     long_description='file: README.rst',
-    long_description_content_type='rst',
+    long_description_content_type='text/x-rst',
     include_package_data=True,
     keywords='polyunite',
     name='polyunite',
