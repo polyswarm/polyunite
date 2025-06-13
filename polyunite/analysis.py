@@ -82,9 +82,9 @@ class Analyses(UserDict):
     def _weighted_names(
         self,
         weights={
-            'familytag': 100000,
-            'triagesandbox': 10000,
-            'capesandbox': 1000,
+            'familytag': 1000,
+            'triagesandbox': 100000,
+            'capesandbox': 10000,
         },
         name_weights={
             LABELS.compile(1, 0).fullmatch: 1 / 8,
