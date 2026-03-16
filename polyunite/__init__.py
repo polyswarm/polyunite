@@ -1,3 +1,5 @@
+__version__ = '2.0.1'
+
 from . import errors, parsers, registry, vocab, analysis  # noqa
 
 Registry = registry.EngineRegistry()
