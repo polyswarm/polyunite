@@ -1,3 +1,63 @@
 [build-system]
-requires = ["setuptools >= 64"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "polyunite"
+version = "2.0.1"
+description = "polyunite parses a variety of antimalware vendor's classification strings"
+authors = [
+    { name = "PolySwarm Developers", email = "developers@polyswarm.io" },
+]
+license = { text = "MIT" }
+urls = { Homepage = "https://github.com/polyswarm/polyunite" }
+requires-python = ">=3.8"
+classifiers = [
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+dependencies = [
+    "regex>=2020.11.13",
+    "rapidfuzz>=1.0",
+]
+
+[project.scripts]
+main = "polyunite.polyunite:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["polyunite", "polyunite.*"]
+
+[tool.setuptools.package-data]
+polyunite = ["vocab/*.json"]
+
+[tool.bumpversion]
+current_version = "2.0.1"
+commit = true
+tag = false
+sign_tags = true
+tag_name = "{new_version}"
+parse = '^(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?:\.dev(?P<dev>\d+))?(?:\+(?P<local>[a-z0-9]+(?:\.[a-z0-9]+)*))?$'
+serialize = [
+  "{major}.{minor}.{patch}.dev{dev}+{short_commit_sha}",
+  "{major}.{minor}.{patch}"
+]
+
+[tool.bumpversion.parts.dev]
+first_value = "0"
+optional_value = "0"
+
+[[tool.bumpversion.files]]
+filename = "polyunite/__init__.py"
+search = "__version__ = '{current_version}'"
+replace = "__version__ = '{new_version}'"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

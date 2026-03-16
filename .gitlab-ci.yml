@@ -1,41 +1,26 @@
-image: $REPO_URL/stage
-
-stages:
-  - build
-  - test
-  - release
-
-default:
-  before_script:
-    - pip install -q --upgrade pip
-    - pip install -q $END_TO_END_LIB@$CI_COMMIT_REF_NAME || pip install -q $END_TO_END_LIB
-    - e2e init
+include:
+  - project: 'externalci/ci-image'
+    ref: master
+    file: '.gitlab-ci-default.yaml'
 
 ###############################################################
-# Build Stage (jobs inside a stage run in parallel)
+# Build Stage
 ###############################################################
+
 dev-pypi:
-  tags:
-    - stage-kube-newer
-  stage: build
-  before_script:
-    - pip3 install -q --upgrade pip setuptools twine wheel bump2version
-  script:
-    - SHORT_SHA=$(git rev-parse --short HEAD) bumpversion --no-commit --no-tag local
-    - python setup.py -q bdist_wheel
-    - twine upload --skip-existing --disable-progress-bar --non-interactive dist/*
+  extends: .dev-pypi
 
 ###############################################################
 # Test Stage
 ###############################################################
-test-py310:
+
+test:
+  stage: test
   tags:
     - stage-kube-newer
-  image: $REPO_URL/public/docker/library/python:3.10-slim-bullseye
-  stage: test
-  before_script:
-    - pip install -q --upgrade pip setuptools wheel
+  image: public.ecr.aws/docker/library/python:3.10-slim-bullseye
   script:
+    - pip install -q --upgrade pip
     - pip install -q pytest
     - pip install .
     - pytest -s -v
@@ -43,12 +28,8 @@ test-py310:
 ###############################################################
 # Release Stage
 ###############################################################
+
 release-pypi:
-  tags:
-    - stage-kube-newer
-  stage: release
+  extends: .release-pypi
   only:
     - master
-  script:
-    # release to internal pypi but do not tag yet
-    - e2e release --skip-tag --remote https://github.com/polyswarm/$CI_PROJECT_NAME.git
