@@ -1,9 +1,12 @@
-from ..vocab import FAMILY_ID, LABELS, VARIANT_ID
+from ..vocab import FAMILY_ID, LABELS, VARIANT_ID, pattern
 from ._base import Classification
 
 
 class URLHaus(Classification):
-    pattern = rf"""^
+    __av_name__ = 'URLHaus'
+    __patterns__ = (
+        pattern.EICAR_MATCH_ANYWHERE,
+        rf"""^
     {LABELS}?
     (?P<VEID>
         (
@@ -12,4 +15,5 @@ class URLHaus(Classification):
         )?
         {VARIANT_ID()}*
     )
-    $"""
+    $""",
+    )

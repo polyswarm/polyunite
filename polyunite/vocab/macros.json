@@ -1,182 +1,207 @@
 {
-  "group": "MACROS",
+  "group_name": "MACROS",
   "children": {
     "ACAD": {
       "description": "Uses the AutoCAD application",
-      "match": [
+      "match-exact": [
+        "ACAD",
         "AutoCAD",
-        "AutoLisp",
-        "ACAD"
+        "AutoLisp"
       ]
     },
     "ASX": {
       "description": "XML metafile of Windows Media .asf files",
-      "match": [
+      "match-exact": [
         "ASX"
+      ]
+    },
+    "CRX": {
+      "description": "Chrome extension",
+      "match-exact": [
+        "CRX"
+      ]
+    },
+    "FONT": {
+      "description": "Font files",
+      "match-exact": [
+        "FONT",
+        "TTF"
       ]
     },
     "HC": {
       "description": "HyperCard Apple scripts",
-      "match": [
+      "match-exact": [
         "HC"
       ]
     },
     "HE": {
       "description": "macro scripting",
-      "match": [
+      "match-exact": [
         "HE"
       ]
     },
     "MIME": {
       "description": "MIME packets",
-      "match": [
+      "match-exact": [
         "MIME"
-      ]
-    },
-    "CRX": {
-      "description": "Chrome extension",
-      "match": [
-        "CRX"
       ]
     },
     "MSControlPanel": {
       "description": "Microsoft Control Panel File",
-      "match": [
+      "match-exact": [
         "Cpl"
       ]
     },
     "MSOffice": {
       "description": "Microsoft Office files",
-      "match": [
-        {
-          "pattern": "(?i:MS(Excel|Word|Powerpoint|Outlook)((20)?\\d\\d)?)"
-        },
-        {
-          "pattern": "(?i:Office((20)?\\d\\d)?)"
-        },
+      "tags": {
+        "platform": [
+          "microsoft-office"
+        ]
+      },
+      "match-exact": [
         "Doc",
-        "MSOffice",
-        "SAgent",
-        "macro",
-        "macro.excel",
-        "macro.word"
+        "Office.Doc",
+        "Macro",
+        "MSGate",
+        "SAgent"
+      ],
+      "match-regex": [
+        "(?:MS[.-]?)?(?:Office|Excel|Word|Powerpoint|Outlook)(?:XP|1997|97|1995|95|2000|2003|2007|2010|2013|2016|2020)?"
       ],
       "children": {
         "A97M": {
           "description": "Access 97, 2000, XP, 2003, 2007, and 2010 macros",
-          "match": [
+          "match-exact": [
             "A97M"
           ]
         },
         "AM": {
           "description": "Runs as a VBA macro in the Microsoft Access application (version 97 or later)",
-          "match": [
+          "match-exact": [
             "AM"
           ]
         },
         "CM": {
           "description": "Runs as a VBA macro in the Corel Draw! application (version 9.0 or later)",
-          "match": [
+          "match-exact": [
             "CM"
           ]
         },
         "O97M": {
           "description": "Office 97, 2000, XP, 2003, 2007, and 2010 macros - those that affect Word, Excel, and Powerpoint",
-          "match": [
+          "match-exact": [
+            "O2000M",
+            "O2007M",
+            "O2020M",
             "O97",
             "O97M",
             "Office2k"
           ]
         },
-        "OM": {
-          "description": "Uses or runs in two or more applications in the Office 97 suite or later, including related products (Visio, Projects)",
-          "match": [
-            "OM"
-          ]
-        },
         "OLE": {
           "description": "Object linking and embedding",
-          "match": [
-            "OleNative",
+          "match-exact": [
             "OLE",
-            "OLE2"
+            "OLE2",
+            "OleNative"
+          ]
+        },
+        "OM": {
+          "description": "Uses or runs in two or more applications in the Office 97 suite or later, including related products (Visio, Projects)",
+          "match-exact": [
+            "OM"
           ]
         },
         "PP97M": {
           "description": "PowerPoint 97, 2000, XP, 2003, 2007, and 2010 macros",
-          "match": [
+          "match-exact": [
+            "P2000M",
+            "P2007M",
+            "P2020M",
             "PP97M"
           ]
         },
         "PPM": {
           "description": "Runs as a VBS macro in Microsoft PowerPoint (version 97 or later)",
-          "match": [
+          "match-exact": [
             "PPM"
           ]
         },
         "PUM": {
           "description": "Runs as a VBS macro in Microsoft Publisher (version 97 or later)",
-          "match": [
+          "match-exact": [
             "PUM"
           ]
         },
         "V5M": {
           "description": "Visio5 macros",
-          "match": [
+          "match-exact": [
             "V5M"
           ]
         },
         "W1M": {
           "description": "Word1Macro",
-          "match": [
+          "match-exact": [
             "W1M"
           ]
         },
         "W2M": {
           "description": "Word2Macro",
-          "match": [
+          "match-exact": [
             "W2M"
           ]
         },
         "W42": {
           "description": "Word2Macro",
-          "match": [
+          "match-exact": [
             "W42"
           ]
         },
         "W97M": {
           "description": "Word 97, 2000, XP, 2003, 2007, and 2010 macros",
-          "match": [
-            "Word97",
-            "W97M"
+          "match-exact": [
+            "Macro.Word",
+            "W2000M",
+            "W2007M",
+            "W2020M",
+            "W97M",
+            "Word",
+            "Word97"
           ]
         },
         "WM": {
           "description": "Word 95 macros",
-          "match": [
+          "match-exact": [
             "WM"
           ]
         },
         "X97M": {
           "description": "Excel 97, 2000, XP, 2003, 2007, and 2010 macros",
-          "match": [
+          "match-exact": [
+            "Excel",
+            "Macro.Excel",
+            "X2000M",
+            "X2003M",
+            "X2007M",
+            "X2010M",
             "X97M"
           ]
         },
         "XF": {
           "description": "Excel formulas",
-          "match": [
+          "match-exact": [
             "XF"
           ]
         },
         "XM": {
           "description": "Excel 95 macros",
-          "match": [
+          "match-exact": [
             "XM"
           ]
         },
         "Xls": {
-          "match": [
+          "match-exact": [
             "Xls"
           ]
         }
@@ -184,83 +209,78 @@
     },
     "Netware": {
       "description": "Novell Netware files",
-      "match": [
+      "match-exact": [
         "Netware"
       ]
     },
     "PASSWD": {
       "description": "Unix PASSWD",
-      "match": [
+      "match-exact": [
         "PASSWD"
       ]
     },
     "PDF": {
       "description": "Portable document format",
-      "match": [
+      "match-exact": [
         "PDF",
+        "PDF.DOC",
         "pdfjs"
       ]
     },
     "QT": {
       "description": "Quicktime files",
-      "match": [
+      "match-exact": [
         "QT"
       ]
     },
     "RTF": {
       "description": "Rich-text format",
-      "match": [
-        "RTF"
+      "match-exact": [
+        "RTF",
+        "RTF.DOC"
       ]
     },
     "SB": {
       "description": "StarBasic (Staroffice XML) files",
-      "match": [
+      "match-exact": [
         "SB"
       ]
     },
     "SWF": {
       "description": "Shockwave Flash files",
-      "match": [
+      "match-exact": [
         "SWF"
       ]
     },
     "TSQL": {
       "description": "MS SQL server files",
-      "match": [
+      "match-exact": [
         "TSQL"
-      ]
-    },
-    "FONT": {
-      "description": "Font files",
-      "match": [
-        "FONT",
-        "TTF"
       ]
     },
     "WMA": {
       "description": "Runs as a Windows media Audio file (usually disguised as mp3)",
-      "match": [
+      "match-exact": [
         "WMA"
       ]
     },
     "WMV": {
       "description": "Runs as a Windows media Video file (usually disguised as avi)",
-      "match": [
+      "match-exact": [
         "WMV"
       ]
     },
     "WinHEX": {
       "description": "Uses WinHex",
-      "match": [
+      "match-exact": [
         "WinHEX"
       ]
     },
     "XML": {
       "description": "XML files",
-      "match": [
-        "XML",
-        "xfa"
+      "match-exact": [
+        "xfa",
+        "XML"
       ]
     }
   }

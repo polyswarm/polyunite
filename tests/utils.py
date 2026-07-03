@@ -9,7 +9,7 @@ import polyunite
 
 
 @contextmanager
-def open_fixture(filename, rootdir=os.path.join(os.path.dirname(__file__), 'fixtures')):
+def open_fixture(filename, rootdir=os.path.join(os.path.dirname(os.path.dirname(__file__)), 'tests/fixtures')):
     name, _ = os.path.splitext(filename)
 
     with ZipFile(os.path.join(rootdir, name + '.zip'), mode='r') as zf:
@@ -23,6 +23,9 @@ def read_result_fixtures():
 
 
 def read_family_fixtures(only=None):
+    if only:
+        only = [o.lower() for o in only]
+
     with open_fixture('engine_families.csv') as fixtures:
         rows = csv.reader(fixtures)
 
@@ -32,7 +35,7 @@ def read_family_fixtures(only=None):
             raise ValueError("Invalid CSV Header: %s" % hdr)
 
         if only:
-            rows = filter(lambda row: row[0] in only, rows)
+            rows = filter(lambda row: row[0].lower() in only, rows)
 
         yield from rows
 

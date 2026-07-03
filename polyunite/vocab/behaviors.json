@@ -1,0 +1,277 @@
+{
+  "group_name": "BEHAVIORS",
+  "children": {
+    "anti_firewall": {
+      "tags": {
+        "behavior": [
+          "disable-firewall"
+        ]
+      },
+      "match-exact": [
+        "AntiFW"
+      ]
+    },
+    "anti_virtual_machine": {
+      "tags": {
+        "malware-capabilities": [
+          "anti-vm"
+        ]
+      },
+      "match-exact": [
+        "AntiVM"
+      ]
+    },
+    "antiarj": {
+      "match-exact": [
+        "AntiArj"
+      ]
+    },
+    "autorun": {
+      "tags": {
+        "behavior": [
+          "persist-after-system-reboot"
+        ]
+      },
+      "match-exact": [
+        "Autorun"
+      ],
+      "match-regex": [
+        "Autorunn?er[0-9]?"
+      ]
+    },
+    "capture_system_memory": {
+      "tags": {
+        "behavior": [
+          "capture-system-memory"
+        ]
+      },
+      "match-exact": [
+        "MemScan"
+      ],
+      "match-regex": [
+        "MemScan(?:Trojan|Backdoor)"
+      ]
+    },
+    "certificate": {
+      "match-exact": [
+        "Revoked.Certificate",
+        "Untrusted.Certificate"
+      ]
+    },
+    "code_encryption": {
+      "description": "Encryption of the malware instance code.",
+      "match-exact": [
+        "code-encryption",
+        "encoder",
+        "encpk",
+        "EXEHeader.AntiArj",
+        "kryptk",
+        "malcrypt",
+        "PE-Encrypt"
+      ],
+      "match-regex": [
+        "[KkCc]rypt(?:ed|er|ic|or|ik)?"
+      ]
+    },
+    "erase_data": {
+      "tags": {
+        "behavior": [
+          "erase-data"
+        ]
+      },
+      "match-exact": [
+        "KillFiles"
+      ]
+    },
+    "evades_av": {
+      "tags": {
+        "malware-capabilities": [
+          "evades-av"
+        ]
+      },
+      "match-exact": [
+        "AVKill",
+        "Countermeasure",
+        "KillAV"
+      ],
+      "match-regex": [
+        "AV[-._]?Killer"
+      ]
+    },
+    "exfiltrates_data": {
+      "description": "able to gather, prepare, (possibly obfuscate) data and transmit it to exfiltration points.",
+      "tags": {
+        "malware-capabilities": [
+          "exfiltrates-data"
+        ]
+      },
+      "match-exact": [
+        "Notifier"
+      ],
+      "children": {
+        "exfiltrates_data_trojan": {
+          "tags": {
+            "malware-type": [
+              "trojan"
+            ]
+          },
+          "match-regex": [
+            "Trojan[.-]?Notifier"
+          ]
+        }
+      }
+    },
+    "generic": {
+      "match-exact": [
+        "Gen",
+        "Generic",
+        "Heuri",
+        "Heuristic",
+        "Heuristics"
+      ]
+    },
+    "hidden": {
+      "description": "Hidden code",
+      "match-exact": [
+        "binder",
+        "patched"
+      ]
+    },
+    "intercept_manipulate_network_traffic": {
+      "description": "Intercepts and/or manipulates network traffic going to or originating from the system on which the malware instance is executing.",
+      "tags": {
+        "behavior": [
+          "intercept-manipulate-network-traffic"
+        ]
+      },
+      "match-exact": [
+        "Sniffer"
+      ],
+      "children": {
+        "intercept_manipulate_network_traffic_trojan": {
+          "tags": {
+            "malware-type": [
+              "trojan"
+            ]
+          },
+          "match-regex": [
+            "Trojan[.-]?Sniffer"
+          ]
+        }
+      }
+    },
+    "kill_process": {
+      "tags": {
+        "malware-action": [
+          "kill-process"
+        ]
+      },
+      "match-exact": [
+        "ProcessKiller",
+        "KillProc"
+      ]
+    },
+    "kill_windows": {
+      "tags": {
+        "malware-action": [
+          "kill-windows"
+        ]
+      },
+      "match-exact": [
+        "KillWin"
+      ]
+    },
+    "network_traffic_redirector": {
+      "tags": {
+        "behavior": [
+          "intercept-manipulate-network-traffic"
+        ]
+      },
+      "match-exact": [
+        "Redirector"
+      ]
+    },
+    "packing": {
+      "description": "Packing of the malware instance code, not including encryption.",
+      "match-exact": [
+        "aspack",
+        "asprotect",
+        "badPE",
+        "fsg",
+        "genpack",
+        "imptbl",
+        "kriz",
+        "magistr",
+        "malob",
+        "malpack",
+        "matchicon",
+        "md5sect",
+        "nspack",
+        "obfus",
+        "obfusc",
+        "Obfuscated",
+        "Pack",
+        "packing",
+        "parite",
+        "pecompact",
+        "pespin",
+        "petite",
+        "polipos",
+        "suspiciouspacker",
+        "swizzor",
+        "themida",
+        "upack",
+        "upx",
+        "vbpack",
+        "vmprotect",
+        "wwpack",
+        "xpack",
+        "zpack"
+      ],
+      "match-regex": [
+        "[pP]acke[dr][0-9]*",
+        "obfuscat(?:e|ed|or|ed|ing)"
+      ],
+      "children": {
+        "packing_trojan": {
+          "tags": {
+            "malware-type": [
+              "trojan"
+            ]
+          },
+          "match-regex": [
+            "Trojan[.-]?Crypter"
+          ]
+        }
+      }
+    },
+    "suspicious": {
+      "description": "Suspicious behavior without signature match",
+      "match-exact": [
+        "Abuse-Worry",
+        "confidence",
+        "DangerousObject",
+        "highconfidence",
+        "possible-Threat",
+        "reputation",
+        "suspicious",
+        "threat",
+        "variant",
+        "Mailfinder",
+        "Obscure"
+      ],
+      "match-regex": [
+        "(?:variant\\s?of|looks\\s?like|behaves\\s?like|suspect(?:ed)?|probabl[ey]|modification(?:\\sof)?|possibl[ey])",
+        "\\bSusp?\\b",
+        "^Sus(?=[.])",
+        "Suspect[0-9]?"
+      ]
+    },
+    "unpacked": {
+      "description": "Upacked binary or code from the original malware",
+      "match-exact": [
+        "unpacked"
+      ]
+    }
+  }
+}

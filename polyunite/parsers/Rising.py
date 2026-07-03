@@ -1,11 +1,14 @@
 import regex as re
 
-from ..vocab import FAMILY_ID, LABELS, PLATFORM, SUFFIXES, VARIANT_ID
+from ..vocab import FAMILY_ID, LABELS, PLATFORM, SUFFIXES, VARIANT_ID, pattern
 from ._base import Classification
 
 
 class Rising(Classification):
-    pattern = rf"""^
+    __av_name__ = 'Rising'
+    __patterns__ = (
+        pattern.EICAR_MATCH_ANYWHERE,
+        rf"""^
     (
         ([./-]|^)
         (
@@ -57,7 +60,8 @@ class Rising(Classification):
             r'[#][A-Z][A-Z0-9]+',
             r'/[A-Z][A-Z0-9]',
             r'[!]tfe',
-            r'[@](CV|EP|URL|VE)',
+            r'[@](CV|EP|URL|VE|ML)',
         )}*
     )
-    $"""
+    $""",
+    )

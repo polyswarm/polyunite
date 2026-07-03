@@ -1,4 +1,4 @@
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Optional, ClassVar, Dict
 
 from functools import lru_cache
 import json
@@ -14,29 +14,25 @@ class VocabRegex:
     children: 'List[VocabRegex]'
     description: 'Optional[str]'
     aliases: 'List[str]'
+    groups: 'ClassVar[Dict[str, VocabRegex]]' = dict()
+
 
     def __init__(self, name, fields, *, parent=None):
         self.name = name
         self.parent = parent
         self.group_name = name
 
+        if self.group_name:
+            self.__class__.groups[self.group_name] = self
+
         if isinstance(fields, dict):
-            self.match = [{'const': v} if isinstance(v, str) else v for v in fields.get('match', [])]
-            self.tags = {f.lower() for f in fields.get('tags', [])}
+            self.aliases = list(map(re.escape, filter(None, fields.get('match-exact', []))))
+            self.patterns = list(filter(None, fields.get('match-regex', [])))
+            self.tags = fields.get('tags', dict())
             self.description = fields.get('description', None)
             self.children = [VocabRegex(n, v, parent=self) for n, v in fields.get('children', dict()).items()]
         else:
             raise ValueError(name, fields)
-
-    @property
-    def aliases(self):
-        """All identifying case-insensitive strings"""
-        return map(re.escape, filter(None, (m.get('const') for m in self.match)))
-
-    @property
-    def patterns(self):
-        """All identifying regular expressions"""
-        return filter(None, (m.get('pattern') for m in self.match))
 
     @lru_cache(typed=True)
     def compile(self, start: 'int' = 0, end: 'int' = 1) -> 're.Pattern':
@@ -47,12 +43,19 @@ class VocabRegex:
         """Convert this grouped regular expression pattern"""
         use_group_name = start <= self.depth <= end
         name = self.group_name if use_group_name else None
-        if any(self.match) or any(self.children):
+        if self.aliases or self.patterns or self.children:
             return group(
                 *(c.pattern(start, end) for c in self.children),
                 *self.aliases,
                 *self.patterns,
                 name=name,
+            )
+
+    def literals(self):
+        if self.aliases or self.children:
+            return group(
+                *(c.literals() for c in self.children),
+                *self.aliases,
             )
 
     def iter(self) -> 'Iterator[VocabRegex]':
@@ -70,7 +73,7 @@ class VocabRegex:
 
     def __format__(self, spec) -> 'str':
         """Format this vocabulary as a regular expression, accepts `-g` to remove groups and `-i` for case-sensitivity"""
-        pat = self.pattern(start=1, end=0) if spec and '-g' in spec else self.pattern()
+        pat = self.pattern(start=1, end=16) if spec and '-g' in spec else self.pattern()
         return pat if spec and '-i' in spec else '(?i:{})'.format(pat)
 
     def __str__(self):
@@ -85,7 +88,7 @@ class VocabRegex:
 
     def has_tag(self, tag):
         """Check if this vocabulary has an associated tag"""
-        return tag.lower() in self.tags
+        return tag in self.tags
 
     @classmethod
     def from_resource(cls, name: 'str') -> 'VocabRegex':

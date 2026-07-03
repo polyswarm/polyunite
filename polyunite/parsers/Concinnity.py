@@ -1,9 +1,12 @@
-from ..vocab import LABELS, PLATFORM
+from ..vocab import LABELS, PLATFORM, pattern
 from ._base import Classification
 
 
 class Concinnity(Classification):
-    pattern = rf"""^
+    __av_name__ = 'Concinnity'
+    __patterns__ = (
+        pattern.EICAR_MATCH_ANYWHERE,
+        rf"""^
     (([.]|^)
      (
         {PLATFORM}
@@ -14,7 +17,8 @@ class Concinnity(Classification):
           )
      )
     )*
-    $"""
+    $""",
+    )
 
     @property
     def name(self):

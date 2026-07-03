@@ -1,4 +1,5 @@
 from ..vocab import (
+    pattern,
     ARCHIVES,
     FAMILY_ID,
     HEURISTICS,
@@ -15,7 +16,10 @@ from ._base import Classification
 
 
 class Lionic(Classification):
-    pattern = rf"""^
+    __av_name__ = 'Lionic'
+    __patterns__ = (
+        pattern.EICAR_MATCH_ANYWHERE,
+        rf"""^
     (
         (^|[.])
         (
@@ -42,4 +46,5 @@ class Lionic(Classification):
         )?
         {VARIANT_ID(r'[.][[:alnum:]][!][[:alnum:]]$')}*
     )
-    $"""
+    $""",
+    )

@@ -35,24 +35,14 @@ def section(name, file=sys.stdout):
 
 def format_match(vr, colorized=True):
     return ' | '.join((
-        '{:<10}',
-        '{:1}',
-        '{:<10.10}',
-        '{:<9.9}',
-        '{:<10.10}',
-        '{:45}',
-        '{:>25.25}',
-        '{}',
-    )).format(
-        vr.registration,
-        vr.is_heuristic and 'H' or '',
-        vr.operating_system or '',
-        vr.language or '',
-        vr.macro or '',
-        ', '.join(vr.labels),
-        vr.name,
+        f'{vr.registration:<10}',
+        'T' if vr.is_heuristic else 'F',
+        f'{" ".join(vr.operating_system or "")!s:<13.13}',
+        f'{" ".join(vr.language or "")!s:<13.13}',
+        f'{" ".join(vr.labels or "")!s:<45.45}',
+        f'{vr.name:>25.25}',
         vr.colorize() if colorized else vr.source,
-    )
+    ))
 
 
 try:
